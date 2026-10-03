@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rod Simulation and Cable Manipulation</title>
+  <meta name="description" content="Research demonstrations from an ongoing simulation and robotics project at UCLA.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="https://yukunethanzhou.github.io/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
+  <style>
+    :root {
+      --text: #494e52;
+      --text-light: #7a8288;
+      --border: #f2f3f3;
+      --bg: #fff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #e2e4e6;
+        --text-light: #a0a6ab;
+        --border: #3a3f44;
+        --bg: #1d1f21;
+      }
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    @media (min-width: 768px) {
+      html {
+        font-size: 18px;
+      }
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: -apple-system, ".SFNSText-Regular", "San Francisco", "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .standalone-project {
+      width: calc(100% - 2rem);
+      max-width: 64rem;
+      margin: 0 auto;
+      padding: 4rem 0;
+    }
+
+    .standalone-project__header,
+    .media-page__intro,
+    .media-gallery {
+      max-width: 48rem;
+      margin-right: auto;
+      margin-left: auto;
+    }
+
+    .standalone-project__header {
+      margin-bottom: 2rem;
+    }
+
+    .standalone-project__header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      line-height: 1.15;
+    }
+
+    .media-page__intro {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      color: var(--text-light);
+    }
+
+    .media-gallery__item {
+      margin: 0 0 1.75rem;
+    }
+
+    .media-gallery__item figcaption {
+      margin-top: 0.55rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .media-gallery__media video {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      border: 1px solid var(--border);
+      border-radius: 0.35rem;
+      background: #000;
+    }
+
+    @media (max-width: 767px) {
+      .standalone-project {
+        padding: 2.5rem 0;
+      }
+
+      .standalone-project__header h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="standalone-project" id="main">
+    <header class="standalone-project__header">
+      <h1>Rod Simulation and Cable Manipulation</h1>
+    </header>
+
+    <section class="standalone-project__content">
+      <p class="media-page__intro">Research demonstrations from my ongoing simulation and robotics project at UCLA.</p>
+
+      <div class="media-gallery">
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="Piper Shape Control">
+              <source src="videos/piper-shape-control.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>Piper Shape Control</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="Franka Shape Control with MPC">
+              <source src="videos/franka-shape-control-mpc.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>Franka Shape Control with MPC</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="Franka Cable Pickup with DER">
+              <source src="videos/franka-cable-pickup-der.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>Franka Cable Pickup with DER</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="DER CIPC Plectoneme Formation">
+              <source src="videos/der-cipc-plectoneme-formation.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>DER CIPC Plectoneme Formation</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="DER X-Axis Anisotropic Rectangular Cantilever Test">
+              <source src="videos/der-x-axis-anisotropic-cantilever.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>DER X-Axis Anisotropic Rectangular Cantilever Test</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="DER Y-Axis Anisotropic Rectangular Cantilever Test">
+              <source src="videos/der-y-axis-anisotropic-cantilever.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>DER Y-Axis Anisotropic Rectangular Cantilever Test</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="DER CIPC Rod Contact">
+              <source src="videos/der-cipc-rod-contact.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>DER CIPC Rod Contact</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="DER CIPC Contact and Dual-Gripper Lift">
+              <source src="videos/der-cipc-contact-dual-gripper-lift.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>DER CIPC Contact and Dual-Gripper Lift</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="PD X-Axis Anisotropic Rectangular Cantilever Test">
+              <source src="videos/pd-x-axis-anisotropic-cantilever.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>PD X-Axis Anisotropic Rectangular Cantilever Test</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="PD Y-Axis Anisotropic Rectangular Cantilever Test">
+              <source src="videos/pd-y-axis-anisotropic-cantilever.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>PD Y-Axis Anisotropic Rectangular Cantilever Test</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="PD Dry-Friction Contact with Crossing Rods">
+              <source src="videos/pd-dry-friction-crossing-rods.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>PD Dry-Friction Contact with Crossing Rods</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="PD Midpoint Release">
+              <source src="videos/pd-midpoint-release.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>PD Midpoint Release</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="PD Rod–Soft Body Contact with Dry Friction">
+              <source src="videos/pd-rod-soft-body-dry-friction.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>PD Rod–Soft Body Contact with Dry Friction</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="PD Plectoneme Formation">
+              <source src="videos/pd-plectoneme-formation.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>PD Plectoneme Formation</figcaption>
+        </figure>
+
+        <figure class="media-gallery__item">
+          <div class="media-gallery__media">
+            <video controls playsinline preload="metadata" aria-label="PD Plastic Deformation">
+              <source src="videos/pd-plastic-deformation.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption>PD Plastic Deformation</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
