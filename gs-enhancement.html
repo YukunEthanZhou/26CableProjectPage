@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GS Enhancement · Rod Simulation and Cable Manipulation</title>
+  <meta name="description" content="Research demonstrations from an ongoing simulation and robotics project at UCLA.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="https://yukunethanzhou.github.io/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .gs-opt__intro {
+      margin: 0 0 1.25rem;
+      color: var(--text-light);
+    }
+
+    .gs-opt__methods {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .gs-opt__method {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.3rem;
+      padding: 0.85rem 1rem 0.95rem;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .gs-opt__method:hover {
+      border-color: var(--line-strong);
+    }
+
+    .gs-opt__method:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .gs-opt__method[aria-expanded="true"] {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .gs-opt__kicker {
+      padding-right: 1.5rem;
+      color: var(--text-light);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .gs-opt__name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .gs-opt__desc {
+      color: var(--text-light);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
+    .gs-opt__cost {
+      margin-top: auto;
+      padding-top: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .gs-opt__chevron {
+      position: absolute;
+      top: 0.8rem;
+      right: 0.8rem;
+      width: 1rem;
+      height: 1rem;
+      color: var(--text-light);
+      transition: transform 0.2s ease;
+    }
+
+    .gs-opt__method[aria-expanded="true"] .gs-opt__chevron {
+      color: var(--accent);
+      transform: rotate(180deg);
+    }
+
+    .gs-opt__panel[hidden] {
+      display: none;
+    }
+
+    .gs-opt__panel h3 {
+      margin: 1.75rem 0 0.5rem;
+      font-size: 1.15rem;
+      line-height: 1.3;
+    }
+
+    .gs-opt__lead {
+      margin: 0 0 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .gs-opt__facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0 0 1.5rem;
+      padding: 0;
+      list-style: none;
+    }
+
+    .gs-opt__facts li {
+      padding: 0.1rem 0.6rem;
+      font-size: 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .cmp {
+      margin: 0 0 2rem;
+    }
+
+    .cmp__head {
+      display: grid;
+      grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+      column-gap: var(--gap, 0);
+      margin-bottom: 0.4rem;
+    }
+
+    .cmp__head > span {
+      padding-bottom: 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1.3;
+      text-align: center;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .cmp__head > .is-base {
+      color: var(--text-light);
+      border-bottom-color: var(--line-strong);
+    }
+
+    .cmp__head--sticky {
+      position: sticky;
+      top: var(--sticky-offset);
+      z-index: 1;
+      padding-top: 0.5rem;
+      background: var(--bg);
+    }
+
+    .cmp__zoom + .cmp__head {
+      margin-top: 0.9rem;
+    }
+
+    .cmp__zoom {
+      display: block;
+      cursor: zoom-in;
+    }
+
+    .cmp__zoom img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 0.35rem;
+      background: var(--border);
+    }
+
+    .cmp__row-title {
+      margin: 1rem 0 0.35rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .cmp figcaption {
+      margin-top: 0.55rem;
+      color: var(--text-light);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 599px) {
+      .gs-opt__methods {
+        gap: 0.5rem;
+      }
+
+      .gs-opt__method {
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.7rem 0.4rem 0.55rem;
+        text-align: center;
+      }
+
+      .gs-opt__kicker,
+      .gs-opt__desc,
+      .gs-opt__cost {
+        display: none;
+      }
+
+      .gs-opt__name {
+        margin: auto 0;
+        font-size: 0.85rem;
+      }
+
+      .gs-opt__chevron {
+        position: static;
+      }
+
+      .cmp__head > span {
+        font-size: 0.68rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-bar">
+    <button type="button" class="site-bar__menu" aria-controls="site-nav" aria-expanded="false" aria-label="Open sections">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <span class="site-bar__title">GS Enhancement</span>
+  </div>
+  <div class="site-scrim"></div>
+
+  <div class="standalone-project">
+    <nav class="site-nav" id="site-nav" aria-label="Sections">
+      <div class="site-nav__head">
+        <span class="site-nav__label">Sections</span>
+        <button type="button" class="site-nav__close" aria-label="Close sections">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="index.html">Home</a></li>
+        <li>
+          <a class="site-nav__link is-active" href="gs-enhancement.html">Real2Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="gs-enhancement.html" aria-current="page">GS Enhancement</a></li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
+        <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
+      </ul>
+    </nav>
+
+    <main id="main">
+      <header class="standalone-project__header">
+        <h1>Rod Simulation and Cable Manipulation</h1>
+      </header>
+
+      <p class="media-page__intro">Research demonstrations from my ongoing simulation and robotics project at UCLA.</p>
+
+      <section class="page-section gs-opt" id="gs-optimization" aria-labelledby="gs-opt-title">
+        <p class="page-section__kicker">Real2Sim</p>
+        <h2 class="page-section__title" id="gs-opt-title">GS Enhancement</h2>
+        <p class="gs-opt__intro">The simulator renders the lab table from a 3D Gaussian Splatting (3DGS) scan, which looks soft and hazy up close. Three methods make it look more like a photo. Select one to compare it with the unmodified version; click any image to open it at full resolution.</p>
+
+        <div class="gs-opt__methods">
+          <button type="button" class="gs-opt__method" id="gs-opt-postfx-tab" aria-expanded="false" aria-controls="gs-opt-postfx">
+            <span class="gs-opt__kicker">Image filter</span>
+            <span class="gs-opt__name">Post-processing</span>
+            <span class="gs-opt__desc">GPU filters on every rendered frame: depth-aware sharpening, de-mottling and a camera look.</span>
+            <span class="gs-opt__cost">~5 ms per 1080p frame</span>
+            <svg class="gs-opt__chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <button type="button" class="gs-opt__method" id="gs-opt-capture-tab" aria-expanded="false" aria-controls="gs-opt-capture">
+            <span class="gs-opt__kicker">New photos</span>
+            <span class="gs-opt__name">Supplementary Capture</span>
+            <span class="gs-opt__desc">Phone photos of the table top, registered to the scan and baked into a texture on the table plane.</span>
+            <span class="gs-opt__cost">~7 min build · ~3 ms per frame</span>
+            <svg class="gs-opt__chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <button type="button" class="gs-opt__method" id="gs-opt-difix-tab" aria-expanded="false" aria-controls="gs-opt-difix">
+            <span class="gs-opt__kicker">Diffusion model</span>
+            <span class="gs-opt__name">Difix3D+</span>
+            <span class="gs-opt__desc">NVIDIA's Difix cleans rendered views, which are distilled back into the splats; Difix3D+ adds a per-frame pass.</span>
+            <span class="gs-opt__cost">~45 min build · + pass ~1 s per frame</span>
+            <svg class="gs-opt__chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="gs-opt__panel" id="gs-opt-postfx" role="region" aria-labelledby="gs-opt-postfx-title" hidden>
+          <h3 id="gs-opt-postfx-title">Post-processing vs. original render</h3>
+          <p class="gs-opt__lead">A GPU chain runs on each rendered frame: multi-band sharpening scaled by per-pixel depth, smoothing of low-contrast splat mottling, then a tone curve, vignette, slight chromatic aberration and sensor noise. Occlusion edges are protected and depth is untouched; with the filter off, the output is bit-identical to the original renderer. It cannot add detail the scan never captured, so keyboard lettering stays blurry.</p>
+          <ul class="gs-opt__facts">
+            <li>~4–5 ms per 1080p frame</li>
+            <li>Presets: photo, crisp, neutral</li>
+            <li>Scene data unchanged</li>
+          </ul>
+
+          <figure class="cmp">
+            <div class="cmp__head" style="--cols: 3; --gap: 0.33%">
+              <span class="is-base">Original render</span>
+              <span>Photo preset (default)</span>
+              <span>Crisp preset (sharpening only)</span>
+            </div>
+            <a class="cmp__zoom" href="images/gs-optimization/postfx-crops-2x.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/postfx-crops-2x.webp" width="1812" height="1378" loading="lazy" decoding="async" alt="2x crops of the keyboard, an arm base, a mat corner and the desk mat in three columns: original render, photo preset, crisp preset.">
+            </a>
+            <figcaption>2× crops: keyboard, arm base and cables, mat corner with the mouse, desk mat.</figcaption>
+          </figure>
+
+          <figure class="cmp">
+            <div class="cmp__head">
+              <span class="is-base">Original render</span>
+              <span>Photo preset</span>
+            </div>
+            <a class="cmp__zoom" href="images/gs-optimization/postfx-left-arm-split.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/postfx-left-arm-split.webp" width="960" height="720" loading="lazy" decoding="async" alt="Left-arm camera frame split down the middle: original render on the left half, photo preset on the right half.">
+            </a>
+            <figcaption>Left-arm camera, one frame split down the middle.</figcaption>
+          </figure>
+        </div>
+
+        <div class="gs-opt__panel" id="gs-opt-capture" role="region" aria-labelledby="gs-opt-capture-title" hidden>
+          <h3 id="gs-opt-capture-title">Supplementary capture vs. original scan</h3>
+          <p class="gs-opt__lead">In the scan, the table top is a 1–3 cm layer of semi-transparent splats, so it looks hazy from every angle. Four new phone photos of the table were registered to the scan and stitched into a texture on the physical table plane, with the arms, monitor and mouse masked out. The texture replaces about 120,000 haze splats, and the table depth now matches the collision plane (the scan sat about 4 mm low). Objects on the table still come from the scan, and the ~17% of the table no photo saw (under the arms, in front of the monitor) is filled smoothly. Cables appear where they lay when the photos were taken, not where they were during the scan.</p>
+          <ul class="gs-opt__facts">
+            <li>4 phone photos</li>
+            <li>0.5 mm per texel</li>
+            <li>~1 mm alignment to the scan</li>
+            <li>~2.7 ms per frame</li>
+          </ul>
+
+          <figure class="cmp">
+            <div class="cmp__head cmp__head--sticky">
+              <span class="is-base">Original scan</span>
+              <span>Photo table texture</span>
+            </div>
+            <p class="cmp__row-title">Pole camera over the arm workspace</p>
+            <a class="cmp__zoom" href="images/gs-optimization/capture-pole-camera.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/capture-pole-camera.webp" width="2560" height="720" loading="lazy" decoding="async" alt="Pole camera view of the table: original scan on the left, photo table texture on the right.">
+            </a>
+            <p class="cmp__row-title">Oblique close-up of the desk mat</p>
+            <a class="cmp__zoom" href="images/gs-optimization/capture-mat-oblique.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/capture-mat-oblique.webp" width="2560" height="800" loading="lazy" decoding="async" alt="Oblique close-up of the desk mat: original scan on the left, photo table texture on the right.">
+            </a>
+            <p class="cmp__row-title">Close-up of the left white board</p>
+            <a class="cmp__zoom" href="images/gs-optimization/capture-left-board.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/capture-left-board.webp" width="2560" height="800" loading="lazy" decoding="async" alt="Close-up of the left white board: original scan on the left, photo table texture on the right.">
+            </a>
+            <p class="cmp__row-title">Left-arm camera</p>
+            <a class="cmp__zoom" href="images/gs-optimization/capture-left-arm.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/capture-left-arm.webp" width="1920" height="720" loading="lazy" decoding="async" alt="Left-arm camera view: original scan on the left, photo table texture on the right.">
+            </a>
+            <p class="cmp__row-title">Front view from 1.3 m</p>
+            <a class="cmp__zoom" href="images/gs-optimization/capture-front.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/capture-front.webp" width="2400" height="800" loading="lazy" decoding="async" alt="Front view of the table from 1.3 m: original scan on the left, photo table texture on the right.">
+            </a>
+            <figcaption>Same camera and render settings in each pair.</figcaption>
+          </figure>
+        </div>
+
+        <div class="gs-opt__panel" id="gs-opt-difix" role="region" aria-labelledby="gs-opt-difix-title" hidden>
+          <h3 id="gs-opt-difix-title">Difix3D and Difix3D+ vs. original scan</h3>
+          <p class="gs-opt__lead">There are no source photos for this scan, so NVIDIA's Difix, a single-step diffusion model that removes rendering artifacts, works on rendered views instead. 384 views along the real scanner path and over the table were rendered, fixed with Difix and distilled back into the splats over four rounds, with depth held to the original scan. The result, Difix3D, is a new splat set that still renders in real time. Difix3D+ runs Difix once more on each final frame, which only works offline. Both look much cleaner, but the added detail is generated rather than measured: small lettering such as the “Lenovo” logo gets rewritten.</p>
+          <ul class="gs-opt__facts">
+            <li>738,669 → 1,028,126 splats</li>
+            <li>1080p render 20.9 → 25.5 ms</li>
+            <li>~45 min distillation</li>
+            <li>Difix3D+ ~1 s per frame</li>
+          </ul>
+
+          <figure class="cmp">
+            <div class="cmp__head" style="--cols: 3">
+              <span class="is-base">Original scan</span>
+              <span>Difix3D (distilled splats)</span>
+              <span>Difix3D+ (+ per-frame Difix)</span>
+            </div>
+            <a class="cmp__zoom" href="images/gs-optimization/difix3d-sim-left-arm.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/difix3d-sim-left-arm.webp" width="2880" height="720" loading="lazy" decoding="async" alt="Left-arm camera in the simulator with the URDF arm, three columns: original scan, Difix3D, Difix3D+.">
+            </a>
+            <figcaption>Left-arm camera in the simulator renderer, with the same URDF arm in all three.</figcaption>
+          </figure>
+
+          <figure class="cmp">
+            <div class="cmp__head">
+              <span class="is-base">Original scan</span>
+              <span>Difix3D after 3 rounds (white specks)</span>
+            </div>
+            <a class="cmp__zoom" href="images/gs-optimization/difix3d-mat-top.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/difix3d-mat-top.webp" width="1200" height="350" loading="lazy" decoding="async" alt="Desk mat from the pole camera: original scan, and Difix3D after three rounds with white specks on the mat.">
+            </a>
+            <div class="cmp__head">
+              <span>Difix3D final (round 4, specks removed)</span>
+              <span>Difix3D+ final</span>
+            </div>
+            <a class="cmp__zoom" href="images/gs-optimization/difix3d-mat-bottom.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/difix3d-mat-bottom.webp" width="1200" height="350" loading="lazy" decoding="async" alt="Desk mat from the pole camera: final Difix3D with the specks removed, and final Difix3D+.">
+            </a>
+            <figcaption>Desk mat from the pole camera. Difix turned scan noise on the black mat into white specks; a fourth round removes them.</figcaption>
+          </figure>
+
+          <figure class="cmp">
+            <div class="cmp__head">
+              <span class="is-base">Original scan</span>
+              <span>Difix 2D (per image)</span>
+            </div>
+            <a class="cmp__zoom" href="images/gs-optimization/difix3d-keyboard-top.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/difix3d-keyboard-top.webp" width="1200" height="340" loading="lazy" decoding="async" alt="Monitor and keyboard: original scan, and Difix applied to the rendered image alone.">
+            </a>
+            <div class="cmp__head">
+              <span>Difix3D (final splats)</span>
+              <span>Difix3D+ (final)</span>
+            </div>
+            <a class="cmp__zoom" href="images/gs-optimization/difix3d-keyboard-bottom.webp" target="_blank" rel="noopener" title="Open full resolution">
+              <img src="images/gs-optimization/difix3d-keyboard-bottom.webp" width="1200" height="340" loading="lazy" decoding="async" alt="Monitor and keyboard: Difix3D final splats, and Difix3D+.">
+            </a>
+            <figcaption>Monitor and keyboard: cleaner and sharper, but the “Lenovo” logo is rewritten.</figcaption>
+          </figure>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="site.js"></script>
+  <script>
+    (function () {
+      var buttons = Array.prototype.slice.call(document.querySelectorAll(".gs-opt__method"));
+
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          var opening = button.getAttribute("aria-expanded") !== "true";
+
+          buttons.forEach(function (other) {
+            var open = opening && other === button;
+            other.setAttribute("aria-expanded", open ? "true" : "false");
+            document.getElementById(other.getAttribute("aria-controls")).hidden = !open;
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

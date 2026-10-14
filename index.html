@@ -3,112 +3,74 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sim2Real · Rod Simulation and Cable Manipulation</title>
+  <title>Rod Simulation and Cable Manipulation</title>
   <meta name="description" content="Research demonstrations from an ongoing simulation and robotics project at UCLA.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/svg+xml" href="https://yukunethanzhou.github.io/images/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
   <link rel="stylesheet" href="site.css">
   <style>
-    .hess-conv__title {
-      margin: 0 0 0.5rem;
-      font-size: 1.15rem;
-      line-height: 1.3;
+    .news {
+      margin: 0.5rem 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
     }
 
-    .hess-conv__lead {
-      margin: 0 0 0.9rem;
-      font-size: 0.9rem;
+    .news__item {
+      display: grid;
+      grid-template-columns: 7rem minmax(0, 1fr);
+      column-gap: 1.25rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--line);
     }
 
-    .hess-conv__figure {
-      margin: 0;
-    }
-
-    .hess-conv__controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.4rem;
-      margin: 0 0 0.5rem;
-    }
-
-    .hess-conv__label {
-      margin-right: 0.2rem;
+    .news__date {
       color: var(--text-light);
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 600;
+      line-height: 1.75;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
     }
 
-    .hess-conv__btn {
-      padding: 0.15rem 0.75rem;
-      color: var(--text-light);
-      font: inherit;
-      font-size: 0.8rem;
-      background: var(--bg);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      cursor: pointer;
-      transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    .news__text {
+      margin: 0;
+      font-size: 0.95rem;
     }
 
-    .hess-conv__btn:hover {
-      color: var(--text);
-      border-color: var(--line-strong);
+    .news__text a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+      text-underline-offset: 0.15em;
     }
 
-    .hess-conv__btn:focus-visible {
+    .news__text a:hover {
+      text-decoration-color: currentColor;
+    }
+
+    .news__text a:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 2px;
     }
 
-    .hess-conv__btn[aria-pressed="true"] {
-      color: var(--accent);
-      background: var(--accent-soft);
-      border-color: var(--accent);
-    }
-
-    .hess-conv__legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem 1.1rem;
-      margin: 0.6rem 0 0.45rem;
-      padding: 0;
-      color: var(--text-light);
-      font-size: 0.78rem;
-      list-style: none;
-    }
-
-    .hess-conv__swatch {
-      display: inline-block;
-      width: 1.5rem;
-      margin-right: 0.4rem;
-      vertical-align: middle;
-      border-top: 2.5px solid;
-    }
-
-    .hess-conv__chart {
-      padding: 0.4rem;
-      border: 1px solid var(--line);
-      border-radius: 0.5rem;
-    }
-
-    .hess-conv__chart canvas {
-      display: block;
-      width: 100%;
-      height: 22rem;
-    }
-
     @media (max-width: 599px) {
-      .hess-conv__chart canvas {
-        height: 18rem;
+      .news__item {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 0.1rem;
       }
     }
   </style>
   <script>
     // the sections used to be anchors on this one page; send old links to their own pages
     (function () {
-      var moved = { "#gs-optimization": "gs-optimization.html", "#simulator": "simulator.html" };
+      var moved = {
+        "#sim2real": "sim2real.html",
+        "#hessian-convergence": "sim2real.html#hessian-convergence",
+        "#gs-optimization": "gs-enhancement.html",
+        "#simulator": "simulator.html"
+      };
       if (moved[location.hash]) {
         location.replace(moved[location.hash]);
       }
@@ -120,7 +82,7 @@
     <button type="button" class="site-bar__menu" aria-controls="site-nav" aria-expanded="false" aria-label="Open sections">
       <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
-    <span class="site-bar__title">Sim2Real</span>
+    <span class="site-bar__title">Home</span>
   </div>
   <div class="site-scrim"></div>
 
@@ -133,9 +95,15 @@
         </button>
       </div>
       <ul class="site-nav__list">
-        <li><a class="site-nav__link" href="index.html" aria-current="page">Sim2Real</a></li>
-        <li><a class="site-nav__link" href="gs-optimization.html">GS Optimization</a></li>
+        <li><a class="site-nav__link" href="index.html" aria-current="page">Home</a></li>
+        <li>
+          <a class="site-nav__link" href="gs-enhancement.html">Real2Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="gs-enhancement.html">GS Enhancement</a></li>
+          </ul>
+        </li>
         <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
+        <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
       </ul>
     </nav>
 
@@ -146,239 +114,35 @@
 
       <p class="media-page__intro">Research demonstrations from my ongoing simulation and robotics project at UCLA.</p>
 
-      <section class="page-section" id="sim2real" aria-labelledby="sim2real-title">
-        <h2 class="page-section__title" id="sim2real-title">Sim2Real</h2>
-
-        <div class="media-gallery">
-          <figure class="media-gallery__item">
-            <div class="media-gallery__media">
-              <video controls playsinline preload="metadata" aria-label="MPC Shape Control with Three Obstacles (Difix3D+ GS Scene)">
-                <source src="videos/sim2real-difix3d-plus-3-obstacles-mpc-shape-control.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>MPC Shape Control with Three Obstacles (Difix3D+ GS Scene)</figcaption>
-          </figure>
-
-          <div class="media-gallery__item hess-conv" id="hessian-convergence" lang="zh-CN">
-            <h3 class="hess-conv__title" id="hessian-convergence-title">杆自接触Hessian忽略非对角项收敛比较</h3>
-            <p class="hess-conv__lead">41 个节点的杆摆成 α 形，末段从上方压过首段；夹爪在离交叉点 5.5 mm 处把上股下压 2 或 4 mm 后保持。误差是相对严格收敛参考解的最大位置偏差，耗时为单个 world、每 1/60 s 一帧（4 个子步，RTX 4060 Laptop）。三种 Hessian 的接触能量和梯度完全相同，只差矩阵里放了哪些块：full 保留两股之间的块，segment 只保留每段内部的块，diagonal 只保留每个粒子自己的 3×3 块。</p>
-            <figure class="hess-conv__figure" aria-labelledby="hessian-convergence-title">
-              <div class="hess-conv__controls" role="group" aria-label="场景">
-                <span class="hess-conv__label">场景</span>
-                <button type="button" class="hess-conv__btn" data-scenario="k1e4_2mm" aria-pressed="false">k 1e4 · 压 2 mm</button>
-                <button type="button" class="hess-conv__btn" data-scenario="k1e5_2mm" aria-pressed="true">k 1e5 · 压 2 mm</button>
-                <button type="button" class="hess-conv__btn" data-scenario="k1e5_4mm" aria-pressed="false">k 1e5 · 压 4 mm</button>
-              </div>
-              <div class="hess-conv__controls" role="group" aria-label="横轴">
-                <span class="hess-conv__label">横轴</span>
-                <button type="button" class="hess-conv__btn" data-axis="iterations" aria-pressed="true">Newton 迭代上限</button>
-                <button type="button" class="hess-conv__btn" data-axis="ms" aria-pressed="false">每帧耗时 ms</button>
-              </div>
-              <ul class="hess-conv__legend">
-                <li><span class="hess-conv__swatch" style="border-color: var(--accent)"></span>full（含交叉块）</li>
-                <li><span class="hess-conv__swatch" style="border-color: #7f77dd; border-top-style: dashed"></span>segment（丢跨股块）</li>
-                <li><span class="hess-conv__swatch" style="border-color: #d85a30; border-top-style: dotted"></span>diagonal（只留对角）</li>
-              </ul>
-              <div class="hess-conv__chart">
-                <canvas role="img" aria-label="离收敛解的误差随 Newton 迭代上限的变化"></canvas>
-              </div>
-            </figure>
-          </div>
-        </div>
+      <section class="page-section" id="news" aria-labelledby="news-title">
+        <h2 class="page-section__title" id="news-title">News</h2>
+        <!-- Newest first: one short entry (date + what changed) for every commit to this site. -->
+        <ul class="news">
+          <li class="news__item">
+            <time class="news__date" datetime="2026-10-14">Oct 14, 2026</time>
+            <p class="news__text">New Home page with these updates. The sections are now <a href="gs-enhancement.html">Real2Sim › GS Enhancement</a> (formerly GS Optimization), <a href="simulator.html">Simulator</a> and <a href="sim2real.html">Sim2Real</a>.</p>
+          </li>
+          <li class="news__item">
+            <time class="news__date" datetime="2026-10-12">Oct 12, 2026</time>
+            <p class="news__text">Each section now has its own page, listed in the menu on the left.</p>
+          </li>
+          <li class="news__item">
+            <time class="news__date" datetime="2026-10-11">Oct 11, 2026</time>
+            <p class="news__text"><a href="sim2real.html#hessian-convergence">Sim2Real</a>: chart of how rod self-contact converges with the full contact Hessian vs. dropping its off-diagonal blocks.</p>
+          </li>
+          <li class="news__item">
+            <time class="news__date" datetime="2026-10-06">Oct 6, 2026</time>
+            <p class="news__text"><a href="sim2real.html">Sim2Real</a>: video of MPC shape control around three obstacles in the Difix3D+ GS scene.</p>
+          </li>
+          <li class="news__item">
+            <time class="news__date" datetime="2026-10-05">Oct 5, 2026</time>
+            <p class="news__text"><a href="gs-enhancement.html">GS Enhancement</a>: post-processing, supplementary capture and Difix3D+, each compared with the original 3DGS scan of the lab table.</p>
+          </li>
+        </ul>
       </section>
     </main>
   </div>
 
   <script src="site.js"></script>
-  <script>
-    (function () {
-      var figure = document.getElementById("hessian-convergence");
-      if (!figure) {
-        return;
-      }
-
-      // Per scenario and Hessian: [Newton iterations per substep, error vs. converged reference (mm),
-      // wall time per 1/60 s frame (ms), Newton residual max |grad E| left in the last substep (mN)].
-      var DATA = {
-        k1e4_2mm: {
-          full: [[4, 0.032, 33.5, 1.7], [8, 0.019, 42.4, 1.8], [12, 0.019, 43.1, 1.0], [20, 0.02, 45.6, 1.0], [40, 0.02, 50.9, 1.0], [80, 0.02, 75.3, 1.0]],
-          segment: [[4, 1.582, 24.5, 630.4], [8, 0.891, 48.6, 581.1], [12, 0.654, 71.8, 181.4], [20, 0.296, 117.1, 56.6], [40, 0.045, 217.4, 4.5], [80, 0.027, 262.7, 1.6]],
-          diagonal: [[4, 1.613, 23.7, 942.7], [8, 0.767, 47.4, 262.6], [12, 0.498, 71.3, 178.5], [20, 0.244, 118.8, 52.6], [40, 0.032, 219.6, 4.3], [80, 0.024, 239.3, 1.4]]
-        },
-        k1e5_2mm: {
-          full: [[4, 0.034, 33.1, 3.0], [8, 0.022, 45.2, 1.3], [12, 0.026, 47.7, 2.0], [20, 0.025, 48.4, 1.2], [40, 0.026, 53.2, 1.9], [80, 0.025, 73.9, 1.2]],
-          segment: [[4, 9.561, 23.6, 3240.0], [8, 9.023, 47.1, 2213.3], [12, 6.244, 70.1, 1579.3], [20, 5.067, 118.7, 703.7], [40, 1.542, 236.3, 221.8], [80, 0.412, 478.1, 57.7]],
-          diagonal: [[4, 7.691, 24.0, 1825.4], [8, 7.67, 48.1, 2030.5], [12, 6.305, 72.5, 1424.8], [20, 5.305, 121.1, 1610.1], [40, 1.415, 239.8, 645.8], [80, 0.387, 480.3, 101.2]]
-        },
-        k1e5_4mm: {
-          full: [[4, 0.274, 32.9, 1.3], [8, 0.162, 47.7, 1.5], [12, 0.156, 51.5, 1.6], [20, 0.144, 54.9, 1.1], [40, 0.131, 59.0, 1.8], [80, 0.131, 83.0, 1.8]],
-          segment: [[4, 18.102, 24.0, 7404.5], [8, 10.768, 47.5, 2025.2], [12, 7.204, 70.4, 1460.6], [20, 3.985, 118.0, 931.9], [40, 1.779, 236.7, 409.6], [80, 0.648, 490.7, 145.9]],
-          diagonal: [[4, 16.59, 24.1, 13492.4], [8, 9.407, 48.2, 2966.3], [12, 7.075, 72.4, 1794.0], [20, 4.266, 122.2, 868.7], [40, 1.801, 246.1, 306.4], [80, 0.678, 505.5, 157.3]]
-        }
-      };
-      var SERIES = [
-        { mode: "diagonal", color: "#d85a30", dash: [2, 3] },
-        { mode: "segment", color: "#7f77dd", dash: [6, 4] },
-        { mode: "full", color: null, dash: [] }
-      ];
-      var state = { scenario: "k1e5_2mm", axis: "iterations" };
-      var canvas = figure.querySelector("canvas");
-      var buttons = Array.prototype.slice.call(figure.querySelectorAll(".hess-conv__btn"));
-
-      function mm(value) {
-        return value >= 10 ? value.toFixed(1) : value >= 1 ? value.toFixed(2) : value.toFixed(3);
-      }
-
-      function row(mode, iterations) {
-        return DATA[state.scenario][mode].filter(function (point) {
-          return point[0] === iterations;
-        })[0];
-      }
-
-      // screen readers get the 12-iteration result of the shown scenario
-      function describe() {
-        var full = row("full", 12);
-        var diagonal = row("diagonal", 12);
-
-        canvas.setAttribute(
-          "aria-label",
-          "12 次 Newton 迭代时，full 离收敛解 " + mm(full[1]) + " mm，diagonal 离收敛解 " + mm(diagonal[1]) + " mm"
-        );
-      }
-
-      function draw() {
-        var ratio = window.devicePixelRatio || 1;
-        var width = canvas.clientWidth;
-        var height = canvas.clientHeight;
-        var root = getComputedStyle(document.documentElement);
-        var muted = root.getPropertyValue("--text-light").trim() || "#7a8288";
-        var grid = root.getPropertyValue("--line").trim() || "#dfe2e4";
-        var accent = root.getPropertyValue("--accent").trim() || "#2f7f93";
-        var font = getComputedStyle(document.body).fontFamily;
-        var byIterations = state.axis === "iterations";
-        var left = 62;
-        var right = 14;
-        var top = 26;
-        var bottom = 44;
-        var plotWidth = width - left - right;
-        var plotHeight = height - top - bottom;
-        var yMin = Math.log10(0.01);
-        var yMax = Math.log10(30);
-        var xMin = byIterations ? Math.log2(4) : 0;
-        var xMax = byIterations ? Math.log2(80) : 520;
-        var ctx = canvas.getContext("2d");
-
-        function x(value) {
-          return left + ((byIterations ? Math.log2(value) : value) - xMin) / (xMax - xMin) * plotWidth;
-        }
-
-        function y(value) {
-          return top + (yMax - Math.log10(Math.max(value, 0.01))) / (yMax - yMin) * plotHeight;
-        }
-
-        canvas.width = Math.round(width * ratio);
-        canvas.height = Math.round(height * ratio);
-        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-        ctx.clearRect(0, 0, width, height);
-        ctx.font = "12px " + font;
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = grid;
-        ctx.fillStyle = muted;
-
-        [0.01, 0.1, 1, 10].forEach(function (value) {
-          ctx.beginPath();
-          ctx.moveTo(left, y(value));
-          ctx.lineTo(left + plotWidth, y(value));
-          ctx.stroke();
-          ctx.textAlign = "right";
-          ctx.fillText(value + " mm", left - 6, y(value) + 4);
-        });
-        ctx.textAlign = "center";
-        (byIterations ? [4, 8, 12, 20, 40, 80] : [0, 100, 200, 300, 400, 500]).forEach(function (value) {
-          ctx.fillText(value, x(value), top + plotHeight + 16);
-        });
-        ctx.fillText(
-          byIterations ? "每个子步的 Newton 迭代上限" : "每帧耗时 ms（1 个 world，1/60 s 一帧）",
-          left + plotWidth / 2,
-          top + plotHeight + 36
-        );
-        ctx.textAlign = "left";
-        ctx.fillText("离收敛解的误差（对数）", left, top - 10);
-
-        if (byIterations) {
-          ctx.strokeStyle = muted;
-          ctx.setLineDash([3, 3]);
-          ctx.beginPath();
-          ctx.moveTo(x(12), top);
-          ctx.lineTo(x(12), top + plotHeight);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.fillText("rollout 默认 12", x(12) + 4, top + plotHeight - 6);
-        }
-
-        SERIES.forEach(function (series) {
-          var points = DATA[state.scenario][series.mode];
-          var color = series.color || accent;
-
-          function px(point) {
-            return x(byIterations ? point[0] : point[2]);
-          }
-
-          ctx.strokeStyle = color;
-          ctx.fillStyle = color;
-          ctx.lineWidth = 2;
-          ctx.setLineDash(series.dash);
-          ctx.beginPath();
-          points.forEach(function (point, i) {
-            if (i === 0) {
-              ctx.moveTo(px(point), y(point[1]));
-            } else {
-              ctx.lineTo(px(point), y(point[1]));
-            }
-          });
-          ctx.stroke();
-          ctx.setLineDash([]);
-          points.forEach(function (point, i) {
-            ctx.beginPath();
-            ctx.arc(px(point), y(point[1]), 3, 0, 2 * Math.PI);
-            ctx.fill();
-            // on the time axis, name the iteration budget of the diagonal points and of the first and last
-            // full point (the full points lie close together), full below its line
-            if (!byIterations && (series.mode === "diagonal" || (series.mode === "full" && (i === 0 || i === points.length - 1)))) {
-              ctx.font = "11px " + font;
-              ctx.fillText(point[0] + "次", px(point) + 5, y(point[1]) + (series.mode === "full" ? 14 : -5));
-              ctx.font = "12px " + font;
-            }
-          });
-        });
-      }
-
-      buttons.forEach(function (button) {
-        button.addEventListener("click", function () {
-          var key = button.dataset.scenario ? "scenario" : "axis";
-          state[key] = button.dataset[key];
-          buttons.forEach(function (other) {
-            if (other.dataset[key]) {
-              other.setAttribute("aria-pressed", other.dataset[key] === state[key] ? "true" : "false");
-            }
-          });
-          describe();
-          draw();
-        });
-      });
-
-      window.addEventListener("resize", draw);
-      if (window.matchMedia) {
-        var scheme = window.matchMedia("(prefers-color-scheme: dark)");
-        if (scheme.addEventListener) {
-          scheme.addEventListener("change", draw);
-        } else if (scheme.addListener) {
-          scheme.addListener(draw);
-        }
-      }
-      describe();
-      draw();
-    })();
-  </script>
 </body>
 </html>
