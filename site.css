@@ -1,4 +1,4 @@
-/* Shared by index.html (Home), gs-enhancement.html, simulator.html and sim2real.html. */
+/* Shared by every page of the site. */
 
 :root {
   --text: #494e52;
@@ -120,6 +120,15 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.4;
+}
+
+.media-gallery__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  background: var(--border);
 }
 
 .media-gallery__media video {
