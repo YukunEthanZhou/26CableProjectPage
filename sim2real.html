@@ -148,16 +148,23 @@
       <section class="page-section" id="sim2real" aria-labelledby="sim2real-title">
         <h2 class="page-section__title" id="sim2real-title">Sim2Real</h2>
 
-        <div class="media-gallery">
-          <figure class="media-gallery__item">
-            <div class="media-gallery__media">
-              <video controls playsinline preload="metadata" aria-label="MPC Shape Control with Three Obstacles (Difix3D+ GS Scene)">
-                <source src="videos/sim2real-difix3d-plus-3-obstacles-mpc-shape-control.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>MPC Shape Control with Three Obstacles (Difix3D+ GS Scene)</figcaption>
-          </figure>
+        <section class="page-subsection" id="simple-routing" aria-labelledby="simple-routing-title">
+          <h3 class="page-subsection__title" id="simple-routing-title">Simple Routing</h3>
+          <p class="page-subsection__lead" lang="zh-CN">使用sim中生成的action序列直接迁移到real机械臂</p>
 
+          <div class="media-gallery">
+            <figure class="media-gallery__item media-gallery__item--portrait">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="MPC Cable Routing: Sim (top) vs. Real (bottom)">
+                  <source src="videos/sim2real-mpc-cable-routing-sim-vs-real.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>MPC Cable Routing: Sim (top) vs. Real (bottom)</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <div class="media-gallery">
           <div class="media-gallery__item hess-conv" id="hessian-convergence" lang="zh-CN">
             <h3 class="hess-conv__title" id="hessian-convergence-title">杆自接触Hessian忽略非对角项收敛比较</h3>
             <p class="hess-conv__lead">41 个节点的杆摆成 α 形，末段从上方压过首段；夹爪在离交叉点 5.5 mm 处把上股下压 2 或 4 mm 后保持。误差是相对严格收敛参考解的最大位置偏差，耗时为单个 world、每 1/60 s 一帧（4 个子步，RTX 4060 Laptop）。三种 Hessian 的接触能量和梯度完全相同，只差矩阵里放了哪些块：full 保留两股之间的块，segment 只保留每段内部的块，diagonal 只保留每个粒子自己的 3×3 块。</p>
