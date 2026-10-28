@@ -114,7 +114,7 @@ body {
 /* a titled group of media inside a page's section (e.g. Sim > Post Wrap) */
 
 .page-subsection {
-  margin: 1.5rem 0 2.5rem;
+  margin: 1.5rem 0 1.25rem;
 }
 
 .page-subsection__title {
@@ -130,18 +130,31 @@ body {
   font-size: 0.95rem;
 }
 
-/* tall videos (two views stacked) are kept narrower so they fit on screen */
-.media-gallery__item--portrait {
-  max-width: 30rem;
+/* two videos per row; a wide item (a chart, a synced comparison) takes the whole row */
+.media-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.25rem;
+  align-items: start;
 }
 
 .media-gallery__item {
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.media-gallery__item--wide {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 599px) {
+  .media-gallery {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .media-gallery__item figcaption {
-  margin-top: 0.55rem;
-  font-size: 0.9rem;
+  margin-top: 0.45rem;
+  font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.4;
 }
