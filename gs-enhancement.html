@@ -444,6 +444,14 @@
           });
         });
       });
+
+      // a link to one method (gs-enhancement.html#gs-opt-difix, from the Home overview) opens its panel
+      var panel = location.hash && document.getElementById(location.hash.slice(1));
+      var opener = panel && document.querySelector('.gs-opt__method[aria-controls="' + panel.id + '"]');
+      if (opener) {
+        opener.click();
+        panel.scrollIntoView();
+      }
     })();
   </script>
 </body>

@@ -61,6 +61,158 @@
         row-gap: 0.1rem;
       }
     }
+
+    .page-section + .page-section {
+      margin-top: 3rem;
+    }
+
+    /* Overview: the project plan as a nested outline; items with a page link to it */
+
+    .overview__lead {
+      margin: 0 0 1.25rem;
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    .overview__phase {
+      margin: 0 0 0.4rem;
+      padding-bottom: 0.35rem;
+      font-size: 1.15rem;
+      line-height: 1.3;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .overview__phase a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .overview__phase a::after {
+      content: " \2192";
+      color: var(--accent);
+    }
+
+    .overview__phase a:hover {
+      color: var(--accent);
+    }
+
+    .overview__phase + .overview__tree {
+      margin-bottom: 2rem;
+    }
+
+    .overview__tree {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .overview__tree ol,
+    .overview__tree ul {
+      margin: 0;
+      padding-left: 1.6rem;
+    }
+
+    /* nested levels hang from their parent's text, with a guide line */
+    .overview__tree li > ol,
+    .overview__tree li > ul {
+      margin: 0.15rem 0 0.3rem;
+      padding-left: 1.35rem;
+      border-left: 1px solid var(--line);
+    }
+
+    .overview__tree li {
+      margin: 0.15rem 0;
+    }
+
+    .overview__tree li::marker {
+      color: var(--text-light);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .overview__tree .task {
+      position: relative;
+      list-style: none;
+    }
+
+    .task__check {
+      -webkit-appearance: none;
+      appearance: none;
+      position: absolute;
+      top: 0.4em;
+      left: -1.35rem;
+      width: 0.85em;
+      height: 0.85em;
+      margin: 0;
+      background: var(--bg);
+      border: 1.5px solid var(--line-strong);
+      border-radius: 0.2em;
+    }
+
+    .task__check:checked {
+      background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-4.9' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat;
+      border-color: var(--accent);
+    }
+
+    .task__date {
+      margin-left: 0.4rem;
+      padding: 0.05rem 0.4rem;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 0.25rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .overview__tree s {
+      color: var(--text-light);
+    }
+
+    .overview__tree mark {
+      padding: 0 0.15em;
+      color: inherit;
+      background: rgba(240, 107, 5, 0.2);
+      border-radius: 0.15em;
+    }
+
+    .overview__tree a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+      text-underline-offset: 0.15em;
+    }
+
+    .overview__tree a:hover {
+      text-decoration-color: currentColor;
+    }
+
+    .overview__phase a:focus-visible,
+    .overview__tree a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .task__check:checked {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-4.9' fill='none' stroke='%231d1f21' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      }
+
+      .overview__tree mark {
+        background: rgba(240, 107, 5, 0.3);
+      }
+    }
+
+    @media (max-width: 599px) {
+      .overview__tree ol,
+      .overview__tree ul {
+        padding-left: 1.4rem;
+      }
+
+      .overview__tree li > ol,
+      .overview__tree li > ul {
+        padding-left: 1.15rem;
+      }
+    }
   </style>
   <script>
     // the sections used to be anchors on this one page; send old links to their own pages
@@ -121,6 +273,10 @@
         <!-- Newest first: one short entry (date + what changed) for every commit to this site. -->
         <ul class="news">
           <li class="news__item">
+            <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
+            <p class="news__text">New <a href="#overview">Overview</a> below the news: the plan for Real2Sim and Sim2Real, with links to the pages that show each part.</p>
+          </li>
+          <li class="news__item">
             <time class="news__date" datetime="2026-10-16">Oct 16, 2026</time>
             <p class="news__text"><a href="perception.html">Perception</a>: DER_projection is now a video with a top view comparing it with TrackDLO and UPETrack.</p>
           </li>
@@ -149,6 +305,127 @@
             <p class="news__text"><a href="gs-enhancement.html">GS Enhancement</a>: post-processing, supplementary capture and Difix3D+, each compared with the original 3DGS scan of the lab table.</p>
           </li>
         </ul>
+      </section>
+
+      <section class="page-section" id="overview" aria-labelledby="overview-title">
+        <h2 class="page-section__title" id="overview-title">Overview</h2>
+        <div lang="zh-CN">
+          <p class="overview__lead">项目的整体路线：Real2Sim 把真实场景、线缆和它的物理参数搬进仿真，Sim2Real 把仿真里找到的操作用到真实机械臂上。带链接的条目可以跳到对应页面。</p>
+
+          <h3 class="overview__phase"><a href="gs-enhancement.html">Real2Sim</a></h3>
+          <div class="overview__tree">
+            <ol>
+              <li>在simulator里重建场景
+                <ol>
+                  <li><a href="gs-enhancement.html">3DGS重建场景</a> 垫子122cm×61cm
+                    <ol>
+                      <li><s>polycam 很垃圾 很糊 也无法照rod</s></li>
+                      <li><s>sceniverse 还不错</s></li>
+                      <li><s>xgrids 效果很好</s>
+                        <ol>
+                          <li><s>替换机械臂</s>
+                            <ol>
+                              <li><s>替换钩爪</s></li>
+                            </ol>
+                          </li>
+                          <li>提高效果
+                            <ol>
+                              <li><a href="gs-enhancement.html#gs-opt-postfx">后处理</a></li>
+                              <li>图片增强</li>
+                              <li><a href="gs-enhancement.html#gs-opt-difix">difix+ 25 cvpr nvidia</a></li>
+                              <li><s>CoDim的做法，直接作为参考建模</s></li>
+                            </ol>
+                          </li>
+                        </ol>
+                      </li>
+                      <li>下一步可以渲染效果和光照, 颜色</li>
+                    </ol>
+                  </li>
+                  <li><s>物体 → mesh，3D打印物体</s></li>
+                  <li>cable，考虑一下cable怎么重建和现实生活中match的比较好，找一下是否有绳子既有模型又可以买到，或者重建比较简单的cable
+                    <ol>
+                      <li>找模型，网线usb那个模型，网线实际的7.5mm直径，全长195.5cm左右(已放入)</li>
+                      <li><s>gs做？</s></li>
+                    </ol>
+                  </li>
+                  <li><s>医用绳子打结</s></li>
+                </ol>
+              </li>
+              <li>real2sim参数识别：
+                <ol>
+                  <li><s>估算范围，让rl范围内学习</s></li>
+                  <li><mark>做test，反推精确测量</mark>
+                    <ol>
+                      <li>做test视频录制，NN学习 PhysCoRe
+                        <ol>
+                          <li>弯折+cantilever：识别弯曲刚度以及 E</li>
+                          <li>扭转：G</li>
+                          <li>绕柱：塑性</li>
+                        </ol>
+                      </li>
+                    </ol>
+                  </li>
+                  <li><s>codim：给一个simulator skill数据库，包含场景，agent判断选哪个作为基础，然后再在基础上改。在simulation环境中做test</s></li>
+                  <li><s>diffsim，求grad</s></li>
+                </ol>
+              </li>
+            </ol>
+          </div>
+
+          <h3 class="overview__phase"><a href="sim2real.html">Sim2Real</a></h3>
+          <div class="overview__tree">
+            <ul>
+              <li class="task"><input type="checkbox" class="task__check" checked disabled aria-label="已完成"><a href="sim2real.html">task：cable绕过物体</a><time class="task__date" datetime="2026-10-15">2026-10-15</time>
+                <ol>
+                  <li>重建场景后用MPC找到成功的trajectory</li>
+                  <li>apply到real机械臂和场景</li>
+                  <li>完成后问题总结：
+                    <ol>
+                      <li>夹爪会松开的不够大，最后丢不下线缆</li>
+                      <li>塑性和摩擦会使得最后的形状不如理想形状 ：但是可能对于routing这种事情区别不大</li>
+                      <li>piper运行时感觉震动很明显，一抖一抖的</li>
+                      <li>gs：光照问题不够真？</li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：绕柱
+                <ul>
+                  <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">目标：几圈+紧紧留在柱上？</li>
+                  <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">几何解法：硬解</li>
+                  <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">mpc
+                    <ul>
+                      <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">bug：
+                        <ul>
+                          <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">对于随机长度，得开始考虑左手抓取的位置，接触点的位置</li>
+                          <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">卡死的时候要加入重抓，找附近的位置，然后预测是否可以</li>
+                          <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">夹爪和rod是刚性耦合，对于软的rod会穿模；改成真实推算的摩擦阈值</li>
+                          <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">初始抓取问题：抓末尾分数最高，但是会影响后面重抓然后重抓范围不够大就会失败。固定规则：左手抓在“引入段长度 + 绕一圈所需长度 + 3 cm”处，杆不够长就抓末端</li>
+                        </ul>
+                      </li>
+                      <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">速度慢：把一个 world 的整套 PCG 放进一个 thread block，kernel 边界变成 block 内的同步
+                        <ul>
+                          <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">mps。multi</li>
+                        </ul>
+                      </li>
+                      <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">双臂位置，左臂有些姿势达不到，比如远一点的地面的线，捡起来必须要竖直否则会碰，但是达不到这个角度，就会判断失败</li>
+                    </ul>
+                  </li>
+                  <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">Imitation Learning</li>
+                </ul>
+              </li>
+              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：先弯折cable。然后进入缝隙/某个位置。
+                <ol>
+                  <li>理由：先弯折再进入利于一些狭小位置并且利于布线</li>
+                </ol>
+              </li>
+              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：布线后保持形状</li>
+              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：弯折后吊起来物品</li>
+              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：插入</li>
+              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：处理本身就携带曲率的自然买来的cable</li>
+            </ul>
+          </div>
+        </div>
       </section>
     </main>
   </div>
