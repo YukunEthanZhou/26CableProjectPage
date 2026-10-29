@@ -350,6 +350,21 @@ p.page-prose__label {
   font-weight: 600;
 }
 
+/* a sub-page's own sections (Post Wrap > MPC ...), shown only while that sub-page is open */
+.site-nav__sub--deep {
+  display: none;
+}
+
+.site-nav__link[aria-current="page"] + .site-nav__sub--deep {
+  display: block;
+}
+
+.site-nav__link--deep {
+  padding: 0.25rem 0.5rem 0.25rem 2.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .site-nav__link:focus-visible,
 .site-nav__close:focus-visible,
 .site-bar__menu:focus-visible {
@@ -392,7 +407,7 @@ p.page-prose__label {
 @media (min-width: 900px) {
   .standalone-project {
     display: grid;
-    grid-template-columns: 10.5rem minmax(0, 48rem);
+    grid-template-columns: 12rem minmax(0, 48rem);
     align-items: start;
     justify-content: center;
     column-gap: 3rem;

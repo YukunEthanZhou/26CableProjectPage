@@ -32,6 +32,13 @@
     setOpen(false);
   });
 
+  // a link to a section of the open page only scrolls, so close the drawer to show it
+  nav.addEventListener("click", function (event) {
+    if (event.target.closest("a")) {
+      setOpen(false);
+    }
+  });
+
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && root.classList.contains("nav-open")) {
       setOpen(false);
