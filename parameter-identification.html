@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parameter Identification · Rod Simulation and Cable Manipulation</title>
+  <meta name="description" content="Research demonstrations from an ongoing simulation and robotics project at UCLA.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="https://yukunethanzhou.github.io/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="site-bar">
+    <button type="button" class="site-bar__menu" aria-controls="site-nav" aria-expanded="false" aria-label="Open sections">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <span class="site-bar__title">Parameter Identification</span>
+  </div>
+  <div class="site-scrim"></div>
+
+  <div class="standalone-project">
+    <nav class="site-nav" id="site-nav" aria-label="Sections">
+      <div class="site-nav__head">
+        <span class="site-nav__label">Sections</span>
+        <button type="button" class="site-nav__close" aria-label="Close sections">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="index.html">Home</a></li>
+        <li>
+          <a class="site-nav__link is-active" href="gs-enhancement.html">Real2Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="gs-enhancement.html">GS Enhancement</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="perception.html">Perception</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="parameter-identification.html" aria-current="page">Parameter Identification</a></li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
+        <li>
+          <a class="site-nav__link" href="sim.html">Sim</a>
+          <ul class="site-nav__sub">
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="post-wrap.html">Post Wrap</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="post-wrap.html#mpc">MPC</a></li>
+                <li><a class="site-nav__link site-nav__link--deep" href="post-wrap.html#imitation-learning">Imitation Learning</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
+      </ul>
+    </nav>
+
+    <main id="main">
+      <header class="standalone-project__header">
+        <h1>Rod Simulation and Cable Manipulation</h1>
+      </header>
+
+      <p class="media-page__intro">Research demonstrations from my ongoing simulation and robotics project at UCLA.</p>
+
+      <section class="page-section" id="parameter-identification" aria-labelledby="parameter-identification-title">
+        <p class="page-section__kicker">Real2Sim</p>
+        <h2 class="page-section__title" id="parameter-identification-title">Parameter Identification</h2>
+
+        <section class="page-subsection" id="experiment-design" aria-labelledby="experiment-design-title">
+          <h3 class="page-subsection__title" id="experiment-design-title">Experiment Design</h3>
+
+          <div class="page-prose" lang="zh-CN">
+            <p>求回弹曲率 κ<sub>s</sub> = M<sub>y</sub>/EI</p>
+
+            <h4>配置</h4>
+            <p><strong>杆</strong>：4 根，2 白 2 绿（两根绿杆色调不同），长 305 mm，直径约 4.8 mm，两端是球形端头。每次试验前都掰直再用，没有记录杆的编号，只能从颜色区分。48 次里白杆 21 次，绿杆 27 次。</p>
+            <p><strong>柱子</strong>：5 根打印柱，直径 10 / 12 / 15 / 20 / 25 mm，高 100 mm，下面是 80×80×3 mm 的底板，放在垫子中央。每次换柱子都重新贴胶带固定，实测位置偏离名义位置最多约 2 cm。</p>
+
+            <h4>相机与录制</h4>
+            <ul>
+              <li>D415：装在立杆上，已在 SIM 坐标系中标定。</li>
+              <li>两个 D405：装在两只 PiPER 手腕上，机械臂摆在规划好的观察位姿。</li>
+              <li>格式：都是 1280×720、30 fps。彩色存成视频（T01–T05 存的是 JPEG 帧），D405 的深度每 3 帧存一张 PNG。每个关键帧另外给 3 台相机各存一张无损 PNG。</li>
+            </ul>
+
+            <h4>流程</h4>
+            <div class="page-prose__table">
+              <table>
+                <thead>
+                  <tr><th scope="col">时刻（相对开始）</th><th scope="col">动作</th><th scope="col">关键帧</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>0–3 s</td><td>杆平放在垫子上</td><td>flat（2.5 s）</td></tr>
+                  <tr><td>3–11 s</td><td>准备</td><td></td></tr>
+                  <tr><td>11 s 起</td><td>以 60°/s 绕柱：180° 用 3 s，360° 用 6 s，720° 用 12 s</td><td></td></tr>
+                  <tr><td>绕完后</td><td>两只手各捏一端保持 3 s（保持时间试验为 60 s）</td><td>hold（松手前 0.5 s）</td></tr>
+                  <tr><td>松手</td><td>绕的那只手先松开，另一只手继续捏住</td><td>1s、4.5s</td></tr>
+                  <tr><td>松手后 5 s</td><td>另一只手也松开，把杆从柱顶取下</td><td></td></tr>
+                  <tr><td>再 12 s 后</td><td>把杆平放到垫子上</td><td>laid（松手后 23 s）</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h4>试验安排（48 次）</h4>
+            <p>
+              主试验 40 次：5 根柱子 × {180°, 360°} × 4 次重复。<br>
+              预试 2 次：T01、T02，都是 d15、360°。<br>
+              留出验证 3 次：T03、T07、T09，d15 上绕 720°。<br>
+              保持时间 3 次：T13–T15，d15、360°、保持 60 s。<br>
+              顺序：一次只放一根柱子，顺序是 d15 → d20 → d25 → d10 → d12，共换 4 次柱子。每根柱子上分 4 个区组，180° 和 360° 交错进行。留出验证和保持时间试验都在第一根柱子 d15 上做。
+            </p>
+            <p>
+              用两个缠绕角分离端部效应<br>
+              60s看粘性<br>
+              720° 的那几次只用来验证
+            </p>
+          </div>
+        </section>
+
+        <section class="page-subsection" id="method" aria-labelledby="method-title">
+          <h3 class="page-subsection__title" id="method-title">Method</h3>
+
+          <div class="page-prose" lang="zh-CN">
+            <ol>
+              <li>测形状（<code>measure.py</code>）：只用顶部相机d415，每个关键帧一条拟合好的曲线
+                <ol>
+                  <li>flat 帧颜色分割像素，找到dlo和柱子</li>
+                  <li>拟合中心线
+                    <ol>
+                      <li>拟合：把杆像素反投影到这个平面，然后最小化以下几项：
+                        <ul>
+                          <li>每个杆像素到曲线的距离；</li>
+                          <li>落在空垫子上的曲线点到杆像素的距离（落在遮挡区的点不计）；</li>
+                          <li>曲线进入柱子圆（半径 R+r）里面的惩罚；</li>
+                          <li>相邻节点曲率差的惩罚（保证光滑，但允许杆离开柱子处的突变）；</li>
+                          <li>看不到的部分稍微偏向直线，端头保持直。</li>
+                        </ul>
+                      </li>
+                    </ol>
+                  </li>
+                  <li>质量检查：每帧都有 rms、解释像素比例，以及每个节点是否 “看得见”（seen）。不合格的帧不用</li>
+                </ol>
+              </li>
+              <li>B：逐点回弹（不用仿真，<code>springback.py</code>）
+                <ol>
+                  <li>物理依据：弹塑性杆卸载时是弹性的。松手后弯矩为零，所以每一点的回弹曲率等于该点 hold 时的弯矩除以 EI。
+                    <ol>
+                      <li>M = EI · (κ − κ̄)　<span class="page-prose__ref">Bending Moment</span>
+                        <ol>
+                          <li>EI：抗弯刚度 见 <cite class="page-prose__ref">Cosserat Rods with Projective Dynamics</cite></li>
+                          <li>曲率差值，当前-静止</li>
+                          <li>由此 κ − κ̄ = M/EI：当前曲率里有 M/EI 这么多是 “弹性弯出来的”，一卸力就会弹回去。因为我们知道曲率会保留在静止曲率κ̄</li>
+                        </ol>
+                      </li>
+                      <li>观测方法：
+                        <ol>
+                          <li>全部点拟合 g(x)：每个采样点放到（hold曲率，回弹）的坐标系，找到一条线拟合这些点，y高度即是曲率</li>
+                          <li>实际：给一个候选 κ<sub>s</sub>，对每次试验算预测回弹角；根据实际情况求残差，然后找最小的残差对应的kappa_s</li>
+                        </ol>
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+              <li>C：模型修正 FEMU　<span class="page-prose__ref">FEMU Finite Element Model Updating</span>
+                <ol>
+                  <li>DER 模型和它的 plastic_return 屈服规则，按每次试验的条件重演一遍 “捏住 → 屈服 → 松手”，扫 κ<sub>s</sub>，看哪个值让仿真松手后的形状最接近实测的平放形状。</li>
+                </ol>
+              </li>
+            </ol>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="site.js"></script>
+</body>
+</html>
