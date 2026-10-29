@@ -130,6 +130,32 @@ body {
   font-size: 0.95rem;
 }
 
+/* a short titled list of working notes above a subsection's media (e.g. Sim > Post Wrap > Control) */
+.page-notes {
+  margin: -0.2rem 0 1.25rem;
+  padding-left: 0.9rem;
+  font-size: 0.95rem;
+  border-left: 3px solid var(--line);
+}
+
+.page-notes__title {
+  margin: 0 0 0.15rem;
+  font-weight: 700;
+}
+
+.page-notes ul {
+  margin: 0;
+  padding-left: 1.3rem;
+}
+
+.page-notes li {
+  margin: 0.1rem 0;
+}
+
+.page-notes li::marker {
+  color: var(--text-light);
+}
+
 /* two videos per row; a wide item (a chart, a synced comparison) takes the whole row */
 .media-gallery {
   display: grid;

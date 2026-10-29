@@ -62,6 +62,51 @@
       }
     }
 
+    /* the newest five show; the script at the end adds the Expand button for the rest */
+    .news.is-collapsed .news__item:nth-child(n+6) {
+      display: none;
+    }
+
+    .news__toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.6rem;
+      padding: 0.2rem 0;
+      color: var(--accent);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: none;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .news__toggle[hidden] {
+      display: none;
+    }
+
+    .news__toggle:hover {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    .news__toggle:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 0.2rem;
+    }
+
+    .news__toggle svg {
+      width: 0.8rem;
+      height: 0.8rem;
+      transition: transform 0.15s ease;
+    }
+
+    .news__toggle[aria-expanded="true"] svg {
+      transform: rotate(180deg);
+    }
+
     .page-section + .page-section {
       margin-top: 3rem;
     }
@@ -186,6 +231,39 @@
       text-decoration-color: currentColor;
     }
 
+    /* where a task shows up on the site: a linked tag, or a dashed one with no page yet */
+    .overview__tags {
+      display: inline-flex;
+      gap: 0.3rem;
+      margin-left: 0.5rem;
+      vertical-align: 0.05em;
+    }
+
+    .overview__tree .overview__tag {
+      padding: 0 0.45rem;
+      color: var(--text-light);
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1.5;
+      text-decoration: none;
+      border: 1px dashed var(--line-strong);
+      border-radius: 999px;
+    }
+
+    .overview__tree a.overview__tag {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+
+    .overview__tree a.overview__tag:hover {
+      border-color: var(--accent);
+    }
+
+    .overview__note {
+      margin: 0.1rem 0 0.2rem;
+    }
+
     .overview__phase a:focus-visible,
     .overview__tree a:focus-visible {
       outline: 2px solid var(--accent);
@@ -270,8 +348,13 @@
 
       <section class="page-section" id="news" aria-labelledby="news-title">
         <h2 class="page-section__title" id="news-title">News</h2>
-        <!-- Newest first: one short entry (date + what changed) for every commit to this site. -->
-        <ul class="news">
+        <!-- Newest first: one short entry (date + what changed) for every commit to this site.
+             Only the newest five show until Expand is clicked; nothing needs moving by hand. -->
+        <ul class="news" id="news-list">
+          <li class="news__item">
+            <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
+            <p class="news__text">News shows the newest five, with the rest behind Expand. The <a href="#overview">Overview</a> adds Perception under Sim2Real and sim / sim2real tags on the post wrap task, and <a href="sim.html#post-wrap">Sim › Post Wrap</a> lists the control plan.</p>
+          </li>
           <li class="news__item">
             <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
             <p class="news__text">The rod self-contact Hessian convergence chart moved from Sim2Real to <a href="sim.html#hessian-convergence">Sim › Post Wrap</a>.</p>
@@ -317,6 +400,10 @@
             <p class="news__text"><a href="gs-enhancement.html">GS Enhancement</a>: post-processing, supplementary capture and Difix3D+, each compared with the original 3DGS scan of the lab table.</p>
           </li>
         </ul>
+        <button type="button" class="news__toggle" aria-controls="news-list" aria-expanded="false" hidden>
+          <span class="news__toggle-text">Expand</span>
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </section>
 
       <section class="page-section" id="overview" aria-labelledby="overview-title">
@@ -387,6 +474,22 @@
           <h3 class="overview__phase"><a href="sim2real.html">Sim2Real</a></h3>
           <div class="overview__tree">
             <ul>
+              <li>Perception
+                <ul>
+                  <li>颜色分割识别：
+                    <p class="overview__note">我发现举的很高的话会有问题识别不到，在蓝色胶带上也有点难以识别</p>
+                  </li>
+                  <li>Track：
+                    <ul>
+                      <li>trackDLO：有些情况绕过就做不到了</li>
+                      <li>MotionDLO：需要事件相机，pass</li>
+                      <li>UniStateDLO：没有开源，要自己训练</li>
+                      <li>UPEDLO：效果一般，无法识别挨得近的dlo</li>
+                      <li><a href="perception.html">Perception：DER-projection</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
               <li class="task"><input type="checkbox" class="task__check" checked disabled aria-label="已完成"><a href="sim2real.html#simple-routing">task：cable绕过物体</a><time class="task__date" datetime="2026-10-15">2026-10-15</time>
                 <ol>
                   <li>重建场景后用MPC找到成功的trajectory</li>
@@ -401,7 +504,7 @@
                   </li>
                 </ol>
               </li>
-              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：绕柱
+              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：绕柱<span class="overview__tags"><a class="overview__tag" href="sim.html#post-wrap">sim</a><span class="overview__tag" title="暂无页面">sim2real</span></span>
                 <ul>
                   <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">目标：几圈+紧紧留在柱上？</li>
                   <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">几何解法：硬解</li>
@@ -443,5 +546,29 @@
   </div>
 
   <script src="site.js"></script>
+  <script>
+    // News: the newest five, the rest behind the Expand button
+    (function () {
+      var list = document.getElementById("news-list");
+      var toggle = document.querySelector(".news__toggle");
+      var label = toggle.querySelector(".news__toggle-text");
+      var older = list.children.length - 5;
+      if (older <= 0) {
+        return;
+      }
+
+      function setExpanded(expanded) {
+        list.classList.toggle("is-collapsed", !expanded);
+        toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+        label.textContent = expanded ? "Collapse" : "Expand (" + older + " older)";
+      }
+
+      setExpanded(false);
+      toggle.hidden = false;
+      toggle.addEventListener("click", function () {
+        setExpanded(toggle.getAttribute("aria-expanded") !== "true");
+      });
+    })();
+  </script>
 </body>
 </html>
