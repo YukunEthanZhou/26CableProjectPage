@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Post Wrap · Rod Simulation and Cable Manipulation</title>
+  <meta name="description" content="Research demonstrations from an ongoing simulation and robotics project at UCLA.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="https://yukunethanzhou.github.io/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .hess-conv__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.15rem;
+      line-height: 1.3;
+    }
+
+    .hess-conv__lead {
+      margin: 0 0 0.9rem;
+      font-size: 0.9rem;
+    }
+
+    .hess-conv__figure {
+      margin: 0;
+    }
+
+    .hess-conv__controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0 0 0.5rem;
+    }
+
+    .hess-conv__label {
+      margin-right: 0.2rem;
+      color: var(--text-light);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .hess-conv__btn {
+      padding: 0.15rem 0.75rem;
+      color: var(--text-light);
+      font: inherit;
+      font-size: 0.8rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .hess-conv__btn:hover {
+      color: var(--text);
+      border-color: var(--line-strong);
+    }
+
+    .hess-conv__btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .hess-conv__btn[aria-pressed="true"] {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .hess-conv__legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 1.1rem;
+      margin: 0.6rem 0 0.45rem;
+      padding: 0;
+      color: var(--text-light);
+      font-size: 0.78rem;
+      list-style: none;
+    }
+
+    .hess-conv__swatch {
+      display: inline-block;
+      width: 1.5rem;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+      border-top: 2.5px solid;
+    }
+
+    .hess-conv__chart {
+      padding: 0.4rem;
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+    }
+
+    .hess-conv__chart canvas {
+      display: block;
+      width: 100%;
+      height: 22rem;
+    }
+
+    @media (max-width: 599px) {
+      .hess-conv__chart canvas {
+        height: 18rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-bar">
+    <button type="button" class="site-bar__menu" aria-controls="site-nav" aria-expanded="false" aria-label="Open sections">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <span class="site-bar__title">Post Wrap</span>
+  </div>
+  <div class="site-scrim"></div>
+
+  <div class="standalone-project">
+    <nav class="site-nav" id="site-nav" aria-label="Sections">
+      <div class="site-nav__head">
+        <span class="site-nav__label">Sections</span>
+        <button type="button" class="site-nav__close" aria-label="Close sections">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="index.html">Home</a></li>
+        <li>
+          <a class="site-nav__link" href="gs-enhancement.html">Real2Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="gs-enhancement.html">GS Enhancement</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="perception.html">Perception</a></li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
+        <li>
+          <a class="site-nav__link is-active" href="sim.html">Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="post-wrap.html" aria-current="page">Post Wrap</a></li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
+      </ul>
+    </nav>
+
+    <main id="main">
+      <header class="standalone-project__header">
+        <h1>Rod Simulation and Cable Manipulation</h1>
+      </header>
+
+      <p class="media-page__intro">Research demonstrations from my ongoing simulation and robotics project at UCLA.</p>
+
+      <section class="page-section" id="post-wrap" aria-labelledby="post-wrap-title">
+        <p class="page-section__kicker">Sim</p>
+        <h2 class="page-section__title" id="post-wrap-title">Post Wrap</h2>
+
+        <section class="page-subsection" id="mpc" aria-labelledby="mpc-title">
+          <h3 class="page-subsection__title" id="mpc-title">MPC</h3>
+
+          <div class="page-notes" lang="zh-CN">
+            <ul>
+              <li>bug：
+                <ul>
+                  <li>对于随机长度，得开始考虑左手抓取的位置，接触点的位置</li>
+                  <li>卡死的时候要加入重抓，找附近的位置，然后预测是否可以</li>
+                  <li>夹爪和rod是刚性耦合，对于软的rod会穿模；改成真实推算的摩擦阈值</li>
+                  <li>初始抓取问题：抓末尾分数最高，但是会影响后面重抓然后重抓范围不够大就会失败。固定规则：左手抓在“引入段长度 + 绕一圈所需长度 + 3 cm”处，杆不够长就抓末端</li>
+                </ul>
+              </li>
+              <li>速度慢：把一个 world 的整套 PCG 放进一个 thread block，kernel 边界变成 block 内的同步
+                <ul>
+                  <li>mps。multi</li>
+                </ul>
+              </li>
+              <li>双臂位置，左臂有些姿势达不到，比如远一点的地面的线，捡起来必须要竖直否则会碰，但是达不到这个角度，就会判断失败</li>
+            </ul>
+          </div>
+
+          <div class="page-notes" lang="zh-CN">
+            <p class="page-notes__title">Control：双臂？</p>
+            <ul>
+              <li>先单臂，另外一个固定位置作为握持</li>
+              <li>右手完全不动、又要绕两圈</li>
+              <li>加入防止手腕卡死的重抓操作</li>
+              <li>重新加入cost：圈数，角度，距离等</li>
+              <li>进度：以高度，圈数，有多长贴在柱面上</li>
+              <li>加入关节，关节极限到mpc，作为cost，一同规划</li>
+            </ul>
+          </div>
+
+          <div class="media-gallery">
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="One-Turn Post Wrap with MPC">
+                  <source src="videos/sim_wrap_one_turn_mpc.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>One-Turn Post Wrap with MPC</figcaption>
+            </figure>
+
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="Post Wrap Failure: Coil Collision">
+                  <source src="videos/sim_wrap_failuree_coilCollision.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>Post Wrap Failure: Coil Collision</figcaption>
+            </figure>
+
+            <div class="media-gallery__item media-gallery__item--wide hess-conv" id="hessian-convergence" lang="zh-CN">
+              <h4 class="hess-conv__title" id="hessian-convergence-title">杆自接触Hessian忽略非对角项收敛比较</h4>
+              <p class="hess-conv__lead">41 个节点的杆摆成 α 形，末段从上方压过首段；夹爪在离交叉点 5.5 mm 处把上股下压 2 或 4 mm 后保持。误差是相对严格收敛参考解的最大位置偏差，耗时为单个 world、每 1/60 s 一帧（4 个子步，RTX 4060 Laptop）。三种 Hessian 的接触能量和梯度完全相同，只差矩阵里放了哪些块：full 保留两股之间的块，segment 只保留每段内部的块，diagonal 只保留每个粒子自己的 3×3 块。</p>
+              <figure class="hess-conv__figure" aria-labelledby="hessian-convergence-title">
+                <div class="hess-conv__controls" role="group" aria-label="场景">
+                  <span class="hess-conv__label">场景</span>
+                  <button type="button" class="hess-conv__btn" data-scenario="k1e4_2mm" aria-pressed="false">k 1e4 · 压 2 mm</button>
+                  <button type="button" class="hess-conv__btn" data-scenario="k1e5_2mm" aria-pressed="true">k 1e5 · 压 2 mm</button>
+                  <button type="button" class="hess-conv__btn" data-scenario="k1e5_4mm" aria-pressed="false">k 1e5 · 压 4 mm</button>
+                </div>
+                <div class="hess-conv__controls" role="group" aria-label="横轴">
+                  <span class="hess-conv__label">横轴</span>
+                  <button type="button" class="hess-conv__btn" data-axis="iterations" aria-pressed="true">Newton 迭代上限</button>
+                  <button type="button" class="hess-conv__btn" data-axis="ms" aria-pressed="false">每帧耗时 ms</button>
+                </div>
+                <ul class="hess-conv__legend">
+                  <li><span class="hess-conv__swatch" style="border-color: var(--accent)"></span>full（含交叉块）</li>
+                  <li><span class="hess-conv__swatch" style="border-color: #7f77dd; border-top-style: dashed"></span>segment（丢跨股块）</li>
+                  <li><span class="hess-conv__swatch" style="border-color: #d85a30; border-top-style: dotted"></span>diagonal（只留对角）</li>
+                </ul>
+                <div class="hess-conv__chart">
+                  <canvas role="img" aria-label="离收敛解的误差随 Newton 迭代上限的变化"></canvas>
+                </div>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section class="page-subsection" id="nn" aria-labelledby="nn-title">
+          <h3 class="page-subsection__title" id="nn-title">NN</h3>
+
+          <div class="page-prose" lang="zh-CN">
+            <h4>脚本做法</h4>
+            <p class="page-prose__label">绕柱任务需要的原语</p>
+            <p>
+              <code>grasp(arm, s)</code>在线缆弧长 s 处抓取，脚本：感知给出中心线，直接计算抓取位姿<br>
+              move(arm, position)<br>
+              <code>wrap_a_turn</code>：<br>
+              设置接触点，高度，圈数/角度，缠绕圈之间的高度差<br>
+              <code>wrap</code>让rod弯曲一定角度，一只手固定，一只手弯<br>
+              <s><code>handover</code>单臂绕不满一圈，需要双臂交接|脚本 + 优化交接时机和抓取点：未使用</s><br>
+              <code>tighten</code>拉紧线圈脚本 + 力阈值，或者一个小 RL<br>
+              <code>release</code> + <code>verify</code>松开并检查圈数脚本：用中心线计算绕柱角度<br>
+              <code>regrasp</code>，如果判断到手将碰到障碍物（此处是柱子），重抓一定距离。
+            </p>
+
+            <h4>V0</h4>
+            <p><span class="page-prose__label">数据生成</span>：模拟器随机场景</p>
+            <ul>
+              <li>柱子：5 种之一，直径 10–25 mm，位置随机（x ∈ [−0.15, 0] m、y ∈ [0.12, 0.17] m）；</li>
+              <li>杆：长 0.28–0.4 m，直径 4–5.5 mm（小于 4 mm 的跳过，手指夹不住），刚度和塑性随机；</li>
+              <li>引入段长度（右手起点到接触点）、杆接触柱子的侧面（接触点的位置，具体是它在柱子圆周上的方位角）、高度和螺距（绕一圈后杆往上升多少，保证不会压到自己本身）。<br>决策：wrap_a_turn 询问 env.decide(...)：每一笔之前、每次重抓、松手前</li>
+            </ul>
+
+            <p><span class="page-prose__label">训练</span>：<br>
+              按照决策训练，写好的primitive，由NN来决策使用<br>
+              使用成功回合里的决策，共 3,150 个：绕 1,984、重抓 184、松手 982。
+            </p>
+
+            <h5>特征生成</h5>
+            <p>每一决策的对应时刻图像冻结的 DINOv2 ViT-S/14</p>
+            <ul>
+              <li>得到 18×32 个 patch token，每个 384 维；</li>
+              <li>再按 2×2 求平均，变成 9×16 = 144 个 token</li>
+            </ul>
+
+            <h5>输入</h5>
+            <ul>
+              <li>3 × 144 × 384的图像特征</li>
+              <li>27维的机器臂位姿
+                <ul>
+                  <li>关节和手指 16；两手握在杆的位置 2；是否握着 2；已绕wrap数、连续重抓次数 2；杆长、直径 2；决策时刻的 one-hot 3</li>
+                </ul>
+              </li>
+              <li>规划信息：可以选择加入，脚本计算出来的，做判断的信息（需要percept），也可以不加，那就是纯图像信息输入，没有脚本辅助计算
+                <ul>
+                  <li>已绕角度、想绕多少、能绕多少；预测剩几圈和“有没有预测”标志 2；停下原因 one-hot 5</li>
+                </ul>
+              </li>
+            </ul>
+
+            <h5>网络结构</h5>
+            <figure class="page-prose__figure">
+              <img src="images/post-wrap/nn-architecture.webp" width="1200" height="1177" loading="lazy" decoding="async" alt="网络结构：三路相机图像（决策时刻 448×252）经冻结的 DINOv2 ViT-S/14 得到每路 144 个 token，再经投影 + 位置编码（384→128，区分相机）和注意力池化（4 个查询，每路 4×128）；机器人状态 27 维（可加规划 10 维）经线性层 + GELU（27→128）；两路拼接后进主干 MLP（1664→256→256），输出分三组：绕之前（绕/先重抓、角度）、重抓（距离 5 类、姿态 3 类）、松手前（松手/继续、多绕几度）。训练的部分约 67 万参数，冻结不训练的部分约 2,200 万参数。">
+            </figure>
+            <p>384 是 DINOv2 ViT-S/14 每个 token 的长度</p>
+            <p><strong class="page-prose__term">注意力池化</strong>：<br>
+              最简单的做法是把 144 个直接平均。但杆很细，只占少数几块，一平均就被稀释了。<br>
+              注意力池化做的是加权平均，权重由内容决定<br>
+              一个匹配由128维的向量q表示；q和token算给一个匹配分，144个做softmax，得到144个权重，表示和q的匹配度。
+            </p>
+            <p><strong class="page-prose__term">位置编码</strong>：<br>
+              给每个 token 加上一个和它的位置对应的向量（3相机，144token，128位置向量）<br>
+              学出来的
+            </p>
+            <p><strong class="page-prose__term">GeLU</strong>：ReLU的平滑版本</p>
+
+            <h5>输出</h5>
+            <ul>
+              <li><code>stroke_action</code>用绕之前的决策训练，0 = 绕，1 = 先重抓</li>
+              <li><code>stroke_angle</code>用决定“绕”的行训练，绕的角度 ÷ 360（sigmoid 输出）</li>
+              <li><code>regrasp_distance</code>用重抓行训练，往杆末端挪多远：−2 / 0 / +2 / +4 / +6 cm，5 类</li>
+              <li><code>regrasp_rank</code>用重抓行训练，选第几好的抓取姿态：0 / 1 / 2</li>
+              <li><code>release_action</code>松手前，0 = 松手，1 = 继续绕</li>
+              <li><code>release_extra</code>决定“继续绕”的行，再多绕多少度 ÷ 90（sigmoid 输出）</li>
+            </ul>
+
+            <p class="page-prose__label">训练结果</p>
+            <p><strong class="page-prose__term">位置编码</strong><br>
+              所有格子的编码彼此几乎一样：左右相邻格子的余弦相似度 0.99，隔 8 格也有 0.97。说明没有学出任何位置结构。<br>
+              原因：网络靠机器人状态就能猜对大部分标签
+            </p>
+            <p><strong class="page-prose__term">成功率（Sim）</strong><br>
+              完全Sim真值：<br>
+              纯脚本 94%<br>
+              NN+部分脚本协助88% given the script’s planner numbers如要绕几圈<br>
+              Sim模拟相机perception：
+            </p>
+            <ul>
+              <li>修改包括柱子也从perception中获得</li>
+            </ul>
+
+            <p><span class="page-prose__label">修改</span><br>
+              设计原语滑出判断 判断当前夹爪是否完全合拢（也就是没抓到 自动无阻碍合拢了）如果没有 执行重抓操作
+            </p>
+            <p><span class="page-prose__label">问题</span>：脚本会出现27/32: 找不到空位（桌面或另一条臂挡着），3 个是找不到无碰撞路径：重抓+-4cm，范围太大了</p>
+
+            <h4>V1-纯感知版</h4>
+            <p>是否加上机械臂的相机2个？</p>
+            <p><span class="page-prose__label">方法</span><br>
+              使用DERPerception，用相机做矫正
+            </p>
+            <ul>
+              <li>没有放深度图，矫正误差大</li>
+              <li>一开始把背后看不到的那些也算去矫正了</li>
+              <li>现在是保守策略，平均错误大才拉</li>
+            </ul>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="site.js"></script>
+  <script>
+    (function () {
+      var figure = document.getElementById("hessian-convergence");
+      if (!figure) {
+        return;
+      }
+
+      // Per scenario and Hessian: [Newton iterations per substep, error vs. converged reference (mm),
+      // wall time per 1/60 s frame (ms), Newton residual max |grad E| left in the last substep (mN)].
+      var DATA = {
+        k1e4_2mm: {
+          full: [[4, 0.032, 33.5, 1.7], [8, 0.019, 42.4, 1.8], [12, 0.019, 43.1, 1.0], [20, 0.02, 45.6, 1.0], [40, 0.02, 50.9, 1.0], [80, 0.02, 75.3, 1.0]],
+          segment: [[4, 1.582, 24.5, 630.4], [8, 0.891, 48.6, 581.1], [12, 0.654, 71.8, 181.4], [20, 0.296, 117.1, 56.6], [40, 0.045, 217.4, 4.5], [80, 0.027, 262.7, 1.6]],
+          diagonal: [[4, 1.613, 23.7, 942.7], [8, 0.767, 47.4, 262.6], [12, 0.498, 71.3, 178.5], [20, 0.244, 118.8, 52.6], [40, 0.032, 219.6, 4.3], [80, 0.024, 239.3, 1.4]]
+        },
+        k1e5_2mm: {
+          full: [[4, 0.034, 33.1, 3.0], [8, 0.022, 45.2, 1.3], [12, 0.026, 47.7, 2.0], [20, 0.025, 48.4, 1.2], [40, 0.026, 53.2, 1.9], [80, 0.025, 73.9, 1.2]],
+          segment: [[4, 9.561, 23.6, 3240.0], [8, 9.023, 47.1, 2213.3], [12, 6.244, 70.1, 1579.3], [20, 5.067, 118.7, 703.7], [40, 1.542, 236.3, 221.8], [80, 0.412, 478.1, 57.7]],
+          diagonal: [[4, 7.691, 24.0, 1825.4], [8, 7.67, 48.1, 2030.5], [12, 6.305, 72.5, 1424.8], [20, 5.305, 121.1, 1610.1], [40, 1.415, 239.8, 645.8], [80, 0.387, 480.3, 101.2]]
+        },
+        k1e5_4mm: {
+          full: [[4, 0.274, 32.9, 1.3], [8, 0.162, 47.7, 1.5], [12, 0.156, 51.5, 1.6], [20, 0.144, 54.9, 1.1], [40, 0.131, 59.0, 1.8], [80, 0.131, 83.0, 1.8]],
+          segment: [[4, 18.102, 24.0, 7404.5], [8, 10.768, 47.5, 2025.2], [12, 7.204, 70.4, 1460.6], [20, 3.985, 118.0, 931.9], [40, 1.779, 236.7, 409.6], [80, 0.648, 490.7, 145.9]],
+          diagonal: [[4, 16.59, 24.1, 13492.4], [8, 9.407, 48.2, 2966.3], [12, 7.075, 72.4, 1794.0], [20, 4.266, 122.2, 868.7], [40, 1.801, 246.1, 306.4], [80, 0.678, 505.5, 157.3]]
+        }
+      };
+      var SERIES = [
+        { mode: "diagonal", color: "#d85a30", dash: [2, 3] },
+        { mode: "segment", color: "#7f77dd", dash: [6, 4] },
+        { mode: "full", color: null, dash: [] }
+      ];
+      var state = { scenario: "k1e5_2mm", axis: "iterations" };
+      var canvas = figure.querySelector("canvas");
+      var buttons = Array.prototype.slice.call(figure.querySelectorAll(".hess-conv__btn"));
+
+      function mm(value) {
+        return value >= 10 ? value.toFixed(1) : value >= 1 ? value.toFixed(2) : value.toFixed(3);
+      }
+
+      function row(mode, iterations) {
+        return DATA[state.scenario][mode].filter(function (point) {
+          return point[0] === iterations;
+        })[0];
+      }
+
+      // screen readers get the 12-iteration result of the shown scenario
+      function describe() {
+        var full = row("full", 12);
+        var diagonal = row("diagonal", 12);
+
+        canvas.setAttribute(
+          "aria-label",
+          "12 次 Newton 迭代时，full 离收敛解 " + mm(full[1]) + " mm，diagonal 离收敛解 " + mm(diagonal[1]) + " mm"
+        );
+      }
+
+      function draw() {
+        var ratio = window.devicePixelRatio || 1;
+        var width = canvas.clientWidth;
+        var height = canvas.clientHeight;
+        var root = getComputedStyle(document.documentElement);
+        var muted = root.getPropertyValue("--text-light").trim() || "#7a8288";
+        var grid = root.getPropertyValue("--line").trim() || "#dfe2e4";
+        var accent = root.getPropertyValue("--accent").trim() || "#2f7f93";
+        var font = getComputedStyle(document.body).fontFamily;
+        var byIterations = state.axis === "iterations";
+        var left = 62;
+        var right = 14;
+        var top = 26;
+        var bottom = 44;
+        var plotWidth = width - left - right;
+        var plotHeight = height - top - bottom;
+        var yMin = Math.log10(0.01);
+        var yMax = Math.log10(30);
+        var xMin = byIterations ? Math.log2(4) : 0;
+        var xMax = byIterations ? Math.log2(80) : 520;
+        var ctx = canvas.getContext("2d");
+
+        function x(value) {
+          return left + ((byIterations ? Math.log2(value) : value) - xMin) / (xMax - xMin) * plotWidth;
+        }
+
+        function y(value) {
+          return top + (yMax - Math.log10(Math.max(value, 0.01))) / (yMax - yMin) * plotHeight;
+        }
+
+        canvas.width = Math.round(width * ratio);
+        canvas.height = Math.round(height * ratio);
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+        ctx.font = "12px " + font;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = grid;
+        ctx.fillStyle = muted;
+
+        [0.01, 0.1, 1, 10].forEach(function (value) {
+          ctx.beginPath();
+          ctx.moveTo(left, y(value));
+          ctx.lineTo(left + plotWidth, y(value));
+          ctx.stroke();
+          ctx.textAlign = "right";
+          ctx.fillText(value + " mm", left - 6, y(value) + 4);
+        });
+        ctx.textAlign = "center";
+        (byIterations ? [4, 8, 12, 20, 40, 80] : [0, 100, 200, 300, 400, 500]).forEach(function (value) {
+          ctx.fillText(value, x(value), top + plotHeight + 16);
+        });
+        ctx.fillText(
+          byIterations ? "每个子步的 Newton 迭代上限" : "每帧耗时 ms（1 个 world，1/60 s 一帧）",
+          left + plotWidth / 2,
+          top + plotHeight + 36
+        );
+        ctx.textAlign = "left";
+        ctx.fillText("离收敛解的误差（对数）", left, top - 10);
+
+        if (byIterations) {
+          ctx.strokeStyle = muted;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(x(12), top);
+          ctx.lineTo(x(12), top + plotHeight);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillText("rollout 默认 12", x(12) + 4, top + plotHeight - 6);
+        }
+
+        SERIES.forEach(function (series) {
+          var points = DATA[state.scenario][series.mode];
+          var color = series.color || accent;
+
+          function px(point) {
+            return x(byIterations ? point[0] : point[2]);
+          }
+
+          ctx.strokeStyle = color;
+          ctx.fillStyle = color;
+          ctx.lineWidth = 2;
+          ctx.setLineDash(series.dash);
+          ctx.beginPath();
+          points.forEach(function (point, i) {
+            if (i === 0) {
+              ctx.moveTo(px(point), y(point[1]));
+            } else {
+              ctx.lineTo(px(point), y(point[1]));
+            }
+          });
+          ctx.stroke();
+          ctx.setLineDash([]);
+          points.forEach(function (point, i) {
+            ctx.beginPath();
+            ctx.arc(px(point), y(point[1]), 3, 0, 2 * Math.PI);
+            ctx.fill();
+            // on the time axis, name the iteration budget of the diagonal points and of the first and last
+            // full point (the full points lie close together), full below its line
+            if (!byIterations && (series.mode === "diagonal" || (series.mode === "full" && (i === 0 || i === points.length - 1)))) {
+              ctx.font = "11px " + font;
+              ctx.fillText(point[0] + "次", px(point) + 5, y(point[1]) + (series.mode === "full" ? 14 : -5));
+              ctx.font = "12px " + font;
+            }
+          });
+        });
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          var key = button.dataset.scenario ? "scenario" : "axis";
+          state[key] = button.dataset[key];
+          buttons.forEach(function (other) {
+            if (other.dataset[key]) {
+              other.setAttribute("aria-pressed", other.dataset[key] === state[key] ? "true" : "false");
+            }
+          });
+          describe();
+          draw();
+        });
+      });
+
+      window.addEventListener("resize", draw);
+      if (window.matchMedia) {
+        var scheme = window.matchMedia("(prefers-color-scheme: dark)");
+        if (scheme.addEventListener) {
+          scheme.addEventListener("change", draw);
+        } else if (scheme.addListener) {
+          scheme.addListener(draw);
+        }
+      }
+      describe();
+      draw();
+    })();
+  </script>
+</body>
+</html>

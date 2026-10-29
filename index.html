@@ -297,7 +297,7 @@
     (function () {
       var moved = {
         "#sim2real": "sim2real.html",
-        "#hessian-convergence": "sim.html#hessian-convergence",
+        "#hessian-convergence": "post-wrap.html#hessian-convergence",
         "#gs-optimization": "gs-enhancement.html",
         "#simulator": "simulator.html"
       };
@@ -334,7 +334,12 @@
           </ul>
         </li>
         <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
-        <li><a class="site-nav__link" href="sim.html">Sim</a></li>
+        <li>
+          <a class="site-nav__link" href="sim.html">Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="post-wrap.html">Post Wrap</a></li>
+          </ul>
+        </li>
         <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
       </ul>
     </nav>
@@ -352,20 +357,24 @@
              Only the newest five show until Expand is clicked; nothing needs moving by hand. -->
         <ul class="news" id="news-list">
           <li class="news__item">
+            <time class="news__date" datetime="2026-10-29">Oct 29, 2026</time>
+            <p class="news__text">New <a href="post-wrap.html">Sim › Post Wrap</a> page. MPC: the post wrap videos, the Hessian convergence chart and the MPC notes, moved from Sim. NN: the decision network that chooses the wrapping primitives, with its architecture diagram, data, inputs, outputs and results.</p>
+          </li>
+          <li class="news__item">
             <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
             <p class="news__text"><a href="perception.html#track">Perception</a>: the videos are grouped under Track. In the <a href="#overview">Overview</a>, the routing task gets sim / sim2real tags, Perception and Track link to that page, and 图片增强 opens the supplementary capture comparison.</p>
           </li>
           <li class="news__item">
             <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
-            <p class="news__text">News shows the newest five, with the rest behind Expand. The <a href="#overview">Overview</a> adds Perception under Sim2Real and sim / sim2real tags on the post wrap task, and <a href="sim.html#post-wrap">Sim › Post Wrap</a> lists the control plan.</p>
+            <p class="news__text">News shows the newest five, with the rest behind Expand. The <a href="#overview">Overview</a> adds Perception under Sim2Real and sim / sim2real tags on the post wrap task, and <a href="post-wrap.html">Sim › Post Wrap</a> lists the control plan.</p>
           </li>
           <li class="news__item">
             <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
-            <p class="news__text">The rod self-contact Hessian convergence chart moved from Sim2Real to <a href="sim.html#hessian-convergence">Sim › Post Wrap</a>.</p>
+            <p class="news__text">The rod self-contact Hessian convergence chart moved from Sim2Real to <a href="post-wrap.html#hessian-convergence">Sim › Post Wrap</a>.</p>
           </li>
           <li class="news__item">
             <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
-            <p class="news__text">Videos are now smaller, two per row. The two-turn post wrap is removed from <a href="sim.html#post-wrap">Sim › Post Wrap</a>.</p>
+            <p class="news__text">Videos are now smaller, two per row. The two-turn post wrap is removed from <a href="post-wrap.html">Sim › Post Wrap</a>.</p>
           </li>
           <li class="news__item">
             <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
@@ -393,7 +402,7 @@
           </li>
           <li class="news__item">
             <time class="news__date" datetime="2026-10-11">Oct 11, 2026</time>
-            <p class="news__text"><a href="sim2real.html#hessian-convergence">Sim2Real</a>: chart of how rod self-contact converges with the full contact Hessian vs. dropping its off-diagonal blocks.</p>
+            <p class="news__text"><a href="post-wrap.html#hessian-convergence">Sim2Real</a>: chart of how rod self-contact converges with the full contact Hessian vs. dropping its off-diagonal blocks.</p>
           </li>
           <li class="news__item">
             <time class="news__date" datetime="2026-10-06">Oct 6, 2026</time>
@@ -508,7 +517,7 @@
                   </li>
                 </ol>
               </li>
-              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：绕柱<span class="overview__tags"><a class="overview__tag" href="sim.html#post-wrap">sim</a><span class="overview__tag" title="暂无页面">sim2real</span></span>
+              <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">task：绕柱<span class="overview__tags"><a class="overview__tag" href="post-wrap.html">sim</a><span class="overview__tag" title="暂无页面">sim2real</span></span>
                 <ul>
                   <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">目标：几圈+紧紧留在柱上？</li>
                   <li class="task"><input type="checkbox" class="task__check" disabled aria-label="未完成">几何解法：硬解</li>

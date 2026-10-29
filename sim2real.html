@@ -10,9 +10,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
   <link rel="stylesheet" href="site.css">
   <script>
-    // the Hessian convergence chart moved to Sim > Post Wrap
+    // the Hessian convergence chart moved to the Sim > Post Wrap page
     if (location.hash === "#hessian-convergence") {
-      location.replace("sim.html#hessian-convergence");
+      location.replace("post-wrap.html#hessian-convergence");
     }
   </script>
 </head>
@@ -43,7 +43,12 @@
           </ul>
         </li>
         <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
-        <li><a class="site-nav__link" href="sim.html">Sim</a></li>
+        <li>
+          <a class="site-nav__link" href="sim.html">Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="post-wrap.html">Post Wrap</a></li>
+          </ul>
+        </li>
         <li><a class="site-nav__link" href="sim2real.html" aria-current="page">Sim2Real</a></li>
       </ul>
     </nav>
