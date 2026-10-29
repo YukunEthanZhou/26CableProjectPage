@@ -450,7 +450,11 @@
       var opener = panel && document.querySelector('.gs-opt__method[aria-controls="' + panel.id + '"]');
       if (opener) {
         opener.click();
+        // jump there like a normal anchor; the page's smooth scrolling can stall while it is still loading
+        var root = document.documentElement;
+        root.style.scrollBehavior = "auto";
         panel.scrollIntoView();
+        root.style.scrollBehavior = "";
       }
     })();
   </script>

@@ -353,6 +353,10 @@
         <ul class="news" id="news-list">
           <li class="news__item">
             <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
+            <p class="news__text"><a href="perception.html#track">Perception</a>: the videos are grouped under Track. In the <a href="#overview">Overview</a>, the routing task gets sim / sim2real tags, Perception and Track link to that page, and 图片增强 opens the supplementary capture comparison.</p>
+          </li>
+          <li class="news__item">
+            <time class="news__date" datetime="2026-10-28">Oct 28, 2026</time>
             <p class="news__text">News shows the newest five, with the rest behind Expand. The <a href="#overview">Overview</a> adds Perception under Sim2Real and sim / sim2real tags on the post wrap task, and <a href="sim.html#post-wrap">Sim › Post Wrap</a> lists the control plan.</p>
           </li>
           <li class="news__item">
@@ -430,7 +434,7 @@
                           <li>提高效果
                             <ol>
                               <li><a href="gs-enhancement.html#gs-opt-postfx">后处理</a></li>
-                              <li>图片增强</li>
+                              <li><a href="gs-enhancement.html#gs-opt-capture">图片增强</a></li>
                               <li><a href="gs-enhancement.html#gs-opt-difix">difix+ 25 cvpr nvidia</a></li>
                               <li><s>CoDim的做法，直接作为参考建模</s></li>
                             </ol>
@@ -474,23 +478,23 @@
           <h3 class="overview__phase"><a href="sim2real.html">Sim2Real</a></h3>
           <div class="overview__tree">
             <ul>
-              <li>Perception
+              <li><a href="perception.html">Perception</a>
                 <ul>
                   <li>颜色分割识别：
                     <p class="overview__note">我发现举的很高的话会有问题识别不到，在蓝色胶带上也有点难以识别</p>
                   </li>
-                  <li>Track：
+                  <li><a href="perception.html#track">Track</a>：
                     <ul>
                       <li>trackDLO：有些情况绕过就做不到了</li>
                       <li>MotionDLO：需要事件相机，pass</li>
                       <li>UniStateDLO：没有开源，要自己训练</li>
                       <li>UPEDLO：效果一般，无法识别挨得近的dlo</li>
-                      <li><a href="perception.html">Perception：DER-projection</a></li>
+                      <li>Perception：DER-projection</li>
                     </ul>
                   </li>
                 </ul>
               </li>
-              <li class="task"><input type="checkbox" class="task__check" checked disabled aria-label="已完成"><a href="sim2real.html#simple-routing">task：cable绕过物体</a><time class="task__date" datetime="2026-10-15">2026-10-15</time>
+              <li class="task"><input type="checkbox" class="task__check" checked disabled aria-label="已完成">task：cable绕过物体<time class="task__date" datetime="2026-10-15">2026-10-15</time><span class="overview__tags"><a class="overview__tag" href="sim.html#simple-routing">sim</a><a class="overview__tag" href="sim2real.html#simple-routing">sim2real</a></span>
                 <ol>
                   <li>重建场景后用MPC找到成功的trajectory</li>
                   <li>apply到real机械臂和场景</li>

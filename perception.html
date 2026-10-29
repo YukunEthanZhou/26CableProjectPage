@@ -83,49 +83,53 @@
         <p class="page-section__kicker">Real2Sim</p>
         <h2 class="page-section__title" id="perception-title">Perception</h2>
 
-        <div class="media-gallery">
-          <figure class="media-gallery__item">
-            <div class="media-gallery__media">
-              <video controls playsinline preload="metadata" aria-label="DER_projection: a simulated rod wound around a mug, with a top view comparing the camera-corrected DER model, TrackDLO and UPETrack with the true rod">
-                <source src="videos/DER_Projection_Perception.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>DER_projection</figcaption>
-          </figure>
+        <section class="page-subsection" id="track" aria-labelledby="track-title">
+          <h3 class="page-subsection__title" id="track-title">Track</h3>
 
-          <figure class="media-gallery__item">
-            <div class="media-gallery__media">
-              <img src="videos/trackdlo_perception_TRACK.gif" width="410" height="219" decoding="async" alt="TrackDLO tracking a synthetic rod wound around a cylinder, with its nodes drawn on the rod.">
-            </div>
-            <figcaption>TrackDLO</figcaption>
-          </figure>
+          <div class="media-gallery">
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="DER_projection: a simulated rod wound around a mug, with a top view comparing the camera-corrected DER model, TrackDLO and UPETrack with the true rod">
+                  <source src="videos/DER_Projection_Perception.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>DER_projection</figcaption>
+            </figure>
 
-          <figure class="media-gallery__item media-gallery__item--wide track-cmp">
-            <div class="media-gallery__media">
-              <div class="track-cmp__grid">
-                <div class="track-cmp__cell">
-                  <span class="track-cmp__label is-base">Camera</span>
-                  <video controls muted playsinline preload="metadata" aria-label="Camera recording of a cable wound around a mug by hand">
-                    <source src="videos/dlo-tracking-wrap-mug-camera.mp4" type="video/mp4">
-                  </video>
-                </div>
-                <div class="track-cmp__cell">
-                  <span class="track-cmp__label">TrackDLO</span>
-                  <video controls muted playsinline preload="metadata" aria-label="TrackDLO on the same recording">
-                    <source src="videos/dlo-tracking-wrap-mug-trackdlo.mp4" type="video/mp4">
-                  </video>
-                </div>
-                <div class="track-cmp__cell">
-                  <span class="track-cmp__label">UPETrack</span>
-                  <video controls muted playsinline preload="metadata" aria-label="UPETrack on the same recording">
-                    <source src="videos/dlo-tracking-wrap-mug-upetrack.mp4" type="video/mp4">
-                  </video>
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <img src="videos/trackdlo_perception_TRACK.gif" width="410" height="219" decoding="async" alt="TrackDLO tracking a synthetic rod wound around a cylinder, with its nodes drawn on the rod.">
+              </div>
+              <figcaption>TrackDLO</figcaption>
+            </figure>
+
+            <figure class="media-gallery__item media-gallery__item--wide track-cmp">
+              <div class="media-gallery__media">
+                <div class="track-cmp__grid">
+                  <div class="track-cmp__cell">
+                    <span class="track-cmp__label is-base">Camera</span>
+                    <video controls muted playsinline preload="metadata" aria-label="Camera recording of a cable wound around a mug by hand">
+                      <source src="videos/dlo-tracking-wrap-mug-camera.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="track-cmp__cell">
+                    <span class="track-cmp__label">TrackDLO</span>
+                    <video controls muted playsinline preload="metadata" aria-label="TrackDLO on the same recording">
+                      <source src="videos/dlo-tracking-wrap-mug-trackdlo.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="track-cmp__cell">
+                    <span class="track-cmp__label">UPETrack</span>
+                    <video controls muted playsinline preload="metadata" aria-label="UPETrack on the same recording">
+                      <source src="videos/dlo-tracking-wrap-mug-upetrack.mp4" type="video/mp4">
+                    </video>
+                  </div>
                 </div>
               </div>
-            </div>
-            <figcaption>Cable Wound Around a Mug: Camera vs. TrackDLO vs. UPETrack (played in sync)</figcaption>
-          </figure>
-        </div>
+              <figcaption>Cable Wound Around a Mug: Camera vs. TrackDLO vs. UPETrack (played in sync)</figcaption>
+            </figure>
+          </div>
+        </section>
       </section>
     </main>
   </div>
