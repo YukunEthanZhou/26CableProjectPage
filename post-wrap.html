@@ -328,10 +328,39 @@
             </p>
             <p><strong class="page-prose__term">成功率（Sim）</strong><br>
               完全Sim真值：<br>
-              纯脚本 94%<br>
-              NN+部分脚本协助88% given the script’s planner numbers如要绕几圈<br>
-              Sim模拟相机perception：
+              纯脚本 94%
             </p>
+            <div class="media-gallery">
+              <figure class="media-gallery__item">
+                <div class="media-gallery__media">
+                  <video controls playsinline preload="metadata" aria-label="真值纯脚本失败案例 1（2012）">
+                    <source src="videos/TrueValue_Failure1_2012.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <figcaption>真值纯脚本失败案例 1（2012）</figcaption>
+              </figure>
+
+              <figure class="media-gallery__item">
+                <div class="media-gallery__media">
+                  <video controls playsinline preload="metadata" aria-label="真值纯脚本失败案例 2（2033）">
+                    <source src="videos/TrueValue_Failure2_2033.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <figcaption>真值纯脚本失败案例 2（2033）</figcaption>
+              </figure>
+            </div>
+            <p>NN+部分脚本协助88% given the script’s planner numbers如要绕几圈</p>
+            <div class="media-gallery">
+              <figure class="media-gallery__item media-gallery__item--wide">
+                <div class="media-gallery__media">
+                  <video controls playsinline preload="metadata" aria-label="成功对比（2020）：左为真值脚本，右为 NN 决策">
+                    <source src="videos/True_value_NN_Success_2020.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <figcaption>成功对比（2020）：左为真值脚本，右为 NN 决策</figcaption>
+              </figure>
+            </div>
+            <p>Sim模拟相机perception：</p>
             <ul>
               <li>修改包括柱子也从perception中获得</li>
             </ul>
