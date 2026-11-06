@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Knot · Rod Simulation and Cable Manipulation</title>
+  <meta name="description" content="Research demonstrations from an ongoing simulation and robotics project at UCLA.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="https://yukunethanzhou.github.io/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="site-bar">
+    <button type="button" class="site-bar__menu" aria-controls="site-nav" aria-expanded="false" aria-label="Open sections">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <span class="site-bar__title">Knot</span>
+  </div>
+  <div class="site-scrim"></div>
+
+  <div class="standalone-project">
+    <nav class="site-nav" id="site-nav" aria-label="Sections">
+      <div class="site-nav__head">
+        <span class="site-nav__label">Sections</span>
+        <button type="button" class="site-nav__close" aria-label="Close sections">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="index.html">Home</a></li>
+        <li>
+          <a class="site-nav__link" href="gs-enhancement.html">Real2Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="gs-enhancement.html">GS Enhancement</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="perception.html">Perception</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="parameter-identification.html">Parameter Identification</a></li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
+        <li>
+          <a class="site-nav__link is-active" href="sim.html">Sim</a>
+          <ul class="site-nav__sub">
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="post-wrap.html">Post Wrap</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="post-wrap.html#mpc">MPC</a></li>
+                <li><a class="site-nav__link site-nav__link--deep" href="post-wrap.html#imitation-learning">Imitation Learning</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="knot.html" aria-current="page">Knot</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="knot.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
+      </ul>
+    </nav>
+
+    <main id="main">
+      <header class="standalone-project__header">
+        <h1>Rod Simulation and Cable Manipulation</h1>
+      </header>
+
+      <p class="media-page__intro">Research demonstrations from my ongoing simulation and robotics project at UCLA.</p>
+
+      <section class="page-section" id="knot" aria-labelledby="knot-title">
+        <p class="page-section__kicker">Sim</p>
+        <h2 class="page-section__title" id="knot-title">Knot</h2>
+
+        <section class="page-subsection" id="scripted-expert" aria-labelledby="scripted-expert-title">
+          <h3 class="page-subsection__title" id="scripted-expert-title">Scripted Expert</h3>
+
+          <div class="media-gallery">
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="单手拧">
+                  <source src="videos/twist_short_v2_close.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>单手拧</figcaption>
+            </figure>
+
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="双手交替拧">
+                  <source src="videos/chain_v3_close.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>双手交替拧</figcaption>
+            </figure>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="site.js"></script>
+</body>
+</html>
