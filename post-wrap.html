@@ -371,7 +371,6 @@
             <p><span class="page-prose__label">问题</span>：脚本会出现27/32: 找不到空位（桌面或另一条臂挡着），3 个是找不到无碰撞路径：重抓+-4cm，范围太大了</p>
 
             <h4>V1-纯感知版</h4>
-            <p>是否加上机械臂的相机2个？</p>
             <p><span class="page-prose__label">方法</span><br>
               使用DERPerception，用相机做矫正
             </p>
@@ -380,6 +379,94 @@
               <li>一开始把背后看不到的那些也算去矫正了</li>
               <li>现在是保守策略，平均错误大才拉</li>
             </ul>
+            <p><span class="page-prose__label">结果</span><br>
+              调整多轮<br>
+              （模拟环境测试）真值30/32，纯感知24/32
+            </p>
+
+            <h4>V2-双臂相机</h4>
+            <p>加入双臂相机</p>
+            <ol>
+              <li>抓取成功直接看夹爪内有没有</li>
+              <li>抓前近距离看一眼加深度，找到位置</li>
+              <li>抓的过程中每0.2s看加深度，找dlo位置</li>
+              <li>在手检查改为相机直接判断tcp有没有dlo</li>
+            </ol>
+            <p>Percept</p>
+            <ol>
+              <li>抓取时：根据相机直接移动点，然后剩下的点自然回弹移动</li>
+            </ol>
+
+            <h4>V3-pi0.5</h4>
+            <p>首先先直接拿已有数据做了一遍绕圈（已拿起），效果一般 69%，但是专家本身也才60%</p>
+
+            <p><span class="page-prose__label">问题</span><br>
+              发现原因是柱子位置导致不一定成功<br>
+              改为柱子在很小范围改变，适配各种rod，长杆的抓取规则调整。<br>
+              因此需要重新训练pi
+            </p>
+
+            <p><span class="page-prose__label">问题</span><br>
+              发现前面不收敛，考虑仿真环境提高收敛迭代数<br>
+              但是生成 π 数据可能不需要S10（十次newton收敛）<br>
+              对模仿学习来说，1–2 cm 的轨迹差和一点松手后的抖动，可能就相当于一点物理随机化，影响不大。
+            </p>
+            <p>先沿着杆去重抓，不行再松开后重抓</p>
+
+            <p><span class="page-prose__label">问题</span><br>
+              0-3成功率很高，大于8到10以上成功率很低，不容易固定。于是忽略掉这部分，提高训练速度
+            </p>
+
+            <p><span class="page-prose__label">4 个子任务 prompt</span>：<br>
+              “pick up the rod from the table with both hands”（抓起）<br>
+              “carry the rod to the post”（搬运）<br>
+              “wind the rod one full turn around the post”（绕圈，和旧数据的 prompt 相同）<br>
+              “let go of the rod”（松手）<br>
+              状态是 15 维，含线圈圈数
+            </p>
+            <p>
+              每个样本是“这一帧的三张图 + 机器人状态 + 一句 prompt → 接下来 1 秒该做的动作”<br>
+              输入的状态是以文字形式输入的 受 200 个 token大小限制
+            </p>
+            <p>
+              混合训练：一个样本总prompt+子任务prompt都训<br>
+              6000steps
+            </p>
+
+            <p><span class="page-prose__label">问题</span><br>
+              抓取的成功率很低 可能是因为rod的位置分布几乎不变 导致学成了固定位置范围抓取
+            </p>
+            <p>改变rod分布 修改抓取脚本 重新训练</p>
+
+            <h5>v2 模型</h5>
+            <ul>
+              <li>570 条示范</li>
+              <li>一个训练步随机抽 32 个样本，6000步约占全部帧的 24%，但是这个4000和6000差不多效果 因为分布都抽到了</li>
+            </ul>
+            <div class="page-prose__table">
+              <table>
+                <thead>
+                  <tr><th scope="col">阶段</th><th scope="col">6000 步<br>每 10 步重新预测（第三轮）</th><th scope="col">6000 步<br>每 5 步重新预测</th><th scope="col">4000 步<br>每 10 步重新预测</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>回合数</td><td>32</td><td>16</td><td>16</td></tr>
+                  <tr><td>R 抓住</td><td>23（72%）</td><td>11（69%）</td><td>9（56%）</td></tr>
+                  <tr><td>L 抓住</td><td>18（56%）</td><td>11（69%）</td><td>15（94%）</td></tr>
+                  <tr><td>双手抓住</td><td>11（34%）</td><td>9（56%）</td><td>8（50%）</td></tr>
+                  <tr><td>双手抬起</td><td>8（25%）</td><td>7（44%）</td><td>7（44%）</td></tr>
+                  <tr><td>线圈 ≥0.8 圈</td><td>3</td><td>1</td><td>2</td></tr>
+                  <tr><td>最终成功</td><td>2（6%）</td><td>1（6%）</td><td>2（12%）</td></tr>
+                  <tr><td>抬起后成功</td><td>2/8</td><td>1/7</td><td>1/7</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              （专家成功率约 85%）<br>
+              原因：大概率是因为专家的抓取不会失败，无法学到真正的判断，只是根据时间点路径依赖
+            </p>
+
+            <h5>DAgger</h5>
+            <p>ongoing</p>
           </div>
         </section>
       </section>
