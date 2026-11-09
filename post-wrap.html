@@ -193,6 +193,18 @@
     .page-prose .dp-run td:last-child {
       white-space: normal;
     }
+
+    /* phones: the row names wrap so the details keep most of the width */
+    @media (max-width: 480px) {
+      .dp-run .page-prose__table {
+        padding: 0 0.5rem 0.5rem;
+      }
+
+      .page-prose .dp-run th[scope="row"] {
+        width: 4.2rem;
+        white-space: normal;
+      }
+    }
   </style>
 </head>
 <body>
@@ -574,11 +586,13 @@
                   <table>
                     <tbody>
                       <tr><th scope="row">数据</th><td>v3：1079 条成功示范，153 万帧，20 Hz。专家到位立即合手，仿真夹爪 1 帧合上；30% 的桌面抓取故意偏 6–15 mm（悬停后抬起重来）；DART 执行噪声 0.3°（一半回合）</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>三批合成：11-05 两台 pod 约 8.3 h（575 条）；11-07 三台 RTX PRO 6000 2 h 39 min（07:30–10:09 UTC，477 条），另有之前中途停掉的一批 27 条；转成 LeRobot 格式 1 h 04 min</td></tr>
                       <tr><th scope="row">输入（观测）</th><td>1 帧：顶部相机 640×360 整图 + 两个腕部相机 640×360；状态 41 维 = 关节和夹爪 14 + 缠绕圈数 1 + 杆关键点 26（8 点 × 3 + 柱子 xy，仿真真值）</td></tr>
                       <tr><th scope="row">输出（动作）</th><td>16 步 × 14 维（每只手 6 个关节的绝对角度 + 夹爪宽度），每次执行前 8 步</td></tr>
                       <tr><th scope="row">模型与训练</th><td>每个相机一个 ResNet18（GroupNorm，从零训），不裁图；DDIM 10 步；AMP；batch 64，lr 1e-4 余弦；没有 EMA，没有图像增强</td></tr>
-                      <tr><th scope="row">训练量</th><td>4 万步（1.67 epoch），RTX PRO 6000 约 2.7 h，loss 0.004</td></tr>
-                      <tr><th scope="row">评测</th><td>种子 600000–600015，各 2 次；评测时两只夹爪都强制张开 30 mm</td></tr>
+                      <tr><th scope="row">训练量</th><td>4 万步（1.67 epoch），loss 0.004</td></tr>
+                      <tr><th scope="row">训练时间</th><td>2 h 43 min（11-07 13:08–15:51 UTC），0.24 s/步，1 台 RTX PRO 6000</td></tr>
+                      <tr><th scope="row">评测</th><td>种子 600000–600015，各 2 次；评测时两只夹爪都强制张开 30 mm；32 回合约 2 h（15:53–17:52 UTC）</td></tr>
                       <tr><th scope="row">结果</th><td>32 回合 0 次抓住；手在杆上方 15–40 cm 游走</td></tr>
                       <tr><th scope="row">结论</th><td>离线逐帧误差小（0.5–0.7°），闭环失败。当时怀疑缺少时间信息 → dp2</td></tr>
                     </tbody>
@@ -592,9 +606,11 @@
                   <table>
                     <tbody>
                       <tr><th scope="row">修改</th><td>观测改为 2 帧（DP 标准），其余同 dp1</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>不重新生成，数据同 dp1；重新转成 LeRobot 格式 46 min</td></tr>
                       <tr><th scope="row">输入（观测）</th><td>2 帧：三个相机 640×360 + 状态 41 维（同 dp1）</td></tr>
                       <tr><th scope="row">输出（动作）</th><td>16 步 × 14 维，执行 8 步</td></tr>
-                      <tr><th scope="row">训练量</th><td>4 万步，约 5.2 h（0.47 s/步），loss 0.004</td></tr>
+                      <tr><th scope="row">训练量</th><td>4 万步（1.67 epoch），loss 0.004</td></tr>
+                      <tr><th scope="row">训练时间</th><td>5 h 15 min（11-07 23:01 – 11-08 04:16 UTC），0.47 s/步（2 帧图像，编码器的计算量翻倍）</td></tr>
                       <tr><th scope="row">评测</th><td>① 强制张开：29 回合 0 次抓住。② 修正后（不强制张开，杆在两指尖之间就算抓住）：16 个场景</td></tr>
                       <tr><th scope="row">结果</th><td>修正后 R 抓住 1、L 抓住 1，双手 0。R 会在约 3 s 下去抓（时机对），但合手时手离杆 5–21 mm</td></tr>
                       <tr><th scope="row">结论</th><td>强制张开在数据里等于“R 已经抓住、该 L 了”，模型去动 L；修正后的问题是合手偏早、偏高。抓空后的状态数据里从未出现（专家对不准时在合手前就退开，“合空后重抓”0 次），于是乱动。另有 5/16 个评测种子和训练数据重合</td></tr>
@@ -609,12 +625,14 @@
                   <table>
                     <tbody>
                       <tr><th scope="row">数据</th><td>v4：1081 条成功示范，79.5 万帧，10 Hz（图像也按 10 Hz 渲染）</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>5 h 17 min（11-08 11:07–16:24 UTC），3 台 RTX PRO 6000 并行，每台 27 个进程；共跑 2035 个场景：成功 1081、跳过 688（布局抓不到）、失败 266；转成 LeRobot 格式 23 min</td></tr>
                       <tr><th scope="row">专家 / 仿真修改</th><td>到位后停 0.3 s 再合；手指按 50 mm/s 合拢（30 mm 约 0.6 s），手指碰到杆才算抓住；去掉桌面抓取的故意偏移；保留 DART 执行噪声 0.3°</td></tr>
                       <tr><th scope="row">输入（观测）</th><td>2 帧：顶部相机 640×360 整图 + 两个腕部相机 320×180；状态 32 维 = 关节和夹爪 14 + 两手末端位置与 6D 姿态 18（去掉仿真真值）</td></tr>
                       <tr><th scope="row">输出（动作）</th><td>16 步 × 14 维（绝对关节角 + 夹爪宽度），执行 8 步</td></tr>
                       <tr><th scope="row">模型与训练</th><td>按原版 DP 配方补齐：EMA（power 0.75，上限 0.9999）、随机平移 ±16 px（不裁图）、每个相机独立的 ResNet18（允许不同尺寸）、DDIM 100 / 100 步；AMP；batch 64，lr 1e-4 余弦（预热 500）</td></tr>
-                      <tr><th scope="row">训练量</th><td>8 万步（6.4 epoch），约 6 h（0.25 s/步），loss 0.004</td></tr>
-                      <tr><th scope="row">评测</th><td>种子 800000–800015（训练没用过）；夹爪限速合拢，指尖从内侧碰到杆且沿工具轴 ≤ 5 mm 才算抓住；每个场景 150 s</td></tr>
+                      <tr><th scope="row">训练量</th><td>8 万步（6.4 epoch），loss 0.004</td></tr>
+                      <tr><th scope="row">训练时间</th><td>6 h 04 min（11-08 16:52–22:55 UTC），0.25 s/步</td></tr>
+                      <tr><th scope="row">评测</th><td>种子 800000–800015（训练没用过）；夹爪限速合拢，指尖从内侧碰到杆且沿工具轴 ≤ 5 mm 才算抓住；每个场景 150 s；16 个场景并行，每个检查点约 40 min</td></tr>
                       <tr><th scope="row">结果</th><td>4 万步：R 5、L 7、双手 1、抬起 1、成功 1。8 万步：R 14、L 13、双手 13、抬起 11、到柱子 14、最多绕到 ≥0.5 圈 2、成功 1（0.95 圈）</td></tr>
                       <tr><th scope="row">问题</th><td>桌面抓取 27/28，空中抓取（R 在锚点重抓、L 换手）只有 3/17；抓在指尖附近（+1.2 mm）容易滑脱。4 万 → 8 万步提升很大</td></tr>
                     </tbody>
@@ -628,12 +646,14 @@
                   <table>
                     <tbody>
                       <tr><th scope="row">数据</th><td>v5：1169 条成功示范，91.8 万帧，10 Hz</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>3 h 31 min（11-09 00:30–04:01 UTC），6 台 RTX PRO 6000（3 台先开，另 3 台晚 14–22 min 加入），合计满 1000 条时统一停、跑完手上的场景；共跑 2346 个场景：成功 1169、跳过 804、失败 373；转成 LeRobot 格式 19 min</td></tr>
                       <tr><th scope="row">专家 / 仿真修改</th><td>在 v4 上：空中抓取在有空间时往深处多抓 4 mm；空中接近的 DART——一半的空中抓取先被推偏 6–15 mm，偏移在对准过程中 0.6 s 内消失，专家指令始终指向杆</td></tr>
                       <tr><th scope="row">输入（观测）</th><td>2 帧：三个相机（同 dp4）；状态 35 维 = 关节和夹爪 14 + 两手末端位置与 6D 姿态 18 + 杆的材料参数 3（直径、log10 弹性模量、回弹曲率 κ<sub>s</sub>），训练时加噪声（0.1 mm / 0.1 / 0.5 m<sup>−1</sup>），模拟真机系统辨识的误差</td></tr>
                       <tr><th scope="row">输出（动作）</th><td>同 dp4：16 步 × 14 维（绝对关节角 + 夹爪宽度），执行 8 步</td></tr>
                       <tr><th scope="row">模型与训练</th><td>同 dp4</td></tr>
-                      <tr><th scope="row">训练量</th><td>12 万步（8.4 epoch），约 8.6 h，loss 0.004</td></tr>
-                      <tr><th scope="row">评测</th><td>同 dp4，另加：杆碰到柱子并在手里绕到 ≥ 0.25 圈后，两手放开 3 s 才算结束（旧规则偶然滑脱一下就提前结束）；手指卡在杆上停住时也判定抓住或抓空</td></tr>
+                      <tr><th scope="row">训练量</th><td>12 万步（8.4 epoch），loss 0.004</td></tr>
+                      <tr><th scope="row">训练时间</th><td>8 h 37 min（11-09 04:22–12:59 UTC），0.26 s/步</td></tr>
+                      <tr><th scope="row">评测</th><td>同 dp4，另加：杆碰到柱子并在手里绕到 ≥ 0.25 圈后，两手放开 3 s 才算结束（旧规则偶然滑脱一下就提前结束）；手指卡在杆上停住时也判定抓住或抓空；每个检查点约 44 min</td></tr>
                       <tr><th scope="row">结果</th><td>6 万步（旧规则、100 s）：R 10、L 6、双手 3、成功 0。8 万步：R 13、L 13、双手 10、抬起 7、≥0.5 圈 4、成功 2。12 万步：R 15、L 15、双手 14、抬起 11、到柱子 14、≥0.5 圈 7、成功 2（1.17 圈、0.95 圈）</td></tr>
                       <tr><th scope="row">问题</th><td>空中抓住时位置更深（−0.8 mm，“抓深”学到了），但空中抓取仍只有 6/30；松手偏早（最多绕到 0.54–0.70 圈就放，只剩 0.12–0.27 圈）；滑脱 13 次</td></tr>
                     </tbody>
@@ -647,6 +667,8 @@
                   <table>
                     <tbody>
                       <tr><th scope="row">修改</th><td>从 dp5 的 12 万步权重（EMA）继续训练 4 万步，lr 3e-5（预热 1000，余弦）；数据和配方同 dp5</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>不重新生成，数据同 dp5</td></tr>
+                      <tr><th scope="row">训练时间</th><td>进行中：11-09 18:53 UTC 开始，0.40 s/步（这台 pod 读数据慢，GPU 部分同为 0.26 s），预计约 4.4 h</td></tr>
                       <tr><th scope="row">结果</th><td>训练中</td></tr>
                     </tbody>
                   </table>
