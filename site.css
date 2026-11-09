@@ -419,6 +419,13 @@ p.page-prose__label {
   font-weight: 600;
 }
 
+/* a section's own parts (Post Wrap > Imitation Learning > V0 ... V4-DP), shown with that section's deep list */
+.site-nav__link--deeper {
+  padding: 0.15rem 0.5rem 0.15rem 3.4rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 .site-nav__link:focus-visible,
 .site-nav__close:focus-visible,
 .site-bar__menu:focus-visible {

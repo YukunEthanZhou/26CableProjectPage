@@ -242,7 +242,17 @@
               <a class="site-nav__link site-nav__link--sub" href="post-wrap.html" aria-current="page">Post Wrap</a>
               <ul class="site-nav__sub site-nav__sub--deep">
                 <li><a class="site-nav__link site-nav__link--deep" href="post-wrap.html#mpc">MPC</a></li>
-                <li><a class="site-nav__link site-nav__link--deep" href="post-wrap.html#imitation-learning">Imitation Learning</a></li>
+                <li>
+                  <a class="site-nav__link site-nav__link--deep" href="post-wrap.html#imitation-learning">Imitation Learning</a>
+                  <ul class="site-nav__sub site-nav__sub--deeper" lang="zh-CN">
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-scripted">脚本做法</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v0">V0</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v1">V1-纯感知版</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v2">V2-双臂相机</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v3">V3-pi0.5</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v4-dp">V4-DP</a></li>
+                  </ul>
+                </li>
               </ul>
             </li>
             <li>
@@ -353,7 +363,7 @@
           <h3 class="page-subsection__title" id="imitation-learning-title">Imitation Learning</h3>
 
           <div class="page-prose" lang="zh-CN">
-            <h4>脚本做法</h4>
+            <h4 id="il-scripted">脚本做法</h4>
             <p class="page-prose__label">绕柱任务需要的原语</p>
             <p>
               <code>grasp(arm, s)</code>在线缆弧长 s 处抓取，脚本：感知给出中心线，直接计算抓取位姿<br>
@@ -367,7 +377,7 @@
               <code>regrasp</code>，如果判断到手将碰到障碍物（此处是柱子），重抓一定距离。
             </p>
 
-            <h4>V0</h4>
+            <h4 id="il-v0">V0</h4>
             <p><span class="page-prose__label">数据生成</span>：模拟器随机场景</p>
             <ul>
               <li>柱子：5 种之一，直径 10–25 mm，位置随机（x ∈ [−0.15, 0] m、y ∈ [0.12, 0.17] m）；</li>
@@ -477,7 +487,7 @@
             </p>
             <p><span class="page-prose__label">问题</span>：脚本会出现27/32: 找不到空位（桌面或另一条臂挡着），3 个是找不到无碰撞路径：重抓+-4cm，范围太大了</p>
 
-            <h4>V1-纯感知版</h4>
+            <h4 id="il-v1">V1-纯感知版</h4>
             <p><span class="page-prose__label">方法</span><br>
               使用DERPerception，用相机做矫正
             </p>
@@ -491,7 +501,7 @@
               （模拟环境测试）真值30/32，纯感知24/32
             </p>
 
-            <h4>V2-双臂相机</h4>
+            <h4 id="il-v2">V2-双臂相机</h4>
             <p>加入双臂相机</p>
             <ol>
               <li>抓取成功直接看夹爪内有没有</li>
@@ -504,7 +514,7 @@
               <li>抓取时：根据相机直接移动点，然后剩下的点自然回弹移动</li>
             </ol>
 
-            <h4>V3-pi0.5</h4>
+            <h4 id="il-v3">V3-pi0.5</h4>
             <p>首先先直接拿已有数据做了一遍绕圈（已拿起），效果一般 69%，但是专家本身也才60%</p>
 
             <p><span class="page-prose__label">问题</span><br>
@@ -575,7 +585,7 @@
             <h5>DAgger</h5>
             <p>ongoing</p>
 
-            <h4>V4-DP</h4>
+            <h4 id="il-v4-dp">V4-DP</h4>
             <p>Diffusion Policy（LeRobot 实现，按原版配方补齐），端到端：三个相机的图像 + 机器人状态 → 接下来 16 步每只手的关节角和夹爪宽度。从桌面拿起杆、搬到柱子、绕一圈、松手，整个任务一个策略。</p>
 
             <h5>Train</h5>
