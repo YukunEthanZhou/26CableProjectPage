@@ -672,14 +672,17 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp5ft · 继续训练</span><span class="dp-run__meta">11-09 · dp5 + 4 万步</span><span class="dp-run__result">进行中</span></summary>
+                <summary><span class="dp-run__name">dp5ft · 继续训练</span><span class="dp-run__meta">11-09 · dp5 + 4 万步</span><span class="dp-run__result">双手 14/16，成功 2/16</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
                       <tr><th scope="row">修改</th><td>从 dp5 的 12 万步权重（EMA）继续训练 4 万步，lr 3e-5（预热 1000，余弦）；数据和配方同 dp5</td></tr>
                       <tr><th scope="row">数据生成时间</th><td>不重新生成，数据同 dp5</td></tr>
-                      <tr><th scope="row">训练时间</th><td>进行中：11-09 18:53 UTC 开始，0.40 s/步（这台 pod 读数据慢，GPU 部分同为 0.26 s），预计约 4.4 h</td></tr>
-                      <tr><th scope="row">结果</th><td>训练中</td></tr>
+                      <tr><th scope="row">训练量</th><td>4 万步（共 16 万步），loss 0.004</td></tr>
+                      <tr><th scope="row">训练时间</th><td>前 2 万步 2 h 27 min（11-09 18:53–21:20 UTC，0.45 s/步，这台 pod 读数据慢）；之后提速（数据加载改为 numpy 列 + uint8 帧，torch.compile、channels-last、bf16、fused Adam），从 2 万步的检查点接着训，后 2 万步 53 min（21:25–22:18 UTC，约 0.15 s/步）</td></tr>
+                      <tr><th scope="row">评测</th><td>同 dp5（种子 800000–800015，新结束规则，150 s）；新 pod 上 16 个仿真同时编译内核时内存映射失败，改为先开 1 个把内核编译进缓存，再开其余 15 个；约 43 min</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 2（800005 1.06 圈、800001 0.90 圈）；R 16、L 14、双手 14、抬起 11、到柱子 15、≥0.5 圈 8；桌面抓取 30/32，空中抓取 4/27（R 在锚点重抓 4/15）；滑脱 6 次（dp5 12 万步 13 次）</td></tr>
+                      <tr><th scope="row">问题</th><td>成功数没变（成功的场景换了：dp5 是 800000、800012）。放手后圈数基本保住（8 个放手的回合，最后圈数 ≈ 最多圈数），但其中 6 个绕到 0.5–0.85 圈就放了，没绕满一圈；另外 8 个超时、几乎没绕，卡在空中重抓或没抬起来。桌面抓取和滑脱变好，空中抓取仍是瓶颈</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -697,6 +700,7 @@
                   <tr><td>dp4 8 万步（旧结束规则）</td><td>1</td><td>14</td><td>13</td><td>13</td><td>11</td><td>14</td><td>2</td><td>3/17</td></tr>
                   <tr><td>dp5 8 万步</td><td>2</td><td>13</td><td>13</td><td>10</td><td>7</td><td>14</td><td>4</td><td>—</td></tr>
                   <tr><td>dp5 12 万步</td><td>2</td><td>15</td><td>15</td><td>14</td><td>11</td><td>14</td><td>7</td><td>6/30</td></tr>
+                  <tr><td>dp5ft 16 万步（12 万 + 4 万）</td><td>2</td><td>16</td><td>14</td><td>14</td><td>11</td><td>15</td><td>8</td><td>4/27</td></tr>
                 </tbody>
               </table>
             </div>
