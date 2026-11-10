@@ -108,6 +108,7 @@
     /* V4-DP training runs: one expandable entry per run, its details as a two-column table */
     .dp-runs {
       display: grid;
+      grid-template-columns: minmax(0, 1fr); /* an entry no wider than the page: its table scrolls on its own */
       gap: 0.5rem;
       margin: 0.25rem 0 1rem;
     }
@@ -198,6 +199,103 @@
     .speed-use {
       color: var(--text-light);
       font-size: 0.8rem;
+    }
+
+    /* prose inside an entry, before or after its table */
+    .dp-run__note {
+      padding: 0 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .dp-run__note--end {
+      padding-bottom: 0.6rem;
+    }
+
+    /* a term with a note: clicked, the note opens next to it (a popover; without popovers it shows below) */
+    .term {
+      padding: 0;
+      border: 0;
+      border-bottom: 1px dashed currentColor;
+      background: none;
+      color: var(--accent);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .term:hover {
+      border-bottom-style: solid;
+    }
+
+    .term:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    .term-note {
+      margin: 0.5rem 0.8rem;
+      padding: 0.7rem 0.9rem 0.8rem;
+      border: 1px solid var(--line-strong);
+      border-radius: 0.5rem;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.85rem;
+      line-height: 1.55;
+    }
+
+    .term-note__close {
+      display: none;
+    }
+
+    .page-prose .term-note__title {
+      margin: 0 0 0.4rem;
+      font-weight: 700;
+    }
+
+    .term-note__title span {
+      margin-left: 0.4rem;
+      color: var(--text-light);
+      font-size: 0.8rem;
+      font-weight: 400;
+    }
+
+    .page-prose .term-note ul {
+      margin: 0 0 0.4rem;
+    }
+
+    .page-prose .term-note__code {
+      margin: 0;
+      color: var(--text-light);
+      font-size: 0.8rem;
+    }
+
+    @supports selector(:popover-open) {
+      .term-note {
+        position: fixed;
+        inset: auto;
+        margin: 0;
+        width: min(26rem, calc(100vw - 1rem));
+        max-height: min(70vh, 32rem);
+        overflow: auto;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+      }
+
+      .term-note__close {
+        display: block;
+        float: right;
+        margin: -0.3rem -0.4rem 0 0.5rem;
+        padding: 0 0.35rem;
+        border: 0;
+        background: none;
+        color: var(--text-light);
+        font-size: 1.2rem;
+        line-height: 1.4;
+        cursor: pointer;
+      }
+
+      .term-note__close:hover {
+        color: var(--accent);
+      }
     }
 
     /* phones: the row names wrap so the details keep most of the width */
@@ -594,6 +692,35 @@
             <h4 id="il-v4-dp">V4-DP</h4>
             <p>Diffusion Policy（LeRobot 实现，按原版配方补齐），端到端：三个相机的图像 + 机器人状态 → 接下来 16 步每只手的关节角和夹爪宽度。从桌面拿起杆、搬到柱子、绕一圈、松手，整个任务一个策略。</p>
 
+            <h5>数据生成</h5>
+            <div class="dp-runs">
+              <details class="dp-run">
+                <summary><span class="dp-run__name">模拟器提速</span><span class="dp-run__meta">11-07 – 11-09 · 数据生成</span><span class="dp-run__result">每帧 −25%，每条示范 −6%</span></summary>
+                <div class="dp-run__note">
+                  <p>数据 v5 一条成功示范平均 14.5 min（72 s 仿真；每台 pod 27 个进程共用一张卡）。</p>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">改动</th><th scope="col">原来 → 现在</th><th scope="col">效果</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>求解器换成 banded PCG<br><span class="speed-use">11-07 起生成的数据</span></td><td>每次 Newton 迭代的线性方程：<button class="term" type="button" popovertarget="note-fused-pcg">fused PCG</button> → <button class="term" type="button" popovertarget="note-banded-pcg">banded PCG</button>（生成数据时显式指定；数据 v3 的 11-05 那批还是 fused）</td><td>同一场景每帧 149 → 111 ms；自由摆动 0.5 s 后离收敛解 75 mm → 0.008 mm</td></tr>
+                      <tr><td>等 GPU 时不空转 CPU<br><span class="speed-use">11-09</span></td><td>容器看到宿主机 288 核，CUDA 默认等 GPU 时原地空转，27 个进程把 27–31 核的 CPU 配额烧在空转上（load 40–66），挤占专家规划 → 改成阻塞等待（要在 warp 初始化之后设置，否则被覆盖）；ffmpeg 限 2 线程</td><td>本地：等待时单核占用 100% → 6%，墙钟不变；数据 pod 上的整机效果还没测</td></tr>
+                      <tr><td>松手检查沿用预测<br><span class="speed-use">11-09</span></td><td>专家松手前先从快照模拟一遍松手，看能留下几圈；决定松手后再真的算一遍 → 决定松手就直接沿用预测那一段（只在脚本自己决策、没有感知估计时）</td><td>每条成功示范平均 1.7 次检查、1 次松手，省约 6%；同一场景 10.9 → 9.9 min，结果相同（1.10 圈），子任务切分不变</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p class="page-prose__label">没做的</p>
+                  <ul>
+                    <li>空中重抓的预测也沿用：每条示范平均只有 0.45 次，约省 1.5%，但要改重抓的内部流程。</li>
+                    <li>多个场景合进一个多 world 仿真：现在数据生成每个进程只有 1 个 world，27 个场景靠 27 个进程并行；合并要把专家脚本改成所有场景同步一帧一帧走，改动大，先看上面阻塞等待的整机效果再定。</li>
+                  </ul>
+                </div>
+              </details>
+            </div>
+
             <h5>Train</h5>
             <div class="dp-runs">
               <details class="dp-run">
@@ -715,6 +842,7 @@
               </details>
             </div>
 
+            <h5>Eval</h5>
             <p class="page-prose__label">结果对比（16 个场景）</p>
             <div class="page-prose__table">
               <table>
@@ -730,27 +858,55 @@
                 </tbody>
               </table>
             </div>
-
-            <h5>模拟器提速（数据生成和评测）</h5>
-            <p>评测时 16 个场景并行，一轮的时长取决于单个回合：失败的回合要跑满 150 s，旧设置下每个约 40–42 min（1 s 仿真约要 16.5 s）。数据生成一条成功示范平均 14.5 min（72 s 仿真）。</p>
-            <div class="page-prose__table">
-              <table>
-                <thead>
-                  <tr><th scope="col">改动</th><th scope="col">原来 → 现在</th><th scope="col">效果</th><th scope="col">状态</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>求解器统一为 banded PCG<br><span class="speed-use">评测</span></td><td>生成训练数据时显式指定 banded PCG，但设置文件的默认值还是 fused PCG，之前所有 DP 评测都跑在 fused 上：评测和训练数据的物理不一致 → 默认值改成 banded PCG，评测、数据生成、DAgger 一致</td><td>同一场景每帧 149 → 111 ms；自由摆动 0.5 s 后离收敛解 75 mm → 0.008 mm</td><td>已生效</td></tr>
-                  <tr><td>评测不录视频<br><span class="speed-use">评测</span></td><td>每个回合结束后按 10 Hz 把三个相机重新渲染一遍 → 不录；trajectory.npz 照常保存，想看哪个回合再单独渲染</td><td>每个回合省几分钟</td><td>已生效</td></tr>
-                  <tr><td>等 GPU 时不空转 CPU<br><span class="speed-use">数据生成、评测</span></td><td>容器看到宿主机 288 核，CUDA 默认等 GPU 时原地空转，27 个进程把 27–31 核的 CPU 配额烧在空转上（load 40–66），挤占专家规划 → 改成阻塞等待（要在 warp 初始化之后设置，否则被覆盖）；ffmpeg 限 2 线程</td><td>本地：等待时单核占用 100% → 6%，墙钟不变；数据 pod 上的整机效果还没测</td><td>已生效</td></tr>
-                  <tr><td>松手检查沿用预测<br><span class="speed-use">数据生成</span></td><td>专家松手前先从快照模拟一遍松手，看能留下几圈；决定松手后再真的算一遍 → 决定松手就直接沿用预测那一段（只在脚本自己决策、没有感知估计时）</td><td>每条成功示范平均 1.7 次检查、1 次松手，省约 6%；同一场景 10.9 → 9.9 min，结果相同（1.10 圈），子任务切分不变</td><td>已生效</td></tr>
-                </tbody>
-              </table>
+            <div class="dp-runs">
+              <details class="dp-run">
+                <summary><span class="dp-run__name">Eval 提速</span><span class="dp-run__meta">11-10 · 评测 · 物理与训练数据一致</span><span class="dp-run__result">每帧 −25%，不录视频</span></summary>
+                <div class="dp-run__note">
+                  <p>评测时 16 个场景并行，一轮的时长取决于单个回合：失败的回合要跑满 150 s，旧设置下每个约 40–42 min（1 s 仿真约要 16.5 s）。</p>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">改动</th><th scope="col">原来 → 现在</th><th scope="col">效果</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>求解器与训练数据一致</td><td>训练数据用 <button class="term" type="button" popovertarget="note-banded-pcg">banded PCG</button> 生成，但设置文件的默认值还是 <button class="term" type="button" popovertarget="note-fused-pcg">fused PCG</button>，之前所有 DP 评测都跑在 fused 上：评测和训练数据的物理不一致 → 默认值改成 banded PCG，评测、数据生成、DAgger 一致</td><td>每帧 149 → 111 ms；评测里杆的运动和训练数据一样收敛</td></tr>
+                      <tr><td>不录视频</td><td>每个回合结束后按 10 Hz 把三个相机重新渲染一遍 → 不录；trajectory.npz 照常保存，想看哪个回合再单独渲染</td><td>每个回合省几分钟</td></tr>
+                      <tr><td>等 GPU 时不空转 CPU</td><td>评测 pod 上 16 个仿真进程 + 1 个策略服务，CUDA 默认等 GPU 时原地空转 → 评测进程也改成阻塞等待（同数据生成）</td><td>本地：等待时单核占用 100% → 6%</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p>dp5ft 4 万步的快速评测（每次只执行 4 步）已用新设置从头重跑，跑完后补上前后耗时对比。</p>
+                </div>
+              </details>
             </div>
-            <p class="page-prose__label">没做的</p>
-            <ul>
-              <li>空中重抓的预测也沿用：每条示范平均只有 0.45 次，约省 1.5%，但要改重抓的内部流程。</li>
-              <li>多个场景合进一个多 world 仿真：现在数据生成每个进程只有 1 个 world，27 个场景靠 27 个进程并行；合并要把专家脚本改成所有场景同步一帧一帧走，改动大，先看上面阻塞等待的整机效果再定。</li>
-            </ul>
+            <div class="term-notes">
+              <div class="term-note" id="note-fused-pcg" popover>
+                <button class="term-note__close" type="button" popovertarget="note-fused-pcg" popovertargetaction="hide" aria-label="关闭">×</button>
+                <p class="term-note__title">fused PCG <span>2026-10-23 至 11-06 的默认求解</span></p>
+                <ul>
+                  <li>仿真每个子步做几次 Newton 迭代，每次都要解一个线性方程 A x = b：A 是杆的 Hessian，每个粒子 4 个自由度，61 个粒子约 244 行。</li>
+                  <li>PCG = 预条件共轭梯度。这里用 Jacobi 预条件，只取 A 的对角线，最多迭代 64 次。</li>
+                  <li>fused = 把整个迭代循环放进一个 GPU kernel：每个 world 一个 thread block，每行一个线程，向量放在 shared memory。warp 自带的 cg 每次迭代要启动约 7 个 kernel，矩阵这么小，时间主要耗在 kernel 之间。</li>
+                  <li>效果：仿真每帧 514 → 253 ms（相比 warp 的 cg）。</li>
+                  <li>问题：只看对角线的预条件对又长又硬的杆太弱，64 次解不准，Newton 也收敛不了（每个子步跑满 12 次）：自由摆动 0.5 s 后离收敛解差 75 mm。</li>
+                </ul>
+                <p class="term-note__code">代码：der/fused_pcg.py</p>
+              </div>
+              <div class="term-note" id="note-banded-pcg" popover>
+                <button class="term-note__close" type="button" popovertarget="note-banded-pcg" popovertargetaction="hide" aria-label="关闭">×</button>
+                <p class="term-note__title">banded PCG <span>2026-11-06 起的默认求解</span></p>
+                <ul>
+                  <li>观察：杆上每个粒子只和相邻的几个粒子耦合，所以 Hessian 几乎是带状的（主对角线两侧各 10 行）；只有杆自己碰到自己（自接触）才有带外的项。</li>
+                  <li>做法：预条件用带内部分的精确 L D L<sup>T</sup> 分解（带状 Cholesky），共轭梯度仍在完整的 A 上迭代，最多 16 次。</li>
+                  <li>没有自接触时带就是整个矩阵，预条件就是精确解：共轭梯度 1 次就收敛，Newton 二次收敛，平均 4.2 次/子步。</li>
+                  <li>实现：每个 world 一个 256 线程的 block，带放进 shared memory 原地分解；超过 125 个粒子放不下，自动退回 fused PCG。</li>
+                  <li>效果：自由摆动每帧 85 → 54 ms，0.5 s 后离收敛解 0.008 mm；线圈压在自己身上（自接触很多）时慢 10–40%，但更准。数据生成的场景平均每帧 149 → 111 ms。</li>
+                </ul>
+                <p class="term-note__code">代码：der/banded_pcg.py</p>
+              </div>
+            </div>
           </div>
         </section>
       </section>
@@ -759,6 +915,40 @@
 
   <script src="site.js"></script>
   <script>
+    /* the term notes (popovers): opened just below the term clicked (above it where the window ends), kept next to
+       it while the page scrolls; light dismiss and Esc close them (the popover's own behaviour) */
+    (function () {
+      if (!HTMLElement.prototype.togglePopover) return;
+      var gap = 6, edge = 8;
+      function place(note, measured) {
+        var term = note._term;
+        if (!term) return;
+        var r = term.getBoundingClientRect();
+        var width = document.documentElement.clientWidth, height = window.innerHeight;
+        var w = measured ? note.offsetWidth : Math.min(416, width - 16);
+        var top = r.bottom + gap;
+        if (measured && top + note.offsetHeight > height - edge && r.top - gap - note.offsetHeight >= edge) {
+          top = r.top - gap - note.offsetHeight;
+        }
+        note.style.left = Math.max(edge, Math.min(r.left, width - w - edge)) + 'px';
+        note.style.top = top + 'px';
+      }
+      Array.prototype.forEach.call(document.querySelectorAll('.term[popovertarget]'), function (term) {
+        var note = document.getElementById(term.getAttribute('popovertarget'));
+        if (!note) return;
+        term.addEventListener('click', function () { note._term = term; });
+        note.addEventListener('beforetoggle', function (e) { if (e.newState === 'open') place(note, false); });
+        note.addEventListener('toggle', function (e) { if (e.newState === 'open') place(note, true); });
+      });
+      function follow() {
+        Array.prototype.forEach.call(document.querySelectorAll('.term-note:popover-open'), function (note) {
+          place(note, true);
+        });
+      }
+      window.addEventListener('scroll', follow, { passive: true });
+      window.addEventListener('resize', follow);
+    })();
+
     (function () {
       var figure = document.getElementById("hessian-convergence");
       if (!figure) {
