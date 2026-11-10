@@ -194,6 +194,12 @@
       white-space: normal;
     }
 
+    /* the speed-up tables: where a change applies, under its name */
+    .speed-use {
+      color: var(--text-light);
+      font-size: 0.8rem;
+    }
+
     /* phones: the row names wrap so the details keep most of the width */
     @media (max-width: 480px) {
       .dp-run .page-prose__table {
@@ -687,6 +693,26 @@
                   </table>
                 </div>
               </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">训练提速</span><span class="dp-run__meta">11-09 · 数据加载 + 计算 + 续训 · 训练结果不变</span><span class="dp-run__result">0.42 → 0.14 s/步</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">改动</th><th scope="col">原来</th><th scope="col">现在</th><th scope="col">效果</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>数据加载</td><td>每个样本对每个键做一次 HF select（约 25 ms）；视频帧在加载进程里就转成 float32，每个 batch 531 MB 经共享内存和锁页内存搬运</td><td>非视频列一次读进 numpy；帧以 uint8 传，到 GPU 上再 ÷255（20 个随机样本与原路径逐值相同）；每个 batch 133 MB</td><td>单进程吞吐 1.76 倍；每步等数据 0.1–0.29 s → 0.001 s</td></tr>
+                      <tr><td>torch.compile</td><td>逐个算子执行。profile：卷积反传 23%，GroupNorm 约 21%，autocast 类型转换 13%，NCHW↔NHWC 转换 11%，Adam 7%</td><td>三个相机编码器和 U-Net 原地编译（权重名不变，检查点照常保存和加载）</td><td>0.243 → 0.131 s/步；显存 28.6 → 17.3 GB</td></tr>
+                      <tr><td>另外三个开关</td><td>fp16 autocast；NCHW；foreach Adam</td><td>bf16 autocast；图像 channels-last；fused Adam</td><td>单独几乎无效（0.245 / 0.246 / 0.234 s/步）；加在 compile 上再快 4%（0.126 s/步）</td></tr>
+                      <tr><td>EMA 更新</td><td>每步逐个张量 mul_ + add_</td><td>torch._foreach_lerp_，一次处理所有张量</td><td>4–5 ms → 2.5 ms/步</td></tr>
+                      <tr><td>断点续训</td><td>lerobot 续训时从 EMA 权重接着训，平均也重新开始</td><td>原始权重从检查点的 raw_model.safetensors 接着训，EMA 从检查点接着平均，步数、优化器、学习率调度都接上</td><td>用 dp5 12 万步检查点验证：续 30 步，原始权重只变 6e-8，EMA 只变 0.001</td></tr>
+                      <tr><td>合计</td><td>0.26 s 计算 + 0.1–0.29 s 等数据</td><td>以上全开，GPU 利用率 98%</td><td>0.14 s/步，约 3 倍；dp5ft 后 2 万步 53 min（前 2 万步 2 h 27 min）</td></tr>
+                      <tr><td>测法与用法</td><td>—</td><td>环境变量 DP_FAST_LOADER=1、DP_COMPILE=1、DP_AMP_DTYPE=bf16、DP_CHANNELS_LAST=1、DP_FUSED_ADAM=1</td><td>空闲 GPU、同一个 batch、30 步的中位数（RTX PRO 6000，batch 64）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
             </div>
 
             <p class="page-prose__label">结果对比（16 个场景）</p>
@@ -704,6 +730,27 @@
                 </tbody>
               </table>
             </div>
+
+            <h5>模拟器提速（数据生成和评测）</h5>
+            <p>评测时 16 个场景并行，一轮的时长取决于单个回合：失败的回合要跑满 150 s，旧设置下每个约 40–42 min（1 s 仿真约要 16.5 s）。数据生成一条成功示范平均 14.5 min（72 s 仿真）。</p>
+            <div class="page-prose__table">
+              <table>
+                <thead>
+                  <tr><th scope="col">改动</th><th scope="col">原来 → 现在</th><th scope="col">效果</th><th scope="col">状态</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>求解器统一为 banded PCG<br><span class="speed-use">评测</span></td><td>生成训练数据时显式指定 banded PCG，但设置文件的默认值还是 fused PCG，之前所有 DP 评测都跑在 fused 上：评测和训练数据的物理不一致 → 默认值改成 banded PCG，评测、数据生成、DAgger 一致</td><td>同一场景每帧 149 → 111 ms；自由摆动 0.5 s 后离收敛解 75 mm → 0.008 mm</td><td>已生效</td></tr>
+                  <tr><td>评测不录视频<br><span class="speed-use">评测</span></td><td>每个回合结束后按 10 Hz 把三个相机重新渲染一遍 → 不录；trajectory.npz 照常保存，想看哪个回合再单独渲染</td><td>每个回合省几分钟</td><td>已生效</td></tr>
+                  <tr><td>等 GPU 时不空转 CPU<br><span class="speed-use">数据生成、评测</span></td><td>容器看到宿主机 288 核，CUDA 默认等 GPU 时原地空转，27 个进程把 27–31 核的 CPU 配额烧在空转上（load 40–66），挤占专家规划 → 改成阻塞等待（要在 warp 初始化之后设置，否则被覆盖）；ffmpeg 限 2 线程</td><td>本地：等待时单核占用 100% → 6%，墙钟不变；数据 pod 上的整机效果还没测</td><td>已生效</td></tr>
+                  <tr><td>松手检查沿用预测<br><span class="speed-use">数据生成</span></td><td>专家松手前先从快照模拟一遍松手，看能留下几圈；决定松手后再真的算一遍 → 决定松手就直接沿用预测那一段（只在脚本自己决策、没有感知估计时）</td><td>每条成功示范平均 1.7 次检查、1 次松手，省约 6%；同一场景 10.9 → 9.9 min，结果相同（1.10 圈），子任务切分不变</td><td>已生效</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="page-prose__label">没做的</p>
+            <ul>
+              <li>空中重抓的预测也沿用：每条示范平均只有 0.45 次，约省 1.5%，但要改重抓的内部流程。</li>
+              <li>多个场景合进一个多 world 仿真：现在数据生成每个进程只有 1 个 world，27 个场景靠 27 个进程并行；合并要把专家脚本改成所有场景同步一帧一帧走，改动大，先看上面阻塞等待的整机效果再定。</li>
+            </ul>
           </div>
         </section>
       </section>
