@@ -690,7 +690,7 @@
             <p>ongoing</p>
 
             <h4 id="il-v4-dp">V4-DP</h4>
-            <p>Diffusion Policy（LeRobot 实现，按原版配方补齐），端到端：三个相机的图像 + 机器人状态 → 接下来 16 步每只手的关节角和夹爪宽度。从桌面拿起杆、搬到柱子、绕一圈、松手，整个任务一个策略。</p>
+            <p>Diffusion Policy（LeRobot 实现，按原版配方补齐），端到端：三个相机的图像 + 机器人状态 → 接下来 16 步每只手的关节角和夹爪宽度（dp7 起加了柱子相机，动作改成夹爪坐标系下的相对位姿）。从桌面拿起杆、搬到柱子、绕一圈、松手，整个任务一个策略。</p>
 
             <h5>数据生成</h5>
             <div class="dp-runs">
@@ -822,6 +822,44 @@
               </details>
 
               <details class="dp-run">
+                <summary><span class="dp-run__name">dp7 · 相对位姿</span><span class="dp-run__meta">11-10 · 数据 v7 · 10 万步</span><span class="dp-run__result">双手 10/16，成功 4/16</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>动作改成夹爪坐标系下的相对位姿（UMI 的做法），观测不变；加一个对准柱子的大图；加辅助任务：从顶部和柱子相机的特征预测已绕的圈数；重抓片段（夹爪放开后、再次合上前 20 步到合上后 5 步）采样加到 5 倍</td></tr>
+                      <tr><th scope="row">数据</th><td>v7：示范同 v5（1169 条，91.8 万帧，10 Hz），每条补渲染柱子相机；动作换成关节指令的正运动学（和记录的 TCP 相差 ≤ 0.0006 mm）；每帧附上圈数作为辅助任务的标签</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>不重新仿真：补渲染柱子相机 + 算动作 27 min（11-10 02:45–03:12 UTC，先 1 台，再拆到 3 台 RTX PRO 6000）；转成 LeRobot 格式 29 min（10 份并行再合并）</td></tr>
+                      <tr><th scope="row">输入（观测）</th><td>2 帧：顶部相机 640×360 整图 + 两个腕部相机 320×180 + 柱子相机 256×256（D415 转向柱子底部上方 6 cm，焦距 2 倍）；状态 35 维（同 dp5）</td></tr>
+                      <tr><th scope="row">输出（动作）</th><td>16 步 × 20 维：每只手 TCP 位置 3 + 6D 姿态 6 + 夹爪宽度 1，位置和姿态相对观测时这只手的位姿；执行时换回绝对位姿，经 IK 走</td></tr>
+                      <tr><th scope="row">模型与训练</th><td>同 dp5，另加圈数辅助头（顶部 + 柱子相机的特征 → 圈数，均方误差权重 0.1，策略本身不用它的输出）；batch 64，lr 1e-4 余弦（预热 500）</td></tr>
+                      <tr><th scope="row">训练量</th><td>10 万步（7.0 epoch），loss 0.003；圈数辅助 mse 0.0007–0.0009（约 0.03 圈）</td></tr>
+                      <tr><th scope="row">训练时间</th><td>3 h 08 min（11-10 05:05–08:12 UTC），0.11 s/步，1 张 B200；之前在 2 × RTX PRO 6000 上试多卡并行，第一次 NCCL 通信就崩溃（虚拟化下 PCIe P2P 不通），放弃</td></tr>
+                      <tr><th scope="row">评测</th><td>种子 800000–800015，150 s，结束规则同 dp5；求解器用和数据一致的 banded PCG；每次执行 4 步（之前 8 步）；不录视频；约 54 min（1 台 RTX PRO 6000）</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 4（800001 0.98 圈、800002 1.06、800006 1.00、800012 1.28）；R 12、L 12、双手 10、抬起 10、到柱子 13、≥0.5 圈 9；桌面抓取 25/42，空中抓取 12/32（R 在锚点重抓 8/11）；滑脱 2 次</td></tr>
+                      <tr><th scope="row">问题</th><td>空中抓取明显变好（dp5ft 4/27），但桌面抓取退步（dp5ft 30/32）：6 个场景 R 离杆还有 15–24 mm 就合手（横向偏 1–2 cm），2 个场景 L 张开得比杆还窄就去合。另测了感知辅助（RodBelief 接管合手前的最后几厘米）：只有 3/16，策略把 R 放到抓不了的位置，辅助反复重试（一个场景 359 次）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp7ft · 继续训练</span><span class="dp-run__meta">11-10 · dp7 + 6 万步</span><span class="dp-run__result">双手 15/16，成功 7/16</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>从 dp7 的 10 万步权重（EMA）继续训练 6 万步，lr 3e-5（预热 1000，余弦），换了随机种子；数据和配方同 dp7</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>不重新生成，数据同 dp7</td></tr>
+                      <tr><th scope="row">训练量</th><td>6 万步（共 16 万步），loss 一直在 0.003–0.004；圈数辅助 mse 0.0014 → 0.0002–0.0006</td></tr>
+                      <tr><th scope="row">训练时间</th><td>2 h 03 min（11-10 19:57–22:00 UTC），0.12–0.13 s/步，1 张 H200（CPU 配额 20 核，数据加载 18 个进程）</td></tr>
+                      <tr><th scope="row">评测</th><td>同 dp7（banded PCG，每次执行 4 步，不录视频）；训练完在同一台 H200 上评测，约 59 min（先单独开 1 个编译内核 5 min，再 16 个并行）</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 7（800001、800002、800006、800007、800010、800011、800014）；R 15、L 16、双手 15、抬起 15、到柱子 16、≥0.5 圈 15；桌面抓取 31/34，空中抓取 27/53（R 16/18，其中锚点重抓 13/15；L 11/35）；滑脱 5 次</td></tr>
+                      <tr><th scope="row">问题</th><td>比 dp7 新增成功 4 个、少了 1 个（800012），桌面抓取的退步也没了；训练 loss 看不出变化，提升只在闭环里显出来。剩下 9 个失败里 6 个卡在 L 的空中重抓：24 次抓空里 21 次合手时杆离 TCP 还有 1 cm 以上（中位数 19 mm），手没到杆的位置。下一步（dp8）：加辅助任务，从腕部相机的特征预测杆在夹爪坐标系下的位置</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
                 <summary><span class="dp-run__name">训练提速</span><span class="dp-run__meta">11-09 · 数据加载 + 计算 + 续训 · 训练结果不变</span><span class="dp-run__result">0.42 → 0.14 s/步</span></summary>
                 <div class="page-prose__table">
                   <table>
@@ -855,6 +893,8 @@
                   <tr><td>dp5 8 万步</td><td>2</td><td>13</td><td>13</td><td>10</td><td>7</td><td>14</td><td>4</td><td>—</td></tr>
                   <tr><td>dp5 12 万步</td><td>2</td><td>15</td><td>15</td><td>14</td><td>11</td><td>14</td><td>7</td><td>6/30</td></tr>
                   <tr><td>dp5ft 16 万步（12 万 + 4 万）</td><td>2</td><td>16</td><td>14</td><td>14</td><td>11</td><td>15</td><td>8</td><td>4/27</td></tr>
+                  <tr><td>dp7 10 万步（banded，执行 4 步）</td><td>4</td><td>12</td><td>12</td><td>10</td><td>10</td><td>13</td><td>9</td><td>12/32</td></tr>
+                  <tr><td>dp7ft 16 万步（10 万 + 6 万）</td><td>7</td><td>15</td><td>16</td><td>15</td><td>15</td><td>16</td><td>15</td><td>27/53</td></tr>
                 </tbody>
               </table>
             </div>
