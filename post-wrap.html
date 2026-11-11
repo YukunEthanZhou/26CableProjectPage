@@ -843,7 +843,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp7ft · 继续训练</span><span class="dp-run__meta">11-10 · dp7 + 6 万步</span><span class="dp-run__result">双手 15/16，成功 7/16</span></summary>
+                <summary><span class="dp-run__name">dp7ft · 继续训练</span><span class="dp-run__meta">11-10 · dp7 + 6 万步</span><span class="dp-run__result">成功 18/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -852,7 +852,7 @@
                       <tr><th scope="row">训练量</th><td>6 万步（共 16 万步），loss 一直在 0.003–0.004；圈数辅助 mse 0.0014 → 0.0002–0.0006</td></tr>
                       <tr><th scope="row">训练时间</th><td>2 h 03 min（11-10 19:57–22:00 UTC），0.12–0.13 s/步，1 张 H200（CPU 配额 20 核，数据加载 18 个进程）</td></tr>
                       <tr><th scope="row">评测</th><td>同 dp7（banded PCG，每次执行 4 步，不录视频）；训练完在同一台 H200 上评测，约 59 min（先单独开 1 个编译内核 5 min，再 16 个并行）</td></tr>
-                      <tr><th scope="row">结果</th><td>成功 7（800001、800002、800006、800007、800010、800011、800014）；R 15、L 16、双手 15、抬起 15、到柱子 16、≥0.5 圈 15；桌面抓取 31/34，空中抓取 27/53（R 16/18，其中锚点重抓 13/15；L 11/35）；滑脱 5 次</td></tr>
+                      <tr><th scope="row">结果</th><td>50 个场景（见 Eval 的 50 场景对比，和 dp8、dp8ft、dp9 同一组种子）：成功 18/50 = 36%；按每次重抓（第一次合手就抓住 / 最终抓住）：桌面 88/93%，R 空中 80/80%，L 空中 22/34%。16 个场景：成功 7（800001、800002、800006、800007、800010、800011、800014）；R 15、L 16、双手 15、抬起 15、到柱子 16、≥0.5 圈 15；桌面抓取 31/34，空中抓取 27/53（R 16/18，其中锚点重抓 13/15；L 11/35）；滑脱 5 次</td></tr>
                       <tr><th scope="row">问题</th><td>比 dp7 新增成功 4 个、少了 1 个（800012），桌面抓取的退步也没了；训练 loss 看不出变化，提升只在闭环里显出来。剩下 9 个失败里 6 个卡在 L 的空中重抓：24 次抓空里 21 次合手时杆离 TCP 还有 1 cm 以上（中位数 19 mm），手没到杆的位置。下一步（dp8）：加辅助任务，从腕部相机的特征预测杆在夹爪坐标系下的位置</td></tr>
                     </tbody>
                   </table>
@@ -860,7 +860,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp8 · 杆位置辅助</span><span class="dp-run__meta">11-11 · dp7ft + 6 万步 · 腕部相机辅助任务</span><span class="dp-run__result">双手 14/16，成功 4/16</span></summary>
+                <summary><span class="dp-run__name">dp8 · 杆位置辅助</span><span class="dp-run__meta">11-11 · dp7ft + 6 万步 · 腕部相机辅助任务</span><span class="dp-run__result">成功 22/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -869,8 +869,59 @@
                       <tr><th scope="row">训练量</th><td>6 万步（共 22 万步），loss 0.003；杆位置误差（均方根）20 mm → 只训头时 10–14 mm → 编码器一起训后 3–5 mm（杆离手 2 cm 以内时 2–3 mm）</td></tr>
                       <tr><th scope="row">训练时间</th><td>2 h 14 min（11-10 23:40 – 11-11 01:54 UTC），0.11–0.13 s/步，1 张 H100（32 vCPU）；先开的 H200 只有 16 vCPU（CPU 配额 13.6 核），数据加载跟不上（0.2 s/步），训了几百步就换机重来</td></tr>
                       <tr><th scope="row">评测</th><td>同 dp7ft（每次执行 4 步，不录视频）；求解器换成大 kernel + banded 分 4 段（见下面的 Eval 提速，物理和原来一致到舍入误差）；训练完在同一台 H100 上评测，约 59 min</td></tr>
-                      <tr><th scope="row">结果</th><td>成功 4（800002、800004、800008、800014）；R 14、L 15、双手 14、抬起 14、到柱子 14、≥0.5 圈 11；桌面抓取 29/35，空中抓取 18/38（R 12/16，其中锚点重抓 11/14；L 6/22）；滑脱 6 次</td></tr>
-                      <tr><th scope="row">问题</th><td>比 dp7ft 少 3 个（新增 800004、800008，丢了 5 个）。只训头时误差降不下去，说明 dp7ft 的腕部相机特征里本来没有精确的杆位置；一起训后能定位到几毫米，但 L 的空中重抓没变好（6/22）：16 次抓空里 11 次合手时杆离 TCP 还有 1 cm 以上（中位数 16.5 mm）——定位信息已在特征里，动作没有因此对准。另有 4 个场景绕到 0.9–1.07 圈却没在 150 s 内松手（超时）</td></tr>
+                      <tr><th scope="row">结果</th><td>50 个场景：成功 22/50 = 44%（和 dp7ft 配对检验 p = 0.56，分不出高低）；按每次重抓：桌面 88/92%，R 空中 88/90%，L 空中 40/51%。16 个场景：成功 4（800002、800004、800008、800014）；R 14、L 15、双手 14、抬起 14、到柱子 14、≥0.5 圈 11；桌面抓取 29/35，空中抓取 18/38（R 12/16，其中锚点重抓 11/14；L 6/22）；滑脱 6 次</td></tr>
+                      <tr><th scope="row">问题</th><td>16 个场景比 dp7ft 少 3 个，50 个场景反而多 4 个：16 个场景分不出两者。只训头时误差降不下去，说明 dp7ft 的腕部相机特征里本来没有精确的杆位置；一起训后误差降到 3–5 mm（大部分帧是握着杆的，手接近杆的那段精度没单独测）。L 空中重抓仍是瓶颈。合手时刻分析（dp7ft、dp8 的评测轨迹）：合手那一刻手只落后策略给的目标 2–3 mm，是目标本身离杆 15–19 mm，之后 0.6 s 也没修正，偏差主要沿接近方向（±11 mm，两个方向都有）、侧向约 8 mm——不是指令时机的问题，是瞄准偏了。另有 4 个场景绕到 0.9–1.07 圈却没在 150 s 内松手（超时）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp9 · 相对观测</span><span class="dp-run__meta">11-11 · 从头 10 万步 · UMI 观测、不做随机平移</span><span class="dp-run__result">成功 7/50（50 场景）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>观测改成 UMI 的相对观测：状态去掉绝对关节角和绝对 TCP 位姿（想让策略只能从图像判断手在哪，不能凭“手在这儿，杆一般就在那儿”去瞄），改为每帧的两手夹爪宽度、每只手上一帧相对当前帧的位姿（运动）、左手在右手坐标系下的位姿（双臂之间的几何）、杆的材料参数，共 32 维；去掉随机平移增强（腕部相机固定在手上，平移 16 像素约等于 ±5° 的方向误差，3–10 cm 处 3–9 mm；仿真里相机位姿是精确的）；保留 dp8 的两个辅助任务和重抓 5 倍采样；从头训，配置同 dp7（直接读 dp7 的训练配置）</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>不重新生成，数据同 dp7；评测时策略服务把仿真发来的 35 维绝对状态换成 32 维相对状态，评测端不用改</td></tr>
+                      <tr><th scope="row">训练量</th><td>10 万步（7.0 epoch），loss 0.003</td></tr>
+                      <tr><th scope="row">训练时间</th><td>4 h 43 min（11-11 07:14–11:57 UTC），0.13–0.17 s/步，1 张 H100</td></tr>
+                      <tr><th scope="row">评测</th><td>50 个场景（同一组种子），大 kernel + banded 分 4 段，批处理策略服务，20 个场景同时跑；87 min</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 7/50 = 14%（dp8 22/50，配对检验 p = 0.001，显著更差）；R 38、L 43、双手 36、抬起 34、到柱子 44、≥0.5 圈 18；按每次重抓：桌面 78/87%，R 空中 67/78%，L 空中 33/56%</td></tr>
+                      <tr><th scope="row">问题</th><td>桌面抓取、R 重抓和绕圈都退步，L 空中重抓也没变好。但它只训了 10 万步（dp8 是 22 万步），又同时改了两样，分不清原因；正在按 dp8 的节奏续训到 22 万步（dp9ft：+6 万步，dp9ft2：再 +6 万步，lr 3e-5）再比</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp8ft · 继续训练（对照）</span><span class="dp-run__meta">11-11 · dp8 + 8 万步</span><span class="dp-run__result">成功 23/50（50 场景）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>从 dp8 的 22 万步权重（EMA）继续训练 8 万步，lr 1e-4（预热 1000，余弦），其余同 dp8；是 dp10 的对照组（两者只差动作的归一化），也回答“多训有没有用”</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>不重新生成，数据同 dp7</td></tr>
+                      <tr><th scope="row">训练量</th><td>8 万步（共 30 万步），loss 0.003</td></tr>
+                      <tr><th scope="row">训练时间</th><td>2 h 59 min（11-11 13:35–16:34 UTC），0.11–0.13 s/步，1 张 H100</td></tr>
+                      <tr><th scope="row">评测</th><td>50 个场景（同一组种子），同 dp9；72 min</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 23/50 = 46%（dp8 22/50，配对检验 p = 1.0）；R 49、L 48、双手 46、抬起 46、到柱子 48、≥0.5 圈 41；按每次重抓：桌面 96/97%，R 空中 89/94%，L 空中 28/47%</td></tr>
+                      <tr><th scope="row">问题</th><td>22 万步之后再多训，成功率没有提高：桌面抓取更稳了（重复合手少了），L 空中重抓没有改善</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp10 · 逐步归一化</span><span class="dp-run__meta">11-11 · dp8 + 8 万步 · 动作按每一步归一化</span><span class="dp-run__result">成功 25/50（50 场景）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>和 dp8ft 完全一样（同一个起点、步数、学习率、随机种子），只改动作的归一化：原来 16 步统一按全局范围归一化（各轴 0.6–0.95 m，1 cm 只占约 2%，扩散模型 1–2% 的输出误差就是 0.5–1.5 cm）→ 每一步用自己的范围（相对动作在数据集里的 0.1%–99.9% 分位数，超出的截掉；推理时扩散策略本来也把输出截到这个范围）。实际执行的第 1 步 L 的范围 x 16 cm、y 26 cm、z 14 cm，第 4 步 31 / 45 / 26 cm，分辨率高 3–6 倍。最小 / 最大值试过：第 1 步被少数“手远远落后指令”的样本撑到半米，没用。从 dp8 接着训时，检查点里旧的动作归一化参数在加载后设回恒等</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>不重新生成，数据同 dp7；每一步的范围从数据集算（约 1 min），和权重一起存进检查点，策略服务读取后把动作换算回去</td></tr>
+                      <tr><th scope="row">训练量</th><td>8 万步（共 30 万步），loss 0.004（归一化不同，和其他模型的 loss 不能直接比）</td></tr>
+                      <tr><th scope="row">训练时间</th><td>0–2 万步 41 min（11-11 13:32–14:14 UTC）；第一次训到 4 万步时 pod 的 100 GB 磁盘满了（还存着 dp9 的检查点），存盘失败，清理后从 2 万步的检查点续训，2–8 万步 2 h 10 min（16:03–18:13 UTC），0.11–0.14 s/步，1 张 H100</td></tr>
+                      <tr><th scope="row">评测</th><td>50 个场景（同一组种子），同 dp9；73 min</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 25/50 = 50%（对照组 dp8ft 23/50，配对检验 p = 0.82）；R 50、L 46、双手 46、抬起 45、到柱子 48、≥0.5 圈 40、绕到 ≥0.9 圈 30（dp8ft 27）；按每次重抓：桌面 94/97%，R 空中 84/84%，L 空中 34/66%（dp8ft 28/47%）；按每次合手，L 空中 32% 对 dp8ft 18%（按种子重抽样，98% 的情况 dp10 更好）</td></tr>
+                      <tr><th scope="row">问题</th><td>目前成功率最高，但比对照组的提升不显著。L 空中重抓有改善的迹象（最终抓住 66% 对 47%），R 空中略差（84% 对 94%）</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -898,7 +949,26 @@
             </div>
 
             <h5>Eval</h5>
-            <p class="page-prose__label">结果对比（16 个场景）</p>
+            <p class="page-prose__label">结果对比（50 个场景，同一组种子，配对比较）</p>
+            <div class="page-prose__table">
+              <table>
+                <thead>
+                  <tr><th scope="col">训练</th><th scope="col">成功</th><th scope="col">双手抓住</th><th scope="col">到柱子</th><th scope="col">最多绕 ≥0.5 圈</th><th scope="col">桌面抓取</th><th scope="col">R 空中重抓</th><th scope="col">L 空中重抓</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>dp7ft 16 万步</td><td>18</td><td>42</td><td>47</td><td>35</td><td>88 / 93%</td><td>80 / 80%</td><td>22 / 34%</td></tr>
+                  <tr><td>dp8 22 万步</td><td>22</td><td>44</td><td>47</td><td>37</td><td>88 / 92%</td><td>88 / 90%</td><td>40 / 51%</td></tr>
+                  <tr><td>dp9 10 万步（相对观测、不平移）</td><td>7</td><td>36</td><td>44</td><td>18</td><td>78 / 87%</td><td>67 / 78%</td><td>33 / 56%</td></tr>
+                  <tr><td>dp8ft 30 万步（dp8 + 8 万）</td><td>23</td><td>46</td><td>48</td><td>41</td><td>96 / 97%</td><td>89 / 94%</td><td>28 / 47%</td></tr>
+                  <tr><td>dp10 30 万步（dp8 + 8 万，逐步归一化）</td><td>25</td><td>46</td><td>48</td><td>40</td><td>94 / 97%</td><td>84 / 84%</td><td>34 / 66%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="dp-run__note">
+              <p>种子 800000–800049，各模型同一组，设置相同（大 kernel + banded 分 4 段、批处理策略服务、每次执行 4 步）。按种子配对比较成功（McNemar 精确检验）：dp8 对 dp7ft p = 0.56，dp8ft 对 dp8 p = 1.0，dp10 对 dp8ft p = 0.82，dp9 对 dp8 p = 0.001。抓取按每次重抓统计（第一次合手就抓住 / 最终抓住），不按每次合手：个别回合会连续合手二十几次，把比例拉偏。</p>
+              <p>16 个场景分不出模型：dp7ft 和 dp8 在 16 个场景是 7 对 4，在 50 个场景是 18 对 22；50 个场景里有 26 个是一个模型成功、另一个失败，单个场景成不成很大程度上看运气。下面那张 16 场景的表只作早期记录。</p>
+            </div>
+            <p class="page-prose__label">结果对比（16 个场景，早期）</p>
             <div class="page-prose__table">
               <table>
                 <thead>
@@ -918,7 +988,7 @@
             </div>
             <div class="dp-runs">
               <details class="dp-run">
-                <summary><span class="dp-run__name">Eval 提速</span><span class="dp-run__meta">11-10 – 11-11 · 评测 · 物理与训练数据一致</span><span class="dp-run__result">每帧 −25%，单进程再 −32%，策略服务 6.5 倍</span></summary>
+                <summary><span class="dp-run__name">Eval 提速</span><span class="dp-run__meta">11-10 – 11-11 · 评测 · 物理与训练数据一致</span><span class="dp-run__result">每帧 −25%，单进程再 −32%，每回合 3.7 → 1.4 min</span></summary>
                 <div class="dp-run__note">
                   <p>评测时 16 个场景并行，一轮的时长取决于单个回合：失败的回合要跑满 150 s，旧设置下每个约 40–42 min（1 s 仿真约要 16.5 s）。</p>
                 </div>
@@ -932,7 +1002,8 @@
                       <tr><td>不录视频</td><td>每个回合结束后按 10 Hz 把三个相机重新渲染一遍 → 不录；trajectory.npz 照常保存，想看哪个回合再单独渲染</td><td>每个回合省几分钟</td></tr>
                       <tr><td>等 GPU 时不空转 CPU</td><td>评测 pod 上 16 个仿真进程 + 1 个策略服务，CUDA 默认等 GPU 时原地空转 → 评测进程也改成阻塞等待（同数据生成）</td><td>本地：等待时单核占用 100% → 6%</td></tr>
                       <tr><td>大 kernel + banded 分段 + 双精度卡<br><span class="speed-use">11-11，dp8 的评测起</span></td><td>杆的 Newton 循环每次迭代约 55 个 kernel；<button class="term" type="button" popovertarget="note-banded-pcg">banded PCG</button> 的分解沿杆一行接一行；跑在 RTX PRO 6000 / 4060 这类双精度只有单精度 1/64 的卡上 → 整个 Newton 循环合成一个 kernel（每个 world 一个 256 线程的 block），分解切成 4 段并行，换 H100（双精度是单精度的 1/2）；物理和原来一致（到舍入误差）</td><td>单进程、同一场景仿真 12 s，每 1 s 仿真：H100 上 3.60 → 2.46 s（−32%；新代码原循环 3.13、大 kernel 1 段 2.62、8 段 2.52）；4060 笔记本 4.72 → 3.67–3.74 s（−21%）。16 个场景同时评测时（dp7ft 在 H200 → dp8 在 H100）每 1 s 仿真 18.6 → 17.1 s（−8%）</td></tr>
-                      <tr><td>策略服务批处理<br><span class="speed-use">11-11</span></td><td>16 个仿真共用一个策略服务；openpi 的服务在收消息的循环里直接调用策略，查询一次处理一个（100 步去噪，H100 上 0.38 s），其余排队 → 策略在算的时候新到的查询先排队，算完把排着的（最多 16 个）合成一个 batch 一起去噪，再各自发回。每个仿真自己仍是一问一答，但 16 个仿真彼此独立，同时在等的查询可以一起算；批里每个样本有自己的噪声、按样本归一化，结果和单独算一样；通信协议不变，评测端不用改</td><td>GPU 上 16 个一起 0.46 s，单个 0.38 s（100 步去噪每步都很小，GPU 远没占满）。压测（16 个客户端同时发查询，dp8，H100）：2.59 → 16.96 次/s（6.5 倍），每次等待 6.1 → 0.88 s；剩下的时间花在每次约 1.5 MB 图像的打包和传输上。整轮评测还没用它重测</td></tr>
+                      <tr><td>策略服务批处理<br><span class="speed-use">11-11</span></td><td>16 个仿真共用一个策略服务；openpi 的服务在收消息的循环里直接调用策略，查询一次处理一个（100 步去噪，H100 上 0.38 s），其余排队 → 策略在算的时候新到的查询先排队，算完把排着的（最多 16 个）合成一个 batch 一起去噪，再各自发回。每个仿真自己仍是一问一答，但 16 个仿真彼此独立，同时在等的查询可以一起算；批里每个样本有自己的噪声、按样本归一化，结果和单独算一样；通信协议不变，评测端不用改</td><td>GPU 上 16 个一起 0.46 s，单个 0.38 s（100 步去噪每步都很小，GPU 远没占满）。压测（16 个客户端同时发查询，dp8，H100）：2.59 → 16.96 次/s（6.5 倍），每次等待 6.1 → 0.88 s；剩下的时间花在每次约 1.5 MB 图像的打包和传输上。整轮评测的实测见下一行</td></tr>
+                      <tr><td>任务池 + 50 个场景<br><span class="speed-use">11-11</span></td><td>16 个场景一次全开，一轮的时长取决于最慢的回合；16 个场景又分不出模型 → 50 个场景（种子 800000–800055，两边取前 50 个有效的，同一组种子按种子配对比较），最多 20 个同时跑，跑完一个补一个；策略服务每批最多 32 个查询</td><td>每个模型 56 个回合 72–87 min（dp7ft 78、dp8 76、dp9 87、dp8ft 72、dp10 73），平均每个回合约 1.4 min；之前 16 个回合 59 min，每个回合 3.7 min。20 个同时跑时 GPU 利用率 100%、显存约 40 GB，瓶颈回到了仿真本身</td></tr>
                     </tbody>
                   </table>
                 </div>
