@@ -918,7 +918,7 @@
             </div>
             <div class="dp-runs">
               <details class="dp-run">
-                <summary><span class="dp-run__name">Eval 提速</span><span class="dp-run__meta">11-10 – 11-11 · 评测 · 物理与训练数据一致</span><span class="dp-run__result">每帧 −25%，单进程再 −32%</span></summary>
+                <summary><span class="dp-run__name">Eval 提速</span><span class="dp-run__meta">11-10 – 11-11 · 评测 · 物理与训练数据一致</span><span class="dp-run__result">每帧 −25%，单进程再 −32%，策略服务 6.5 倍</span></summary>
                 <div class="dp-run__note">
                   <p>评测时 16 个场景并行，一轮的时长取决于单个回合：失败的回合要跑满 150 s，旧设置下每个约 40–42 min（1 s 仿真约要 16.5 s）。</p>
                 </div>
@@ -932,15 +932,15 @@
                       <tr><td>不录视频</td><td>每个回合结束后按 10 Hz 把三个相机重新渲染一遍 → 不录；trajectory.npz 照常保存，想看哪个回合再单独渲染</td><td>每个回合省几分钟</td></tr>
                       <tr><td>等 GPU 时不空转 CPU</td><td>评测 pod 上 16 个仿真进程 + 1 个策略服务，CUDA 默认等 GPU 时原地空转 → 评测进程也改成阻塞等待（同数据生成）</td><td>本地：等待时单核占用 100% → 6%</td></tr>
                       <tr><td>大 kernel + banded 分段 + 双精度卡<br><span class="speed-use">11-11，dp8 的评测起</span></td><td>杆的 Newton 循环每次迭代约 55 个 kernel；<button class="term" type="button" popovertarget="note-banded-pcg">banded PCG</button> 的分解沿杆一行接一行；跑在 RTX PRO 6000 / 4060 这类双精度只有单精度 1/64 的卡上 → 整个 Newton 循环合成一个 kernel（每个 world 一个 256 线程的 block），分解切成 4 段并行，换 H100（双精度是单精度的 1/2）；物理和原来一致（到舍入误差）</td><td>单进程、同一场景仿真 12 s，每 1 s 仿真：H100 上 3.60 → 2.46 s（−32%；新代码原循环 3.13、大 kernel 1 段 2.62、8 段 2.52）；4060 笔记本 4.72 → 3.67–3.74 s（−21%）。16 个场景同时评测时（dp7ft 在 H200 → dp8 在 H100）每 1 s 仿真 18.6 → 17.1 s（−8%）</td></tr>
+                      <tr><td>策略服务批处理<br><span class="speed-use">11-11</span></td><td>16 个仿真共用一个策略服务；openpi 的服务在收消息的循环里直接调用策略，查询一次处理一个（100 步去噪，H100 上 0.38 s），其余排队 → 策略在算的时候新到的查询先排队，算完把排着的（最多 16 个）合成一个 batch 一起去噪，再各自发回。每个仿真自己仍是一问一答，但 16 个仿真彼此独立，同时在等的查询可以一起算；批里每个样本有自己的噪声、按样本归一化，结果和单独算一样；通信协议不变，评测端不用改</td><td>GPU 上 16 个一起 0.46 s，单个 0.38 s（100 步去噪每步都很小，GPU 远没占满）。压测（16 个客户端同时发查询，dp8，H100）：2.59 → 16.96 次/s（6.5 倍），每次等待 6.1 → 0.88 s；剩下的时间花在每次约 1.5 MB 图像的打包和传输上。整轮评测还没用它重测</td></tr>
                     </tbody>
                   </table>
                 </div>
                 <div class="dp-run__note dp-run__note--end">
                   <p>dp5ft 4 万步的快速评测（每次只执行 4 步）已用新设置从头重跑，跑完后补上前后耗时对比。</p>
-                  <p>整轮评测的时长没变：dp7ft（H200，旧求解器）59 min，dp8（H100，新求解器）59 min；dp8 跑满 150 s 的回合更多，仿真总量 1808 → 2004 s。现在主要卡在策略服务：16 个仿真共用一个服务，一次只处理一个查询，每次 100 步去噪，H100 上 0.38 s；dp8 一轮约 5000 次查询，排队就占约 32 min。</p>
+                  <p>为什么要批处理：换上大 kernel 后整轮评测的时长没变，dp7ft（H200，旧求解器）59 min，dp8（H100，新求解器）59 min（dp8 跑满 150 s 的回合更多，仿真总量 1808 → 2004 s）。卡在策略服务：dp8 一轮约 5000 次查询，一次处理一个，排队就占约 32 min。</p>
                   <p class="page-prose__label">没做的</p>
                   <ul>
-                    <li>策略服务批处理：同时到达的查询合成一个 batch。H100 上 16 个一起 0.46 s（每个 29 ms），吞吐约 13 倍，策略本身不变。</li>
                     <li>去噪 100 → 16 步（原版 DP 真机配置）：每个查询 0.38 → 0.07 s，但策略输出会变，要重新评测。</li>
                   </ul>
                 </div>
