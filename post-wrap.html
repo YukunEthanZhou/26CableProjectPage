@@ -860,6 +860,23 @@
               </details>
 
               <details class="dp-run">
+                <summary><span class="dp-run__name">dp8 · 杆位置辅助</span><span class="dp-run__meta">11-11 · dp7ft + 6 万步 · 腕部相机辅助任务</span><span class="dp-run__result">双手 14/16，成功 4/16</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>从 dp7ft 的 16 万步权重（EMA）继续训练 6 万步，lr 3e-5（预热 1000，余弦）；加辅助任务：每个腕部相机一个小头，从这个相机的特征预测杆在这只手的夹爪坐标系下的位置（离 TCP 最近的杆上一点，超过 5 cm 的截到 5 cm），均方误差权重 0.1，策略本身不用它的输出；新头前 2000 步单独学（不回传到编码器），之后编码器一起训</td></tr>
+                      <tr><th scope="row">数据生成时间</th><td>不重新生成；标签从记录的轨迹直接算（每帧的杆和两手位姿），91.8 万帧 2 min。L 的杆中位数离 TCP 0.8 mm、81% 的帧在 5 mm 以内（大部分时间握着杆），R 1.7 mm、74%</td></tr>
+                      <tr><th scope="row">训练量</th><td>6 万步（共 22 万步），loss 0.003；杆位置误差（均方根）20 mm → 只训头时 10–14 mm → 编码器一起训后 3–5 mm（杆离手 2 cm 以内时 2–3 mm）</td></tr>
+                      <tr><th scope="row">训练时间</th><td>2 h 14 min（11-10 23:40 – 11-11 01:54 UTC），0.11–0.13 s/步，1 张 H100（32 vCPU）；先开的 H200 只有 16 vCPU（CPU 配额 13.6 核），数据加载跟不上（0.2 s/步），训了几百步就换机重来</td></tr>
+                      <tr><th scope="row">评测</th><td>同 dp7ft（每次执行 4 步，不录视频）；求解器换成大 kernel + banded 分 4 段（见下面的 Eval 提速，物理和原来一致到舍入误差）；训练完在同一台 H100 上评测，约 59 min</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 4（800002、800004、800008、800014）；R 14、L 15、双手 14、抬起 14、到柱子 14、≥0.5 圈 11；桌面抓取 29/35，空中抓取 18/38（R 12/16，其中锚点重抓 11/14；L 6/22）；滑脱 6 次</td></tr>
+                      <tr><th scope="row">问题</th><td>比 dp7ft 少 3 个（新增 800004、800008，丢了 5 个）。只训头时误差降不下去，说明 dp7ft 的腕部相机特征里本来没有精确的杆位置；一起训后能定位到几毫米，但 L 的空中重抓没变好（6/22）：16 次抓空里 11 次合手时杆离 TCP 还有 1 cm 以上（中位数 16.5 mm）——定位信息已在特征里，动作没有因此对准。另有 4 个场景绕到 0.9–1.07 圈却没在 150 s 内松手（超时）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
                 <summary><span class="dp-run__name">训练提速</span><span class="dp-run__meta">11-09 · 数据加载 + 计算 + 续训 · 训练结果不变</span><span class="dp-run__result">0.42 → 0.14 s/步</span></summary>
                 <div class="page-prose__table">
                   <table>
@@ -895,12 +912,13 @@
                   <tr><td>dp5ft 16 万步（12 万 + 4 万）</td><td>2</td><td>16</td><td>14</td><td>14</td><td>11</td><td>15</td><td>8</td><td>4/27</td></tr>
                   <tr><td>dp7 10 万步（banded，执行 4 步）</td><td>4</td><td>12</td><td>12</td><td>10</td><td>10</td><td>13</td><td>9</td><td>12/32</td></tr>
                   <tr><td>dp7ft 16 万步（10 万 + 6 万）</td><td>7</td><td>15</td><td>16</td><td>15</td><td>15</td><td>16</td><td>15</td><td>27/53</td></tr>
+                  <tr><td>dp8 22 万步（dp7ft + 6 万，杆位置辅助）</td><td>4</td><td>14</td><td>15</td><td>14</td><td>14</td><td>14</td><td>11</td><td>18/38</td></tr>
                 </tbody>
               </table>
             </div>
             <div class="dp-runs">
               <details class="dp-run">
-                <summary><span class="dp-run__name">Eval 提速</span><span class="dp-run__meta">11-10 · 评测 · 物理与训练数据一致</span><span class="dp-run__result">每帧 −25%，不录视频</span></summary>
+                <summary><span class="dp-run__name">Eval 提速</span><span class="dp-run__meta">11-10 – 11-11 · 评测 · 物理与训练数据一致</span><span class="dp-run__result">每帧 −25%，单进程再 −32%</span></summary>
                 <div class="dp-run__note">
                   <p>评测时 16 个场景并行，一轮的时长取决于单个回合：失败的回合要跑满 150 s，旧设置下每个约 40–42 min（1 s 仿真约要 16.5 s）。</p>
                 </div>
@@ -913,11 +931,18 @@
                       <tr><td>求解器与训练数据一致</td><td>训练数据用 <button class="term" type="button" popovertarget="note-banded-pcg">banded PCG</button> 生成，但设置文件的默认值还是 <button class="term" type="button" popovertarget="note-fused-pcg">fused PCG</button>，之前所有 DP 评测都跑在 fused 上：评测和训练数据的物理不一致 → 默认值改成 banded PCG，评测、数据生成、DAgger 一致</td><td>每帧 149 → 111 ms；评测里杆的运动和训练数据一样收敛</td></tr>
                       <tr><td>不录视频</td><td>每个回合结束后按 10 Hz 把三个相机重新渲染一遍 → 不录；trajectory.npz 照常保存，想看哪个回合再单独渲染</td><td>每个回合省几分钟</td></tr>
                       <tr><td>等 GPU 时不空转 CPU</td><td>评测 pod 上 16 个仿真进程 + 1 个策略服务，CUDA 默认等 GPU 时原地空转 → 评测进程也改成阻塞等待（同数据生成）</td><td>本地：等待时单核占用 100% → 6%</td></tr>
+                      <tr><td>大 kernel + banded 分段 + 双精度卡<br><span class="speed-use">11-11，dp8 的评测起</span></td><td>杆的 Newton 循环每次迭代约 55 个 kernel；<button class="term" type="button" popovertarget="note-banded-pcg">banded PCG</button> 的分解沿杆一行接一行；跑在 RTX PRO 6000 / 4060 这类双精度只有单精度 1/64 的卡上 → 整个 Newton 循环合成一个 kernel（每个 world 一个 256 线程的 block），分解切成 4 段并行，换 H100（双精度是单精度的 1/2）；物理和原来一致（到舍入误差）</td><td>单进程、同一场景仿真 12 s，每 1 s 仿真：H100 上 3.60 → 2.46 s（−32%；新代码原循环 3.13、大 kernel 1 段 2.62、8 段 2.52）；4060 笔记本 4.72 → 3.67–3.74 s（−21%）。16 个场景同时评测时（dp7ft 在 H200 → dp8 在 H100）每 1 s 仿真 18.6 → 17.1 s（−8%）</td></tr>
                     </tbody>
                   </table>
                 </div>
                 <div class="dp-run__note dp-run__note--end">
                   <p>dp5ft 4 万步的快速评测（每次只执行 4 步）已用新设置从头重跑，跑完后补上前后耗时对比。</p>
+                  <p>整轮评测的时长没变：dp7ft（H200，旧求解器）59 min，dp8（H100，新求解器）59 min；dp8 跑满 150 s 的回合更多，仿真总量 1808 → 2004 s。现在主要卡在策略服务：16 个仿真共用一个服务，一次只处理一个查询，每次 100 步去噪，H100 上 0.38 s；dp8 一轮约 5000 次查询，排队就占约 32 min。</p>
+                  <p class="page-prose__label">没做的</p>
+                  <ul>
+                    <li>策略服务批处理：同时到达的查询合成一个 batch。H100 上 16 个一起 0.46 s（每个 29 ms），吞吐约 13 倍，策略本身不变。</li>
+                    <li>去噪 100 → 16 步（原版 DP 真机配置）：每个查询 0.38 → 0.07 s，但策略输出会变，要重新评测。</li>
+                  </ul>
                 </div>
               </details>
             </div>
@@ -936,13 +961,15 @@
               </div>
               <div class="term-note" id="note-banded-pcg" popover>
                 <button class="term-note__close" type="button" popovertarget="note-banded-pcg" popovertargetaction="hide" aria-label="关闭">×</button>
-                <p class="term-note__title">banded PCG <span>2026-11-06 起的默认求解</span></p>
+                <p class="term-note__title">banded PCG <span>2026-11-06 起的默认求解；11-10 分解改成分段并行</span></p>
                 <ul>
                   <li>观察：杆上每个粒子只和相邻的几个粒子耦合，所以 Hessian 几乎是带状的（主对角线两侧各 10 行）；只有杆自己碰到自己（自接触）才有带外的项。</li>
                   <li>做法：预条件用带内部分的精确 L D L<sup>T</sup> 分解（带状 Cholesky），共轭梯度仍在完整的 A 上迭代，最多 16 次。</li>
                   <li>没有自接触时带就是整个矩阵，预条件就是精确解：共轭梯度 1 次就收敛，Newton 二次收敛，平均 4.2 次/子步。</li>
                   <li>实现：每个 world 一个 256 线程的 block，带放进 shared memory 原地分解；超过 125 个粒子放不下，自动退回 fused PCG。</li>
                   <li>效果：自由摆动每帧 85 → 54 ms，0.5 s 后离收敛解 0.008 mm；线圈压在自己身上（自接触很多）时慢 10–40%，但更准。数据生成的场景平均每帧 149 → 111 ms。</li>
+                  <li>分段并行（11-10）：原来的分解沿杆一行接一行，是一条约 432 步的依赖链（占一次 Newton 迭代的 30%）。现在把带切成 P 段、段间留 10 行：各段由自己的 warp 同时分解，再解分隔行的 Schur 补（一个小的带状 L D L<sup>T</sup>）把各段接起来，依赖链缩到约 45 步。还是同一个预条件，结果只差舍入，CG 次数不变；设置 der.banded_partitions（默认 1，dp8 的评测起用 4）。</li>
+                  <li>分段的效果（每 1 s 仿真，大 kernel）：4060 上 1 段 3.87 s → 4 段 3.67–3.74 s，只快约 5%：瓶颈是这类卡的双精度吞吐（消费卡和 RTX PRO 6000 只有单精度的 1/64），几个 warp 抢同一组双精度单元。H100（双精度是单精度的 1/2）上 2.62 → 2.46 s（−6%）。8 段反而稍慢（4060 3.78–3.82 s，H100 2.52 s）。</li>
                 </ul>
                 <p class="term-note__code">代码：der/banded_pcg.py</p>
               </div>
