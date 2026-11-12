@@ -962,7 +962,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp12 · 颜色随机</span><span class="dp-run__meta">11-12 · dp11 + 4 万步 · 杆和柱子的颜色随机</span><span class="dp-run__result">成功 33/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp12 · 颜色随机</span><span class="dp-run__meta">11-12 · dp11 + 4 万步 · 杆和柱子的颜色随机</span><span class="dp-run__result">成功 33/50，不算黑杆 19/27</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -971,15 +971,15 @@
                       <tr><th scope="row">训练量</th><td>4 万步（共 38 万步），loss 0.004</td></tr>
                       <tr><th scope="row">训练时间</th><td>1 h 21 min（11-12 00:25–01:46 UTC），0.12 s/步，1 张 H200</td></tr>
                       <tr><th scope="row">评测</th><td>50 个场景，新合手判定 + 腕部深度 + 随机颜色；62 min</td></tr>
-                      <tr><th scope="row">结果</th><td>成功 33/50 = 66%（dp11 26/50，配对检验 p = 0.23）；双手 48、到柱子 49、≥0.5 圈 43，超时 23 → 9；按每次重抓：桌面 96/97%，R 空中 94/94%，L 空中 64/81%。按颜色：黑杆 14/23、绿 6/11、红 7/8、白 6/8</td></tr>
-                      <tr><th scope="row">问题</th><td>提升主要来自 L “停在杆前面、没够到”的合空大幅减少（20 → 8 次）：颜色随机让策略没法凭外观走捷径。剩下的 L 合空多是离杆很远（跟丢了）。黑杆最差（对比度低）</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 33/50 = 66%（dp11 26/50，配对检验 p = 0.23）；双手 48、到柱子 49、≥0.5 圈 43，超时 23 → 9；按每次重抓：桌面 96/97%，R 空中 94/94%，L 空中 64/81%。按颜色：黑杆 14/23、绿 6/11、红 7/8、白 6/8；不算黑杆 19/27 = 70%</td></tr>
+                      <tr><th scope="row">问题</th><td>提升主要来自 L “停在杆前面、没够到”的合空大幅减少（20 → 8 次）：颜色随机让策略没法凭外观走捷径。剩下的 L 合空多是离杆很远（跟丢了）。黑杆最差（对比度低，14/23 = 61%），而训练和评测里黑杆都占 55%（按当时“实际以黑色为主”设的）；实际不用黑杆，更该看不算黑杆的 19/27 = 70%</td></tr>
                     </tbody>
                   </table>
                 </div>
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp13 · 点云 + 细微随机</span><span class="dp-run__meta">11-12 · dp12 + 4 万步 · 腕部点云、相机抖动、图像增强</span><span class="dp-run__result">成功 34/50（50 场景，目前最好）</span></summary>
+                <summary><span class="dp-run__name">dp13 · 点云 + 细微随机</span><span class="dp-run__meta">11-12 · dp12 + 4 万步 · 腕部点云、相机抖动、图像增强</span><span class="dp-run__result">成功 34/50，不算黑杆 21/27（目前最好）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -988,15 +988,15 @@
                       <tr><th scope="row">训练量</th><td>4 万步（共 42 万步），loss 0.004</td></tr>
                       <tr><th scope="row">训练时间</th><td>1 h 34 min（11-12 06:40–08:14 UTC），0.13–0.15 s/步，1 张 H200</td></tr>
                       <tr><th scope="row">评测</th><td>同 dp12；64 min</td></tr>
-                      <tr><th scope="row">结果</th><td>成功 34/50 = 68%（dp12 33/50，配对检验 p = 1.0）；双手 44、到柱子 49、≥0.5 圈 41；按每次重抓：桌面 94/97%，R 空中 88/88%，L 空中 75/85%（按每次合手 49% → 67%）。不算黑杆 21/27 = 78%，白杆 + 橙柱 5/6</td></tr>
-                      <tr><th scope="row">问题</th><td>L 空中重抓明显变好（合空 36 → 22 次，离杆很远的 17 → 8 次），但 R 空中和桌面略差；三项一起加，分不清各自的作用</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 34/50 = 68%（dp12 33/50，配对检验 p = 1.0）；双手 44、到柱子 49、≥0.5 圈 41；按每次重抓：桌面 94/97%，R 空中 88/88%，L 空中 75/85%（按每次合手 49% → 67%）。按颜色：黑杆 13/23、绿 7/11、红 7/8、白 7/8；不算黑杆 21/27 = 78%，白杆 + 橙柱 5/6</td></tr>
+                      <tr><th scope="row">问题</th><td>L 空中重抓明显变好（合空 36 → 22 次，离杆很远的 17 → 8 次），但 R 空中和桌面略差；三项一起加，分不清各自的作用。黑杆仍最差（13/23 = 57%）；实际不用黑杆，看不算黑杆的 78%</td></tr>
                     </tbody>
                   </table>
                 </div>
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp14 · DAgger 第一轮</span><span class="dp-run__meta">11-12 · dp13 + 4 万步 · 专家接管的纠错数据</span><span class="dp-run__result">成功 28/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp14 · DAgger 第一轮</span><span class="dp-run__meta">11-12 · dp13 + 4 万步 · 专家接管的纠错数据</span><span class="dp-run__result">成功 28/50，不算黑杆 20/27</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1005,7 +1005,7 @@
                       <tr><th scope="row">训练量</th><td>4 万步（共 46 万步），loss 0.004</td></tr>
                       <tr><th scope="row">训练时间</th><td>1 h 36 min（11-12 14:07–15:43 UTC），0.15 s/步，1 张 H200</td></tr>
                       <tr><th scope="row">评测</th><td>同 dp13；87 min</td></tr>
-                      <tr><th scope="row">结果</th><td>成功 28/50 = 56%（dp13 34/50，配对检验 p = 0.24）；双手 46、到柱子 48、≥0.5 圈 39，超时 13 → 17；按每次重抓：桌面 91/98%，R 空中 89/90%，L 空中 60/80%；按每次合手 L 空中 67% → 45%（按种子重抽样，98% 的情况 dp13 更好）</td></tr>
+                      <tr><th scope="row">结果</th><td>成功 28/50 = 56%（dp13 34/50，配对检验 p = 0.24）；双手 46、到柱子 48、≥0.5 圈 39，超时 13 → 17；按每次重抓：桌面 91/98%，R 空中 89/90%，L 空中 60/80%；按每次合手 L 空中 67% → 45%（按种子重抽样，98% 的情况 dp13 更好）。按颜色：黑杆 8/23、绿 9/11、红 5/8、白 6/8；不算黑杆 20/27 = 74%（dp13 21/27）：比 dp13 少的 6 个成功里 5 个在黑杆上</td></tr>
                       <tr><th scope="row">问题</th><td>没有变好。杆离 TCP 0–5 mm 时合手照样抓得住（21/24），但杆还差 1–5 cm 就合手的次数从 15 涨到 37（合手时杆的中位距离 6.9 → 10.0 mm），张开宽度没变。原因：接管开头的“张开 + 上抬”让同样的画面对应了不同的动作；另外“合空”在手指还在合拢时就触发了（手指有速度限制，宽度先到闭合值），专家把本来要抓住的手又张开了</td></tr>
                     </tbody>
                   </table>
@@ -1075,6 +1075,22 @@
               <p>种子 800000–800049，各模型同一组，设置相同（大 kernel + banded 分 4 段、批处理策略服务、每次执行 4 步）。按种子配对比较成功（McNemar 精确检验）：dp8 对 dp7ft p = 0.56，dp8ft 对 dp8 p = 1.0，dp10 对 dp8ft p = 0.82，dp9 对 dp8 p = 0.001，dp9ft2 对 dp8 p = 1.0；新判定下 dp11 对 dp10 p = 0.66，dp12 对 dp11 p = 0.23，dp13 对 dp12 p = 1.0，dp14 对 dp13 p = 0.24。抓取按每次重抓统计（第一次合手就抓住 / 最终抓住），不按每次合手：个别回合会连续合手二十几次，把比例拉偏。</p>
               <p>* 合手判定放宽：CAD 指尖的夹持面从指尖往里约 78 mm 都是平行的平面，杆在两指之间、比 TCP 深 5–15 mm 也能夹住，原来的判定只认 TCP 前后 5 mm（dp10 的 41 次 L 空中合空里有 14 次是这种）→ 深的一侧放宽到 30 mm（指尖一侧仍是 5 mm），之后的评测都用新判定。只在评测时让空中重抓多张开 10 mm，成功掉到 2/50：R 的锚点重抓第一次合手的成功率 87% → 19%，合手时离杆约 67 mm——腕部相机里手指张得更开，策略把它当成了另一个阶段（dp1、dp2 强制张开桌面抓取时也是这样），所以张开宽度只能连训练数据一起改。** 再加：评测场景按种子随机杆和柱子的颜色，仿真把腕部深度发给策略（dp11 只发深度，杆仍是蓝色）。</p>
               <p>16 个场景分不出模型：dp7ft 和 dp8 在 16 个场景是 7 对 4，在 50 个场景是 18 对 22；50 个场景里有 26 个是一个模型成功、另一个失败，单个场景成不成很大程度上看运气。下面那张 16 场景的表只作早期记录。</p>
+            </div>
+            <p class="page-prose__label">按杆的颜色（随机颜色的评测；50 个场景里黑 23、绿 11、红 8、白 8）</p>
+            <div class="page-prose__table">
+              <table>
+                <thead>
+                  <tr><th scope="col">训练</th><th scope="col">黑杆</th><th scope="col">绿杆</th><th scope="col">红杆</th><th scope="col">白杆</th><th scope="col">不算黑杆</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>dp12（+ 颜色随机）</td><td>14/23</td><td>6/11</td><td>7/8</td><td>6/8</td><td>19/27 = 70%</td></tr>
+                  <tr><td>dp13（+ 点云、相机抖动、图像增强）</td><td>13/23</td><td>7/11</td><td>7/8</td><td>7/8</td><td>21/27 = 78%</td></tr>
+                  <tr><td>dp14（dp13 + DAgger 第一轮）</td><td>8/23</td><td>9/11</td><td>5/8</td><td>6/8</td><td>20/27 = 74%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="dp-run__note">
+              <p>训练数据和评测场景里黑杆都占 55%（按当时“实际以黑色为主”设的），而黑杆最难（对比度低）：dp12、dp13 在黑杆上只有 61%、57%。实际不用黑杆，所以更该看不算黑杆的成功率：dp13 78%。dp14 比 dp13 少的 6 个成功里有 5 个在黑杆上，不算黑杆时两者差不多（20 对 21 / 27）。</p>
             </div>
             <p class="page-prose__label">结果对比（16 个场景，早期）</p>
             <div class="page-prose__table">
