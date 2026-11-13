@@ -211,6 +211,22 @@
       padding-bottom: 0.6rem;
     }
 
+    /* the real robot's figures: several camera views side by side, as wide as the entry */
+    .dp-run .page-prose__figure {
+      margin: 0.25rem 0 1rem;
+    }
+
+    .page-prose__figure--wide img {
+      max-width: 100%;
+    }
+
+    .page-prose__figure figcaption {
+      margin-top: 0.35rem;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      line-height: 1.45;
+    }
+
     /* a term with a note: clicked, the note opens next to it (a popover; without popovers it shows below) */
     .term {
       padding: 0;
@@ -719,6 +735,39 @@
                   </ul>
                 </div>
               </details>
+              <details class="dp-run" id="dp-data-real">
+                <summary><span class="dp-run__name">真机之后的数据</span><span class="dp-run__meta">11-13 · 数据生成 · 办公室的杆和线、相机随机化</span><span class="dp-run__result">代码已改（_long 工作区，未提交），待生成</span></summary>
+                <div class="dp-run__note">
+                  <p>dp13 第一次上真机（见 <a href="#dp-real">真机</a>）后对数据生成的修改：真机的摆放、杆的长短粗细、腕部相机的安装位置都和训练数据不一样，数据的分布要把这些盖住。原来的数据（数据 v3–v7、DAgger）不动，新数据另外生成。</p>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">改动</th><th scope="col">原来 → 现在</th><th scope="col">为什么 / 效果</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>长杆求解器</td><td>杆超过 125 个粒子时 <button class="term" type="button" popovertarget="note-banded-pcg">banded PCG</button> 的带放不进 shared memory，退回 fused / warp 的 PCG → 带放进动态 shared memory（双精度到约 258 个粒子，单精度到约 475 个），拉伸刚度不变；桌面摩擦锚点刚度 kf_table 1e5 → 1000（只改桌面和固定物体，道具和手指不变）</td><td>精确解：0.9 m 杆每步 22 → 5.7 ms（原来离收敛解 21 mm），2 m 54 → 9.5 ms（原来差 101 mm）；2 m 的线在整个场景里每个子步 Newton 12 → 6 次，DER 80 → 34 ms。顺带修了 125 个粒子的杆编译失败（main 上也有）</td></tr>
+                      <tr><td>长度</td><td>0.48–0.65 m → 0.4–0.6 m 50%、0.6–0.8 m 8%、0.8–1.0 m 25%、1.0–1.8 m 5%、1.8–2.2 m 12%</td><td>办公室里常见的杆和线：0.4–0.6 m 最多，0.9 m 次之，2 m 最少；2 m 的线只需要两只手抓的那段在原位置附近，其余可以弯着或垂下桌面</td></tr>
+                      <tr><td>直径</td><td>4–6 mm → 4–6 mm 70%、6–12 mm 15%、13–16 mm 15%；长于 1.2 m 的线 4–7 mm</td><td>指尖夹不住 4 mm 以下的杆；粗杆材料不明，弯曲刚度按 EI 0.002–0.05 N·m² 随机；粗杆的粒子间距至少 0.67 倍直径</td></tr>
+                      <tr><td>初始形状</td><td>直杆 → 塑料杆的弯曲静止形状和拱起，先在桌上落定（这段不录）；两只手要抓的那段仍是直的，其余避开桌边、底座、柱子和桌上的物体</td><td>真机上的杆和线都不是直的</td></tr>
+                      <tr><td>摆放</td><td>杆沿 x，前后 ±4.5 cm、角度 ±15°，柱子 ±1 cm → 围绕原位置的截断正态（σ 3 cm / 10° / 两手间距 2 cm，截在 2σ），每只手抓在竖直夹爪够得到的地方（离底座 0.22–0.395 m）；柱子 ±3 cm</td><td>真机上摆放稍偏，R 就到数据里杆该在的地方去找；仍以原位置为主，只为吸收摆放误差</td></tr>
+                      <tr><td>杆头附近抓取</td><td>新增：约 20% 的 episode，L 抓在离杆头 3–7 cm 处</td><td>较短的杆两只手只能抓到杆头附近</td></tr>
+                      <tr><td>桌面摩擦</td><td>μ = 0.6 → 0.6 附近小幅随机（截断正态 σ 0.05，0.5–0.7）</td><td>杆的橡胶外皮在黑色垫子上，范围不宜大</td></tr>
+                      <tr><td>抓取</td><td>桌面抓取夹爪张 30 mm、空中张到杆径 + 10 mm → 尽量张大：依次试 70 / 55 / 40 mm，张开的手指会碰到东西才缩小；整体放慢、中间不停：2 s 移到上方，1.5 s 慢慢下降，合爪后停 0.3 s，手指 50 mm/s（真夹爪的速度）</td><td>真机上 R 合得太早、太高或偏到杆旁边；策略要在慢慢下去的过程中看清、对准</td></tr>
+                      <tr><td>边下降边纠正</td><td>原来桌面上的扰动是手偏了、合空后退回重来，空中的扰动到位之后才慢慢纠正 → 桌面和空中各一半的抓取里，手先偏离杆 6–15 mm（70% 横跨手指方向、左右随机，30% 沿工具轴停在杆上方），偏差在 1.5 s 的下降过程中逐渐消失，到底时正好对准；专家的指令本身不带偏差</td><td>数据里有手偏了、一边慢慢下降一边自己对准的样子，对应真机上 R 偏到杆旁或停在杆上方的情况</td></tr>
+                      <tr><td>成功判定</td><td>松手后柱子上留一圈 → 握着成一圈就算成功（wrap_a_turn 以“握住”结束，不松手）；评测端 sim_eval --success hold 一致</td><td>先把绕的动作做对，松手留圈另说</td></tr>
+                      <tr><td>相机随机化</td><td>dp13：顶部相机 ±5 mm / 0.5°、腕部 ±2 mm / 1.5°（随机轴），深度仍按原位姿渲染 → wide 档：顶部和腕部相机俯仰 ±5.5°、偏航和滚转 ±2°、位置每轴 ±1.2 cm，焦距 ±3%；腕部深度和 RGB 用同一套位姿</td><td>实测真机 R 腕部相机比仿真多俯仰约 4.5°、位置差约 1 cm（见 <a href="#dp-real">真机</a>），范围比实测误差大一些</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p class="page-prose__label">下一步</p>
+                  <ul>
+                    <li>生成新数据，在 dp13 / dp15 中更好的那个基础上用旧数据 + 新数据微调（不从头训练）。</li>
+                    <li>原型的仿真速度（笔记本）：0.55 m 杆 111 个粒子每 1 s 仿真 7.7 s，0.9 m 181 个 12 s，2 m 401 个 32 s。</li>
+                  </ul>
+                </div>
+              </details>
             </div>
 
             <h5>Train</h5>
@@ -1145,6 +1194,123 @@
                 </div>
               </details>
             </div>
+
+            <h5 id="dp-real">真机</h5>
+            <p>11-13（UTC 00:13–03:31）dp13 在两台真 PiPER 上跑了 15 次，都停在第一步：R 从桌上抓杆。R 抓住 1 次，另有 2 次可能抓住（待确认）；L 一次也没有抓到杆。</p>
+            <div class="dp-runs">
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp13 · 第一次上真机</span><span class="dp-run__meta">11-13 · 15 次运行 · 只到 R 的桌面抓取</span><span class="dp-run__result">R 抓住 1/15（另 2 次待确认），L 0</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">策略</th><td>dp13（42 万步：腕部深度 + 点云、颜色随机、相机抖动、图像增强；仿真 50 个场景成功 34 个）</td></tr>
+                      <tr><th scope="row">策略服务</th><td>Runpod pod（RTX 6000 Ada）上跑 train.dp.serve（openpi 的 websocket 协议）。机器人经 Runpod 的 HTTPS 代理（wss，443 端口）连接：校园网挡住了出站的高端口。推理约 0.53 s（100 步去噪），往返约 1 s；每次查询的图像、状态、动作和辅助输出都存在服务器上</td></tr>
+                      <tr><th scope="row">机器人端</th><td>aivc-bot 上跑 real/dp_run.py，和仿真评测同一套设置：10 Hz，每次执行 8 步里的前 4 步，2 帧历史；相对 TCP 位姿的动作 → 绝对目标 → numpy IK（仿真的手臂模型）以 60 Hz 发 MOVE J；夹爪按二值规则。查询间隔约 1.5 s（第一次运行约 10 s）</td></tr>
+                      <tr><th scope="row">相机</th><td>顶部 D415 去畸变成仿真的 640×360 针孔；柱子相机由 D415 的画面做单应变换得到；两个腕部 D405 去畸变成 320×180，深度转成射线长度（和仿真渲染一样）再编码成 160×90</td></tr>
+                      <tr><th scope="row">杆</th><td>主要是约 4.6 mm 的绿色塑料杆，也试了红杆、蓝杆；柱子是橙色的。合爪后的读数：0.1–0.2 mm 是空的，0.5–0.8 mm 是夹着绿杆（CAD 指尖读数为 0 时还有 4 mm 间隙）</td></tr>
+                      <tr><th scope="row">数据里的摆放</th><td>垫子刻度（从机器人一侧量）：杆 0.48–0.65 m，沿 x 方向，离下边约 39 cm；R 抓在左 43.2 cm，L 抓在左 78.8 cm（两手相距 35.6 cm），R 的抓取点外还有 6–15 cm 杆；柱子在左 80.3 / 下 30.5 cm</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">时间（UTC）</th><th scope="col">杆和摆放（垫子刻度）</th><th scope="col">查询</th><th scope="col">R 做了什么</th><th scope="col">结果 · 原因</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>00:13</td><td>蓝杆约 31 cm，左 66–97 cm，在柱子旁边；柱子在左 85.6 / 下 31.1 cm</td><td>13（间隔约 10 s）</td><td>到数据里的抓取点上方（q5，离桌 7.6 cm），没看到杆，退回后乱转</td><td>未合爪 · 杆太短（数据 ≥ 0.48 m）</td></tr>
+                      <tr><td>00:41</td><td>绿色长线（约 1 m，弯），左 21–117、下 51–66 cm</td><td>14</td><td>q8 离桌 3 mm 合爪；之后 L 张开往下走</td><td>可能抓住（0.8 mm），待确认：开始时的顶部画面里线离合爪处约 10 cm，合爪时腕部画面里线在两指之间</td></tr>
+                      <tr><td>01:27</td><td>红杆，左 41–104、下 47.5–51.6 cm</td><td>18</td><td>在抓取点上方徘徊，辅助输出说杆已在手里，一直没合</td><td>未合爪 · 远了 9–13 cm</td></tr>
+                      <tr><td>01:33</td><td>红杆，左 34–97、下 38.5–42 cm（位置对）</td><td>45</td><td>q7 下到桌面（离杆约 16 mm）没合；q16 离桌 13 mm、离杆约 3 cm 合爪</td><td>空（0.1 mm）· 合得太高、偏到杆旁</td></tr>
+                      <tr><td>01:40</td><td>绿杆，左 45–107 cm（往柱子偏了十几厘米）、下约 40–42 cm</td><td>12</td><td>q8 在杆头外约 3 cm、离桌 11 mm 合爪</td><td>空（0.1 mm）· R 的抓取点上没有杆</td></tr>
+                      <tr><td>01:44</td><td>绿杆，左 46–107、下 32–35 cm，斜压在柱子底板上</td><td>11</td><td>下到杆头，离桌 11 mm 合爪</td><td>空（0.1 mm）· R 的抓取点在杆头外约 2 cm</td></tr>
+                      <tr><td>02:08</td><td>绿杆，左 40–102.5、下 39.5–43.5 cm，略斜</td><td>14</td><td>到了杆头，高度对（离桌 4 mm），没合就抬起</td><td>未合爪 · R 一侧只剩约 3 cm 杆（数据 6–15 cm）</td></tr>
+                      <tr><td>02:14</td><td>绿杆，左 41.8–104、下 39–40.5 cm，直</td><td>13</td><td>先到杆头上方，又去数据里杆还在延伸的地方（x 0.31 m）往下找</td><td>未合爪 · R 一侧只剩约 1.5 cm 杆</td></tr>
+                      <tr><td>02:17</td><td>同上</td><td>12</td><td>q10 离桌 8 mm、离杆约 1 cm 合爪，腕部画面里杆在两指之间</td><td><strong>R 抓住</strong>（0.6 mm）</td></tr>
+                      <tr><td>02:18</td><td>绿杆，左 35–97、下约 40 cm（和数据一致）</td><td>11</td><td>到了抓取点，但在离桌 41 mm、还在往上时合爪</td><td>空（0.2 mm）· R 腕部相机的安装位置（见下）</td></tr>
+                      <tr><td>03:22</td><td>绿杆，左 35–97、下 41–42 cm</td><td>8</td><td>q6 离桌 5 mm 合爪，杆在右指外约 2 cm</td><td>空（0.2 mm）· 横向偏了</td></tr>
+                      <tr><td>03:23</td><td>同上</td><td>10</td><td>离桌 31 mm 合爪；之后 L 张开</td><td>空（0.2 mm）· 合得太高</td></tr>
+                      <tr><td>03:24</td><td>同上</td><td>8</td><td>下到离桌 1 mm、离杆约 2 cm，运行结束前没合</td><td>未合爪</td></tr>
+                      <tr><td>03:27</td><td>绿杆，左 34–97、下 45–46 cm（远了约 6 cm）</td><td>15</td><td>q10 离桌 5 mm 合爪，腕部画面里杆在两指之间；之后 L 张开往下走</td><td>可能抓住（0.5 mm），待确认</td></tr>
+                      <tr><td>03:30</td><td>绿杆，左 41–104、下 43–45 cm</td><td>9</td><td>下到离桌 6 mm、离杆约 2 cm，运行结束前没合</td><td>未合爪</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p>摆放按开始时顶部相机里杆的像素投到桌面上量出；离桌高度是 R 的 TCP（按 FK）到桌面的距离。</p>
+                  <p class="page-prose__label">失败原因</p>
+                  <ul>
+                    <li><strong>摆放</strong>（00:13、01:27、01:40、01:44、02:08、02:14）：策略只在数据的摆放附近有效。杆太短、太远，或 R 一侧不够长，R 就到数据里杆该在的地方去找，或在杆头外合爪。之后用 <code>dp_run --check</code> 在顶部相机画面上画出数据里的位置，照着摆（见“失败抓取 · 各视角”的第一张图）。</li>
+                    <li><strong>R 腕部相机的安装位置</strong>（摆对之后 01:33、02:18、03:22、03:23 合得太高或偏到杆旁）：训练数据的腕部画面按扫描估计的安装位置渲染，没有标定过（估计误差约 ±1 cm、±8°）。拿 4 次运行里 34 帧靠近桌面的真实腕部深度对着桌面拟合：真实相机比仿真多俯仰约 4.5°（±0.05°），位置差约 1 cm，深度残差 7.8 → 2.5 mm；FK、关节零点、桌面高度一致到 1 cm 以内。4.5° 在约 18 cm 处相当于画面里错开约 1.4 cm：02:18 那次策略的辅助输出认为杆只在指尖下方 5–9 mm，按 FK 实际是 18–26 mm，于是在空中合爪。L 的腕部相机还没检查。</li>
+                    <li><strong>L</strong>：没有一次走到抓杆这一步，只在 00:41、03:27 里 R 合爪后张开往下走了。</li>
+                    <li><strong>其他问题</strong>（已解决）：两个 CAN 口接反过一次（can_l 读出的是 piper_right 的姿态）；一次手臂撞到自己后关节零点偏了，用 Piper_sdk_ui 重新设零；校园网挡出站的高端口 → 改走 Runpod 的 HTTPS 代理；aivc-bot 的内存有坏块（memtester 报错，下载的包反复校验失败），显卡 TITAN X（Pascal）也不被 torch cu128 支持 → 策略服务放到 pod 上。</li>
+                  </ul>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">失败抓取 · 各视角</span><span class="dp-run__meta">合爪或最低点那一刻策略看到的画面</span><span class="dp-run__result">5 次失败 + 1 次成功</span></summary>
+                <div class="dp-run__note dp-run__note--end">
+                  <p>每张图上排：顶部相机（品红圈 = R 的 TCP）、R 腕部、R 腕部深度；下排：柱子相机、L 腕部、L 腕部深度。都是重映射到仿真相机之后、发给策略的画面；深度近蓝远红，黑色是没有深度。</p>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/placements.webp" width="1284" height="724" loading="lazy" decoding="async" alt="四次运行开始时的顶部相机画面，画着数据里杆、两只手抓取点和柱子的位置：00:13 蓝杆太短、在柱子旁；01:27 红杆远了；01:44 绿杆斜着、往柱子偏；02:18 绿杆和数据一致">
+                    <figcaption>摆放：开始时的顶部画面，画上数据里的位置（绿线 = 杆，深绿 = 前后范围；黄圈 = 两只手抓的地方；青线 = 柱子）。00:13 杆约 31 cm；01:27 远了 9–13 cm；01:44 斜着、往柱子偏了十几厘米；02:18 和数据一致。</figcaption>
+                  </figure>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/001310_q5.webp" width="1208" height="454" loading="lazy" decoding="async" alt="00:13 第 5 次查询的六路画面：R 在数据里的抓取点上方，腕部画面里没有杆">
+                    <figcaption>00:13 · q5：R 到了数据里的抓取点上方（离桌 7.6 cm），腕部画面里没有杆——杆约 31 cm，在柱子旁边。</figcaption>
+                  </figure>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/014434_q9.webp" width="1208" height="454" loading="lazy" decoding="async" alt="01:44 第 9 次查询的六路画面：R 在杆头处合爪，杆在手指外侧">
+                    <figcaption>01:44 · q9：R 下到杆头，离桌 11 mm 开始合爪，杆在手指外侧，空。</figcaption>
+                  </figure>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/020852_q11.webp" width="1208" height="454" loading="lazy" decoding="async" alt="02:08 第 11 次查询的六路画面：杆头在 R 两指之间，夹爪张开">
+                    <figcaption>02:08 · q11：杆在两指之间、高度也对（离桌 4 mm），但这是杆头（R 一侧只剩约 3 cm），R 没合就抬起。</figcaption>
+                  </figure>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/021853_q8.webp" width="1208" height="454" loading="lazy" decoding="async" alt="02:18 第 8 次查询的六路画面：摆放正确，杆在 R 两指之间，但 R 离桌面还有 41 mm">
+                    <figcaption>02:18 · q8：摆放和数据一致，杆在两指之间，但 R 离桌还有 41 mm 就合爪（腕部相机的安装位置），空。</figcaption>
+                  </figure>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/032233_q7.webp" width="1208" height="454" loading="lazy" decoding="async" alt="03:22 第 7 次查询的六路画面：R 已合拢，杆在右指外侧">
+                    <figcaption>03:22 · q7：离桌 5 mm 合爪之后，杆在右指外约 2 cm，空。</figcaption>
+                  </figure>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/021705_q11.webp" width="1208" height="454" loading="lazy" decoding="async" alt="02:17 第 11 次查询的六路画面：杆夹在 R 合拢的两指之间">
+                    <figcaption>02:17 · q11（成功）：离桌 5 mm，杆夹在合拢的两指之间，读数 0.6 mm。</figcaption>
+                  </figure>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/wrist_sim_vs_real.webp" width="1440" height="270" loading="lazy" decoding="async" alt="同一起始姿态下 R 腕部相机的仿真渲染、真机画面和两者叠加：真机画面里手指更小、位置偏了">
+                    <figcaption>同一个起始姿态下的 R 腕部相机：左 = 训练数据里的仿真渲染，中 = 真机，右 = 两者叠加。真机画面里手指更小、位置偏了：相机的安装位置和仿真里估计的不同。</figcaption>
+                  </figure>
+                </div>
+              </details>
+              <details class="dp-run" id="dp-real-fix">
+                <summary><span class="dp-run__name">对应改进</span><span class="dp-run__meta">11-13 · 改在数据生成里</span><span class="dp-run__result"><a href="#dp-data-real">→ 数据生成 · 真机之后的数据</a></span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">真机上的问题</th><th scope="col">数据生成里的改进</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>摆放稍偏，R 就找不到杆或在杆头外合爪（6 次）</td><td>摆放围绕原位置散开（σ 3 cm / 10°，截在 2σ），柱子 ±3 cm；约 20% 的 episode L 抓在杆头附近</td></tr>
+                      <tr><td>真机上的杆和线长短粗细不一，也不是直的</td><td>长度 0.4–2.2 m（0.4–0.6 m 为主，0.9 m 次之，2 m 最少），直径 4–16 mm，弯曲的初始形状；长杆换精确的求解器，2 m 的线也能收敛</td></tr>
+                      <tr><td>R 腕部相机比仿真多俯仰约 4.5°、位置差约 1 cm，合得太高</td><td>相机随机化 wide 档：顶部和腕部相机俯仰 ±5.5°、位置每轴 ±1.2 cm，腕部深度和 RGB 用同一套位姿</td></tr>
+                      <tr><td>合得太早、太高，或偏到杆旁</td><td>抓取前夹爪尽量张大（70 / 55 / 40 mm），用 1.5 s 慢慢下降；一半的抓取里手先偏离杆 6–15 mm（横向或偏高），在下降过程中自己纠正到位</td></tr>
+                      <tr><td>真机上先看抓住之后能不能绕成圈</td><td>握着成一圈就算成功，评测端一致；桌面摩擦 μ 在 0.5–0.7 小幅随机</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p>详见 <a href="#dp-data-real">数据生成 · 真机之后的数据</a>。代码在 _long 工作区，还没提交，新数据还没生成。</p>
+                  <p class="page-prose__label">还没做的</p>
+                  <ul>
+                    <li>标定两个 D405 的真实安装位置，用它重新渲染已有数据的腕部画面再微调；或者在 dp_run 里先把真实腕部图像按拟合的角度转回仿真的视角（角度能补准，约 1 cm 的位置差因为视差补不了）。</li>
+                    <li>L 的腕部相机还没检查。</li>
+                  </ul>
+                </div>
+              </details>
+            </div>
             <div class="term-notes">
               <div class="term-note" id="note-fused-pcg" popover>
                 <button class="term-note__close" type="button" popovertarget="note-fused-pcg" popovertargetaction="hide" aria-label="关闭">×</button>
@@ -1402,6 +1568,21 @@
       }
       describe();
       draw();
+    })();
+
+    /* a link to an entry (e.g. #dp-data-real): the entries around it open, then the page goes to it */
+    (function () {
+      function openTarget() {
+        var id = decodeURIComponent(location.hash.slice(1));
+        var target = id && document.getElementById(id);
+        if (!target) return;
+        for (var node = target; node; node = node.parentElement) {
+          if (node.tagName === "DETAILS") node.open = true;
+        }
+        target.scrollIntoView();
+      }
+      window.addEventListener("hashchange", openTarget);
+      openTarget();
     })();
   </script>
 </body>
