@@ -220,6 +220,11 @@
       max-width: 100%;
     }
 
+    /* tall or small figures (the randomisation's): not wider than they need */
+    .page-prose__figure--tall img {
+      max-width: min(100%, 36rem);
+    }
+
     .page-prose__figure figcaption {
       margin-top: 0.35rem;
       color: var(--text-light);
@@ -708,6 +713,211 @@
             <h4 id="il-v4-dp">V4-DP</h4>
             <p>Diffusion Policy（LeRobot 实现，按原版配方补齐），端到端：三个相机的图像 + 机器人状态 → 接下来 16 步每只手的关节角和夹爪宽度（dp7 起加了柱子相机，动作改成夹爪坐标系下的相对位姿）。从桌面拿起杆、搬到柱子、绕一圈、松手，整个任务一个策略。</p>
 
+            <h5 id="dp-random">随机化</h5>
+            <p>第二批数据（11-13，办公室的杆和线）生成时每一项随机化的定义、范围，以及实际跑的 929 个场景（不算开局就跳过的 64 个）里的分布。专家成功 496 条（53%）：细杆 &lt; 0.75 m 304/431（71%），线 ≥ 0.75 m 146/368（40%），粗杆 46/130（35%）。训练集 = 这 496 条 + 第一批里 0.75 m 以下的细杆 377 条，每条用两套颜色和相机偏移各渲染一次。不随机：两臂底座的位置、桌面背景和光照（GS 扫描）、柱高 100 mm 和 80 mm 底板、夹爪模型、绕的方向（从柱子同一侧贴上去、向上绕）。训练时另有颜色增强、图像平移 ±16 px、杆参数输入加噪声。</p>
+            <div class="dp-runs">
+              <details class="dp-run">
+                <summary><span class="dp-run__name">柱子</span><span class="dp-run__meta">五根 3D 打印的柱子 · 位置 ±3 cm</span><span class="dp-run__result">15 mm 占 60%</span></summary>
+                <div class="dp-run__note dp-run__note--end">
+                  <figure class="page-prose__figure page-prose__figure--wide page-prose__figure--tall">
+                    <img src="images/post-wrap/random/posts.webp" width="1280" height="896" loading="lazy" decoding="async" alt="上：顶部相机放大的柱子附近，紫框为柱子中心的随机范围，黄点为 120 个场景的柱子中心；下：五根柱子 10、12、15、20、25 mm 的柱子相机画面">
+                    <figcaption>上：顶部相机（放大），紫框 = 柱子中心的范围（原位置 (−0.19, 0.145) 周围 ±3 cm，均匀），黄点 = 120 个场景的柱子中心。下：柱子相机看到的五根柱子（直径 · 抽中的比例），都是 100 mm 高、80 mm 底板。</figcaption>
+                  </figure>
+                  <p>杆从柱子 85–95° 的方向贴上去，第一圈离底板 5.5–6.5 cm，向上绕，每圈升 6–9 mm（都是均匀分布）。</p>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">长度和直径</span><span class="dp-run__meta">混合分布</span><span class="dp-run__result">0.4–0.6 m 最多、0.9 m 次之、2 m 最少</span></summary>
+                <div class="dp-run__note">
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/random/lengths.webp" width="1525" height="485" loading="lazy" decoding="async" alt="929 个场景的长度和直径直方图，按细杆、线、粗杆堆叠，深色为专家成功">
+                    <figcaption>929 个场景的长度和直径，按类别堆叠；深色 = 专家成功，浅色 = 失败。</figcaption>
+                  </figure>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">长度</th><td>0.4–0.6 m 50%，0.6–0.8 m 8%，0.8–1.0 m 25%，1.0–1.8 m 5%，1.8–2.2 m 12%（每段内均匀）</td></tr>
+                      <tr><th scope="row">直径</th><td>4–6 mm 85%，6–12 mm 8%，13–16 mm 7%；指尖夹不住 4 mm 以下的杆</td></tr>
+                      <tr><th scope="row">长线</th><td>长于 1.2 m 的线直径重抽：4–7 mm 均匀</td></tr>
+                      <tr><th scope="row">粗杆（&gt; 6.5 mm）</th><td>长度重抽：80% 在 0.42–0.445 m（17 英寸），20% 在 0.40–0.60 m；粒子间距至少 0.67 倍直径</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">材料：塑性和弹性</span><span class="dp-run__meta">抗弯刚度 EI + 回弹曲率 κ_s</span><span class="dp-run__result">杆留得住弯，线弹回去</span></summary>
+                <div class="dp-run__note">
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/random/material.webp" width="1712" height="561" loading="lazy" decoding="async" alt="左：绕 15 mm 柱子一圈后松手的形状，κ_s 越大圈越松；中：弯成半径 5 cm 后松手，塑料杆保持弯曲，κ_s 25 和 40 的线弹直；右：929 个场景的 EI 和 κ_s 散点">
+                    <figcaption>按仿真里的弹塑性模型算：左 = 绕 15 mm 柱子一圈后松手，中 = 弯成半径 5 cm 后松手（蓝 = 塑料杆的 κ_s，绿 = 线的 κ_s），右 = 929 个场景的 EI 和 κ_s。</figcaption>
+                  </figure>
+                  <p>κ_s = M_y / EI（屈服力矩 / 抗弯刚度）：杆被弯到曲率 κ 后松手，最多弹回 κ_s——κ &lt; κ_s 完全弹回，κ &gt; κ_s 留下 κ − κ_s。κ_s 越小越“塑”，越大越“弹”。绕在 15 mm 柱子上（κ ≈ 98 /m）松手后，塑料杆的圈几乎不松；κ_s = 25 的线圈径变大，离柱子约 κ_s·ρ² ≈ 2.5 mm；弯成半径 5 cm（κ = 20 /m）的线松手就完全弹直。杆在桌上的起始形状同时是它的静止形状（见“初始形状”）。</p>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">细杆 &lt; 0.75 m</th><td>E 100–800 MPa（EI 0.0015–0.055 N·m²，中位 0.013），κ_s 1–8 /m（中位 4.5）：塑料扎带杆，实测 4–7 /m</td></tr>
+                      <tr><th scope="row">线 ≥ 0.75 m</th><td>E 30–200 MPa（EI 0.0005–0.016 N·m²，中位 0.0034），κ_s 12–40 /m（中位 25）：网线、充电线，更软，弯了大部分弹回去</td></tr>
+                      <tr><th scope="row">粗杆 &gt; 6.5 mm</th><td>EI 0.002–0.05 N·m²（和细杆同一量级：按真实 E，手臂的力矩弯不动），κ_s 1–8 /m</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">摆放：杆的位置和双手的范围</span><span class="dp-run__meta">以原位置为中心的截断正态</span><span class="dp-run__result">L 抓点 σ 3 cm · 朝向 σ 10° · 两手间距 σ 2 cm</span></summary>
+                <div class="dp-run__note">
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/random/reach.webp" width="1280" height="720" loading="lazy" decoding="async" alt="顶部相机画面上画出 L 和 R 能抓到桌面的环形范围、L 抓点的抽样框、929 个场景实际的 L 和 R 抓点、柱子的范围">
+                    <figcaption>顶部相机，画在桌面高度：蓝 / 橙环 = L / R 能用竖直夹爪抓到桌面上的杆的范围（离各自底座 0.22–0.395 m），白框 = L 抓点的抽样范围（±2σ），蓝点 / 橙点 = 929 个场景实际的 L / R 抓点，紫框 = 柱子。</figcaption>
+                  </figure>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">抽样</th><td>L 抓点在 (−0.175, 0.06) 附近（柱子旁约 10 cm），x、y 各 σ 3 cm；杆的朝向 180°（沿两臂底座的连线）σ 10°；R 抓点在 L 往回 0.356 m 处，σ 2 cm；都截在 2σ</td></tr>
+                      <tr><th scope="row">约束（不满足就重抽）</th><td>两个抓点都在各自的环里；两手抓的直段在桌面内（离桌边 4 cm）、离桌上的物体 1 cm 以上；抓点离物体 4.5 cm 以上（给张开的手指留地方）</td></tr>
+                      <tr><th scope="row">实际（p10–p90）</th><td>L 抓点 x −0.195 至 −0.169 m、y 0.02–0.07 m；朝向 177–194°；两手间距 0.35–0.39 m。两只手都接近最大臂展，所以只用到白框里靠 L 底座的那部分</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">初始形状：弯曲</span><span class="dp-run__meta">直段 + 随机弯段 + 拱，先落稳</span><span class="dp-run__result">曲率 σ 8 /m（典型半径约 12 cm）</span></summary>
+                <div class="dp-run__note">
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/random/shape.webp" width="1740" height="834" loading="lazy" decoding="async" alt="三个场景（0.56 m 杆、0.99 m 线、2.19 m 线）俯视的起始形状：粗线为双手要抓的直段，细线为弯段，虚线为落稳前生成的形状；下图为沿杆的离桌高度，虚线为生成时的拱，实线为落稳后">
+                    <figcaption>上：俯视（方向同顶部相机），粗线 = 双手要抓的直段，细线 = 弯段（落稳后），虚线 = 生成的形状（落稳前）；灰块 = 桌上的物体，橙圈 = 机械臂底座，紫圈 = 柱子。下：沿杆的离桌高度，虚线 = 生成时的拱，实线 = 落稳后。</figcaption>
+                  </figure>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">直段</th><td>从 L 抓点（及杆尾）到 R 抓点再往前 4–10 cm：直的，就是两只手要抓的部分</td></tr>
+                      <tr><th scope="row">弯段</th><td>再往杆头方向逐步生成：每一步的曲率 = 平滑噪声（σ 8 /m，相关长度约 8 cm）+ 避障转向（往前看 6 cm，靠近桌边 4 cm、底座 13 cm、柱子 9 cm、桌上物体 3 cm 就转开；仍碰到就重抽，最多 20 次）。长线的大弯主要来自避障转向</td></tr>
+                      <tr><th scope="row">拱</th><td>弯段上 0–3 个向上的拱，高 0.5–3 cm、宽 4–15 cm</td></tr>
+                      <tr><th scope="row">落稳</th><td>这个形状同时是杆的静止形状（被弯过留下的形状）；放到桌上后先落 0.5–3 s（最快的点慢于 5 mm/s），这段不录，episode 从杆静止开始。软线的拱基本塌平</td></tr>
+                      <tr><th scope="row">短杆</th><td>0.40–0.5 m 的杆 R 几乎抓在杆头，所以基本是直的；0.5–0.6 m 的杆在杆头只有不到 10 cm 的弯段</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">实际放置：不同长度</span><span class="dp-run__meta">8 个场景的第一帧</span><span class="dp-run__result">多出来的长度都在 R 一侧</span></summary>
+                <div class="dp-run__note dp-run__note--end">
+                  <figure class="page-prose__figure page-prose__figure--wide page-prose__figure--tall">
+                    <img src="images/post-wrap/random/starts.webp" width="1280" height="1440" loading="lazy" decoding="async" alt="8 个场景顶部相机的第一帧：0.40 m 短杆、0.56 m 杆、0.52 m 杆抓杆头、17 英寸粗杆、0.88 m、0.99 m、1.91 m、2.19 m 的线">
+                    <figcaption>顶部相机第 1 帧（落稳之后；生成时的原始渲染，杆是蓝色，训练数据另上实验室的颜色）。双手抓的那段对所有长度都一样；多出来的长度在 R 一侧（画面左边）弯着铺开。2 m 左右的线有一段会出顶部相机的视野（2.19 m 那张）。</figcaption>
+                  </figure>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">L 抓在哪</span><span class="dp-run__meta">L 抓点到杆尾（L 那一端）的长度</span><span class="dp-run__result">20% 抓在杆尾附近</span></summary>
+                <div class="dp-run__note dp-run__note--end">
+                  <figure class="page-prose__figure page-prose__figure--wide page-prose__figure--tall">
+                    <img src="images/post-wrap/random/lgrasp.webp" width="900" height="1047" loading="lazy" decoding="async" alt="上：0.56 m 杆，L 抓在离杆尾 11 cm；中：0.52 m 杆，L 抓在离杆尾 3 cm；下：929 个场景杆尾长度的直方图">
+                    <figcaption>上：默认 L 抓在离杆尾约 11 cm（黄 = 杆尾）；中：20% 的场景抓在离杆尾 3–7 cm；下：929 个场景的杆尾长度。</figcaption>
+                  </figure>
+                  <p>两只手之间至少要有 34 cm 杆，所以 0.40–0.47 m 的短杆也只能抓在杆尾附近；合起来约 40% 的场景杆尾不到 8 cm。</p>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">桌面摩擦</span><span class="dp-run__meta">杆的橡胶外皮和黑色垫子</span><span class="dp-run__result">μ 0.5–0.7</span></summary>
+                <div class="dp-run__note dp-run__note--end">
+                  <figure class="page-prose__figure page-prose__figure--wide page-prose__figure--tall">
+                    <img src="images/post-wrap/random/friction.webp" width="860" height="376" loading="lazy" decoding="async" alt="929 个场景桌面摩擦系数的直方图，集中在 0.6，范围 0.5 到 0.7">
+                    <figcaption>每个场景抽一次：正态 N(0.6, 0.05)，截断在 0.5–0.7；实际 p10–p90 为 0.54–0.66。</figcaption>
+                  </figure>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">抓取动作</span><span class="dp-run__meta">所有抓取（桌面和空中），不随机，但比旧数据慢</span><span class="dp-run__result">慢慢下降，到位才合爪</span></summary>
+                <div class="dp-run__note">
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/random/grasp.webp" width="2000" height="716" loading="lazy" decoding="async" alt="R 在桌面上抓杆的五个时刻：R 腕部相机和顶部相机，以及杆偏离最终握持位置的距离和夹爪张开宽度随时间的曲线">
+                    <figcaption>2000007 中 R 在桌面上的一次抓取（没有扰动）。上 = R 腕部相机，中 = 顶部相机，下 = 杆偏离最终握持位置的距离（R 腕部相机里横跨手指的方向）和夹爪张开宽度。</figcaption>
+                  </figure>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">张开</th><td>依次试 70 / 55 / 40 mm，取张开后手指不碰东西的最宽一档；桌面上的抓取实际 93% 是 40 mm（70 mm 5%、55 mm 2%），空中的没有记录</td></tr>
+                      <tr><th scope="row">移动</th><td>2.0 s 移到抓取点上方，1.5 s 慢慢下降，中间不停顿；下降时目标跟着杆的实际位置走</td></tr>
+                      <tr><th scope="row">合爪</th><td>手到位（TCP 连续 3 帧慢于 3 mm/s，最多等 1 s）才开始合；手指 50 mm/s（真夹爪的速度），合上后停 0.3 s</td></tr>
+                      <tr><th scope="row">桌面 / 空中</th><td>桌面上往下压 3 mm，失败最多重试 2 次；空中多往下 4 mm</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">抓取扰动：边下降边对正</span><span class="dp-run__meta">DART · 一半的抓取</span><span class="dp-run__result">偏 6–15 mm，下降中消失</span></summary>
+                <div class="dp-run__note">
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/random/dart.webp" width="2000" height="716" loading="lazy" decoding="async" alt="L 在桌面上抓杆、被偏了 12.7 mm 的五个时刻，以及偏差在下降过程中消失、到位后合爪的曲线">
+                    <figcaption>2001013 中 L 在桌面上的一次抓取：手臂的关节被偏了 12.7 mm（横跨手指的方向），偏差在下降中线性消失。上 = L 腕部相机，中 = 顶部相机，下同上一项。</figcaption>
+                  </figure>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">哪些抓取</th><td>桌面上 50%、空中（搬运和缠绕中的重抓）50% 抽中；实际桌面 748/1791 次、空中 865/1728 次</td></tr>
+                      <tr><th scope="row">偏多少</th><td>6–15 mm 均匀；70% 横跨手指方向（左右随机），30% 沿工具轴停在杆上方</td></tr>
+                      <tr><th scope="row">怎么消失</th><td>偏差加在实际执行的关节上，下降过程中线性减小，下降到 70% 时为零，最后一段干净地下到底</td></tr>
+                      <tr><th scope="row">记录的</th><td>专家的干净指令：数据里是“手偏了、一边慢慢下降一边自己对正”，对应真机上 R 偏到杆旁或停在杆上方</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">执行噪声</span><span class="dp-run__meta">一半的场景 · 整个 episode</span><span class="dp-run__result">σ 0.3°，相关时间 0.3 s</span></summary>
+                <div class="dp-run__note dp-run__note--end">
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/random/noise.webp" width="1300" height="375" loading="lazy" decoding="async" alt="六个关节的执行噪声样例曲线，在正负 1 度以内缓慢变化">
+                    <figcaption>六个关节的一段噪声样例。</figcaption>
+                  </figure>
+                  <p>每个关节一条 Ornstein-Uhlenbeck 过程（平稳标准差 0.3°，相关时间 0.3 s），手臂按“指令 + 噪声”运动，记录的仍是干净的指令：数据里有手臂被带偏、指令把它拉回来的样子。约一半的场景有（实际 53%）。</p>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">相机</span><span class="dp-run__meta">顶部和两个腕部相机，每次渲染各抽一次</span><span class="dp-run__result">俯仰 ±5.5° · 偏航 / 横滚 ±2° · ±12 mm</span></summary>
+                <div class="dp-run__note">
+                  <figure class="page-prose__figure page-prose__figure--wide page-prose__figure--tall">
+                    <img src="images/post-wrap/random/camera.webp" width="1280" height="1440" loading="lazy" decoding="async" alt="同一帧在四种相机位姿下的画面：左列顶部相机，右列 L 腕部相机；从上到下为标称、俯仰加 5.5 度、俯仰减 5.5 度、偏航 2 度横滚 2 度加平移和焦距">
+                    <figcaption>同一帧：左 = 顶部相机，右 = L 腕部相机；从上到下：标称位姿、俯仰 +5.5°、俯仰 −5.5°、偏航 2° + 横滚 2° + 平移 (12, −12, 12) mm + 焦距 +3%（都取抽样范围的边）。</figcaption>
+                  </figure>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">范围</th><td>每个相机各自：平移每轴 ±12 mm，俯仰 ±5.5°、偏航 ±2°、横滚 ±2°（绕相机自身的轴），焦距 ±3%，都是均匀分布</td></tr>
+                      <tr><th scope="row">一致性</th><td>腕部深度和 RGB 用同一套位姿；柱子相机由顶部相机生成，跟着一起动；每条数据渲染两次，各抽一次</td></tr>
+                      <tr><th scope="row">为什么</th><td>实测真机 R 腕部相机比仿真多俯仰约 4.5°、位置差约 1 cm（见 <a href="#dp-real">真机</a>），范围要比实测误差大</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">颜色</span><span class="dp-run__meta">实验室的杆 · 渲染时上色</span><span class="dp-run__result">白、绿、红、蓝各 25%</span></summary>
+                <div class="dp-run__note dp-run__note--end">
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/random/colors.webp" width="1920" height="540" loading="lazy" decoding="async" alt="同一帧四种颜色：白杆白柱、绿杆橙柱、红杆橙柱、蓝杆白柱，上为顶部相机，下为 L 腕部相机">
+                    <figcaption>同一帧换颜色（上 = 顶部相机，下 = L 腕部相机）。</figcaption>
+                  </figure>
+                  <p>杆：白、绿、红、蓝各 25%，每种亮度再随机 ±10–15%、每个通道 ±0.02–0.04；柱子：白、橙各一半；桌面和背景不变。颜色在渲染时上，不用重新仿真；颜色和相机偏移的抽样互相独立。</p>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">成功判定</span><span class="dp-run__meta">只保留成功的示范</span><span class="dp-run__result">握着绕成 ≥ 0.9 圈</span></summary>
+                <div class="dp-run__note dp-run__note--end">
+                  <figure class="page-prose__figure page-prose__figure--wide page-prose__figure--tall">
+                    <img src="images/post-wrap/random/success.webp" width="1000" height="360" loading="lazy" decoding="async" alt="结束时的顶部相机和柱子相机画面：杆在柱子上绕了一圈，两只手仍握着">
+                    <figcaption>2000007 结束时：0.99 圈，两只手还握着（左 = 顶部相机，右 = 柱子相机）。</figcaption>
+                  </figure>
+                  <p>专家的一圈以“握住”结束，不松手；评测（sim_eval --success hold）用同一个判定。</p>
+                </div>
+              </details>
+            </div>
+
             <h5>数据生成</h5>
             <div class="dp-runs">
               <details class="dp-run">
@@ -736,7 +946,7 @@
                 </div>
               </details>
               <details class="dp-run" id="dp-data-real">
-                <summary><span class="dp-run__name">真机之后的数据</span><span class="dp-run__meta">11-13 · 数据生成 · 办公室的杆和线、相机随机化</span><span class="dp-run__result">第一批 727 条（成功率 58.5%）；第二批生成中</span></summary>
+                <summary><span class="dp-run__name">真机之后的数据</span><span class="dp-run__meta">11-13 · 数据生成 · 办公室的杆和线、相机随机化</span><span class="dp-run__result">第一批 727 条（成功率 58.5%）；第二批 496 条（53%）</span></summary>
                 <div class="dp-run__note">
                   <p>dp13 第一次上真机（见 <a href="#dp-real">真机</a>）后对数据生成的修改：真机的摆放、杆的长短粗细、腕部相机的安装位置都和训练数据不一样，数据的分布要把这些盖住。原来的数据（数据 v3–v7、DAgger）不动，新数据另外生成。</p>
                 </div>
@@ -767,7 +977,7 @@
                 <div class="dp-run__note dp-run__note--end">
                   <p class="page-prose__label">下一步</p>
                   <ul>
-                    <li>第一批数据训成 dp16（见 Train）。第二批（弹性长线、17 英寸粗杆、实验室配色）11-13 19:22 UTC 起生成：3 张 RTX PRO 6000 + 1 张 RTX 6000 Ada，3 h。</li>
+                    <li>第一批数据训成 dp16（见 Train）。第二批（弹性长线、17 英寸粗杆、实验室配色）11-13 19:22 UTC 起生成：3 张 RTX PRO 6000 + 1 张 RTX 6000 Ada，3 h，929 个场景 496 条成功（53%）；每一项随机化见 <a href="#dp-random">随机化</a>。</li>
                     <li>之后的训练只用新专家的数据：第二批 + 第一批里 0.75 m 以下的细塑料杆；不再用的：dp13 的旧数据（旧专家抓得快、不张大，结尾松手）、第一批里按塑料杆仿真的长线、长度不对的粗杆（卷上的文件保留）。</li>
                     <li>原型的仿真速度（笔记本）：0.55 m 杆 111 个粒子每 1 s 仿真 7.7 s，0.9 m 181 个 12 s，2 m 401 个 32 s。</li>
                   </ul>
