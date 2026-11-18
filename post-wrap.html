@@ -978,9 +978,28 @@
                   <p class="page-prose__label">下一步</p>
                   <ul>
                     <li>第一批数据训成 dp16（见 Train）。第二批（弹性长线、17 英寸粗杆、实验室配色）11-13 19:22 UTC 起生成：3 张 RTX PRO 6000 + 1 张 RTX 6000 Ada，3 h，929 个场景 496 条成功（53%）；每一项随机化见 <a href="#dp-random">随机化</a>。</li>
-                    <li>之后的训练只用新专家的数据：第二批 + 第一批里 0.75 m 以下的细塑料杆；不再用的：dp13 的旧数据（旧专家抓得快、不张大，结尾松手）、第一批里按塑料杆仿真的长线、长度不对的粗杆（卷上的文件保留）。</li>
+                    <li>之后的训练只用新专家的数据：第二批 + 第一批里 0.75 m 以下的细塑料杆；不再用的：dp13 的旧数据（旧专家抓得快、不张大，结尾松手）、第一批里按塑料杆仿真的长线、长度不对的粗杆（卷上的文件保留）。后来改成只用 modes 数据，见 <a href="#dp-data-modes">modes 数据 → clean 专家</a>。</li>
                     <li>原型的仿真速度（笔记本）：0.55 m 杆 111 个粒子每 1 s 仿真 7.7 s，0.9 m 181 个 12 s，2 m 401 个 32 s。</li>
                   </ul>
+                </div>
+              </details>
+              <details class="dp-run" id="dp-data-modes">
+                <summary><span class="dp-run__name">modes 数据 → clean 专家</span><span class="dp-run__meta">11-14 – 11-17 · 数据生成 · 只用新专家的数据</span><span class="dp-run__result">modes 1076 条（专家 56.5%）；clean 1069 条</span></summary>
+                <div class="dp-run__note">
+                  <p>dp16 真机测试之后，旧数据（dp13 的数据、第一批和第二批）全部不再训练，从 modes 数据从头开始（dp17）；dp18 的失败又暴露出示范本身的问题，专家重写成 clean 版本（dp20 起）。每条示范只渲染一次，用它自己抽到的颜色和相机偏移。</p>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">改动</th><th scope="col">内容</th><th scope="col">为什么 / 效果</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>modes 数据<br><span class="speed-use">11-14，dp17–dp19</span></td><td>R 在离杆头 8–35 mm 处抓（70% 的场景）；手从杆上方 6–10 cm 开始慢慢下降（移到上方 1.6–2.6 s，下降 15–30 mm/s，都随机）；抓取偏差在移动时就加上（手到达时已经偏离杆）；杆长大多 0.44–0.56 m</td><td>dp16 真机上 R 两次都到杆头附近去抓，数据里补上这种抓法；手在高处就开始放慢。5 张卡生成 1076 条成功示范，专家成功率 56.5%（细杆 68%、长线 42%、粗杆 27%）</td></tr>
+                      <tr><td>专家修复<br><span class="speed-use">11-15</span></td><td>搬运的每一段都等手到位（原来抄近路，下垂的杆扫过柱子落到另一侧）；判断“握住一圈”多检查几次；桌面抓取后杆停在指尖就重新放好；锚点重抓没抓住时另一只手先把杆抬高再试</td><td>75 个新场景约 70%（数据里 56.5%）。另外试过：软一些的材料 79%；摩擦上限 80 N、1500 N 都没用；刚性抓取 2/10、3/15（绕线时拉力约 1700 N，把杆拖离柱子），所以仍用摩擦抓取</td></tr>
+                      <tr><td>clean 专家<br><span class="speed-use">11-16，dp20 起</span></td><td>示范里不许“夹、松、再夹”，也不许试探性的动作：合爪时手跟着杆走，直到指尖碰到杆；抓取、重抓和每一次绕线先在仿真快照里预测，不行就撤回换方案；R 的桌面抓取一直保持到锚点；按测到的杆和柱子的间隙一次靠上去；掉过杆或合空的示范不要</td><td>dp18 在柱子旁“夹、松、再夹”：modes 数据里 28% 的示范（297/1076）R 掉过杆又重新夹，策略学会了这个动作。一次靠上去之后“杆碰不到柱子”从 30% 降到 5%。生成 1069 条 clean 示范（68 万帧）</td></tr>
+                      <tr><td>掉杆判定<br><span class="speed-use">11-17，dp20 的评测起</span></td><td>杆离 TCP 超过 8 mm 就算掉 → 夹住的那段杆整个离开指垫（25.8 × 40 mm）才算掉</td><td>原来抓得深（杆在 TCP 后 8–20 mm）也被当成掉杆。dp20 15 万步在 30 个验证场景上 21/30 → 25/30，翻转的 6 个场景原来都“掉过杆”。之后的评测和数据都用新判定</td></tr>
+                    </tbody>
+                  </table>
                 </div>
               </details>
             </div>
@@ -1311,6 +1330,71 @@
               </details>
 
               <details class="dp-run">
+                <summary><span class="dp-run__name">dp17 · 只用 modes 数据</span><span class="dp-run__meta">11-14 · 从头 20 万步 · modes 1076 条</span><span class="dp-run__result">modes 场景 15/50</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>旧数据全部不用，只用 <a href="#dp-data-modes">modes 数据</a>（1076 条），从头训 20 万步（学习率 1e-4），网络同 dp16；每 1 万步在 12 个场景上验证</td></tr>
+                      <tr><th scope="row">结果</th><td>modes 场景（见 Eval）：13 万步 12/50，16 万步 12/50，20 万步 15/50；12 个场景的验证从 14 万步起一直是 5/12</td></tr>
+                      <tr><th scope="row">问题</th><td>合爪时偏离杆中心超过 2.5 mm 约一半会滑脱，16% 的合爪什么也没夹到；20 万步长线 0/11、粗杆 2/8</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp18 · DAgger</span><span class="dp-run__meta">11-15 · dp17 + 10 万步 · modes + 360 段纠正</span><span class="dp-run__result">22/50（对照 dp17c 13/50）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>dp17 20 万步在新场景上跑，专家接管纠正，2 台 pod 收集 175 + 185 = 360 段；从 dp17 再训 10 万步（学习率 5e-5），数据 = modes + 360 段（1436 条）。对照 dp17c：同样续训 10 万步，只用 modes 数据</td></tr>
+                      <tr><th scope="row">结果</th><td>modes 场景 22/50，dp17c 13/50；只有 dp18 成功的场景 16 个，只有 dp17c 成功的 7 个。难场景（长线和粗杆更多）13/50；dp18 自己训练过的 50 个场景 23/50</td></tr>
+                      <tr><th scope="row">问题</th><td>多训步数没用，DAgger 有用。训练场景和新场景成功率差不多，问题不在见过的场景不够，而在闭环执行不准。失败的回合都到了柱子，之后绕线中的重抓出错：约 29 个失败里 24–25 个出现杆没有手拿着，约一半杆滑出——示范里 R 常常“夹、松、再夹”（见 <a href="#dp-data-modes">clean 专家</a>）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp19 · DAgger 第二轮</span><span class="dp-run__meta">11-16 · dp18 + 10 万步 · 在难场景上纠正</span><span class="dp-run__result">25/50；难场景 27/50（dp18 13/50）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>dp18 在难场景上跑（长线 32%、粗杆 29%、细杆 39%），收集 175 + 185 = 360 段；从 dp18 再训 10 万步（5e-5），数据 = modes + 两轮 DAgger（1796 条）</td></tr>
+                      <tr><th scope="row">结果</th><td>modes 场景 25/50（dp18 22/50）；难场景 27/50（dp18 13/50）</td></tr>
+                      <tr><th scope="row">问题</th><td>在难场景上收集的纠正让难场景的成功翻了一倍；粗杆在 modes 场景上仍是 0</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp20 · clean 专家</span><span class="dp-run__meta">11-16 · 从头 20 万步 · clean 1069 条</span><span class="dp-run__result">31/50（新掉杆判定）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>数据换成 <a href="#dp-data-modes">clean 专家</a>的 1069 条示范，从头训 20 万步（学习率 1e-4），网络同 dp17</td></tr>
+                      <tr><th scope="row">结果</th><td>30 个验证场景（旧判定）8–20 万步之间 16–21/30；换成新掉杆判定，15 万步 21/30 → 25/30。modes 场景（新判定）15 万步 31/50，20 万步 31/50（每个回合给到 360 s）</td></tr>
+                      <tr><th scope="row">问题</th><td>15 万步和 20 万步在 24 个场景上结果相反（各 12 个）：DP 每次采样不同，单个场景成不成很看运气。时间给到 360 s 只多成功 1 个，失败是前面的错误没救回来，不是时间不够。15 万步剩下的失败：粗杆卡在 0.4–0.76 圈（7 个）、L 的桌面抓取偏 10–25 cm 或没抓到（5 个）、真正掉杆（约 5 个）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp21 · clean 专家的 DAgger</span><span class="dp-run__meta">11-17 · dp20 + 10 万步 · clean + 288 段纠正</span><span class="dp-run__result">38/50（dp20 31/50）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>dp20 20 万步在新场景上跑，clean 专家接管，只留下干净的接管（之后不掉杆、不合空）：3 台 pod 93 + 98 + 97 = 288 段；从 dp20 再训 10 万步（5e-5），数据 = clean + 288 段（1357 条）</td></tr>
+                      <tr><th scope="row">结果</th><td>modes 场景（新判定，360 s）38/50：细杆 22/31、长线 10/11、粗杆 6/8；比 dp20 多成功 13 个场景、少 6 个；合空 98/264 = 37%（dp20 45%）</td></tr>
+                      <tr><th scope="row">问题</th><td>合空的时候策略看不准杆在哪里：dp20 合空时杆离 TCP 超过 15 mm 的 75 次里，策略自己的估计有 54 次 &lt; 5 mm，dp21 仍是这样——这些状态训练里没见过。在示范数据上测，冻结的预训练编码器（ImageNet ResNet18、DINOv2-S，加上深度也一样）都不如任务里训练出来的编码器，判断高度这个方向离不开深度。DAgger 教会的是失败后怎么补救，而不是看得更准</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
                 <summary><span class="dp-run__name">训练提速</span><span class="dp-run__meta">11-09 · 数据加载 + 计算 + 续训 · 训练结果不变</span><span class="dp-run__result">0.42 → 0.14 s/步</span></summary>
                 <div class="page-prose__table">
                   <table>
@@ -1391,7 +1475,27 @@
               </table>
             </div>
             <div class="dp-run__note">
-              <p>场景按第一批数据的分布抽（0.4–2.2 m、4–16 mm，摆放围绕原位置），评测时杆和柱子按种子随机颜色（办公室配色，黑杆占约 42%），每个回合最多 180 s（成功的回合中位 61 s，65 个成功里有 4 个超过 150 s），和上面 dlo 场景的数字不能直接比。专家在这类场景上约 58%。用实验室配色（白、绿、红、蓝）的 dp16 评测在跑；第二批数据之后的评测，长线会按新的弹性材料仿真。</p>
+              <p>场景按第一批数据的分布抽（0.4–2.2 m、4–16 mm，摆放围绕原位置），评测时杆和柱子按种子随机颜色（办公室配色，黑杆占约 42%），每个回合最多 180 s（成功的回合中位 61 s，65 个成功里有 4 个超过 150 s），和上面 dlo 场景的数字不能直接比。专家在这类场景上约 58%。dp16 换成实验室配色（白、绿、红、蓝）评测是 23/50（办公室配色 24/50），黑杆的差距不是颜色造成的。之后的模型改在下面的 modes 场景上评测。</p>
+            </div>
+            <p class="page-prose__label">modes 场景（只用新专家的数据之后；50 个场景，种子 3100000 起，实验室配色）</p>
+            <div class="page-prose__table">
+              <table>
+                <thead>
+                  <tr><th scope="col">训练</th><th scope="col">成功</th><th scope="col">双手抓住</th><th scope="col">最多绕 ≥0.5 圈</th><th scope="col">细杆（31）</th><th scope="col">长线 &gt; 0.7 m（11）</th><th scope="col">粗杆 ≥ 11 mm（8）</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>dp17 20 万步（modes，从头）</td><td>15</td><td>43</td><td>16</td><td>13</td><td>0</td><td>2</td></tr>
+                  <tr><td>dp17c 30 万步（dp17 + 10 万，对照）</td><td>13</td><td>45</td><td>17</td><td>10</td><td>2</td><td>1</td></tr>
+                  <tr><td>dp18 30 万步（dp17 + 10 万，DAgger）</td><td>22</td><td>45</td><td>22</td><td>15</td><td>4</td><td>3</td></tr>
+                  <tr><td>dp19 40 万步（dp18 + 10 万，DAgger 第二轮）</td><td>25</td><td>44</td><td>27</td><td>19</td><td>6</td><td>0</td></tr>
+                  <tr><td>dp20 15 万步（clean，从头）*</td><td>31</td><td>44</td><td>35</td><td>20</td><td>10</td><td>1</td></tr>
+                  <tr><td>dp20 20 万步 *（360 s）</td><td>31</td><td>40</td><td>32</td><td>19</td><td>6</td><td>6</td></tr>
+                  <tr><td>dp21 30 万步（dp20 + 10 万，clean DAgger）*（360 s）</td><td>38</td><td>46</td><td>40</td><td>22</td><td>10</td><td>6</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="dp-run__note">
+              <p>每个回合最多 180 s（标了 360 s 的除外），场景按 modes 数据的分布抽。* 用新的掉杆判定（夹住的那段杆整个离开指垫才算掉，见 <a href="#dp-data-modes">数据生成</a>），和上面几行不完全可比。难场景（长线 32%、粗杆 29%，种子 3200000 起）：dp18 13/50，dp19 27/50。同一模型两个检查点之间常有一半场景结果相反（dp20 15 万和 20 万步 24/50），相差几个成功说明不了什么。</p>
             </div>
             <p class="page-prose__label">结果对比（16 个场景，早期）</p>
             <div class="page-prose__table">
