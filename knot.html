@@ -64,6 +64,18 @@
                 <li><a class="site-nav__link site-nav__link--deep" href="knot.html#scripted-expert">Scripted Expert</a></li>
               </ul>
             </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="route-insert.html">Route and Insert</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="route-insert.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="bottle-lift.html">Bottle Lift</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="bottle-lift.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
@@ -84,7 +96,21 @@
         <section class="page-subsection" id="scripted-expert" aria-labelledby="scripted-expert-title">
           <h3 class="page-subsection__title" id="scripted-expert-title">Scripted Expert</h3>
 
+          <div class="page-prose" lang="zh-CN">
+            <p>整条链一次完成：两只手把 50 cm 塑料杆绕柱子 1.5 圈；把 A 端顺到 B 端旁边并拢；L 回到休息位，R 松开起始端，再在离柱子轴线 50 mm 处同时抓住两股，分几次转腕拧 720°（中间换抓）；松手后两股仍然缠成半结。</p>
+            <p><span class="page-prose__label">仿真</span>：离散弹性杆（DER，塑性，带自接触），材料阻尼 Kelvin-Voigt（viscous_time 0.02 s，只作用于弯曲和扭转），牛顿迭代上限 40、容差 0.002：同样设置重跑到“抓住两股”为止的 53250 个子步里，71 个（0.13%）用满上限，平均每步 11 次迭代（拧的阶段没有统计到）。<span class="page-prose__label">渲染</span>：3DGS 扫描场景，机械臂、柱子和杆用扫描的环境光重新打光（带阴影和互反射），每像素 2×2 超采样。</p>
+          </div>
+
           <div class="media-gallery">
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="绕柱后拧成半结（整条链）">
+                  <source src="videos/knot-wrap-twist.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>整条链：绕柱 537°，两股并拢，R 抓两股分 7 次拧 720°（换抓 3 次），松手后 +1.41 圈、离柱子 0.6 mm</figcaption>
+            </figure>
+
             <figure class="media-gallery__item">
               <div class="media-gallery__media">
                 <video controls playsinline preload="metadata" aria-label="单手拧">

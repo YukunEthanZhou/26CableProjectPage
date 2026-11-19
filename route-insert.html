@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Route and Insert · Rod Simulation and Cable Manipulation</title>
+  <meta name="description" content="Research demonstrations from an ongoing simulation and robotics project at UCLA.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="https://yukunethanzhou.github.io/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="site-bar">
+    <button type="button" class="site-bar__menu" aria-controls="site-nav" aria-expanded="false" aria-label="Open sections">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <span class="site-bar__title">Route and Insert</span>
+  </div>
+  <div class="site-scrim"></div>
+
+  <div class="standalone-project">
+    <nav class="site-nav" id="site-nav" aria-label="Sections">
+      <div class="site-nav__head">
+        <span class="site-nav__label">Sections</span>
+        <button type="button" class="site-nav__close" aria-label="Close sections">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="index.html">Home</a></li>
+        <li>
+          <a class="site-nav__link" href="gs-enhancement.html">Real2Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="gs-enhancement.html">GS Enhancement</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="perception.html">Perception</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="parameter-identification.html">Parameter Identification</a></li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
+        <li>
+          <a class="site-nav__link is-active" href="sim.html">Sim</a>
+          <ul class="site-nav__sub">
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="post-wrap.html">Post Wrap</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="post-wrap.html#mpc">MPC</a></li>
+                <li>
+                  <a class="site-nav__link site-nav__link--deep" href="post-wrap.html#imitation-learning">Imitation Learning</a>
+                  <ul class="site-nav__sub site-nav__sub--deeper" lang="zh-CN">
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-scripted">脚本做法</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v0">V0</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v1">V1-纯感知版</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v2">V2-双臂相机</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v3">V3-pi0.5</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v4-dp">V4-DP</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="knot.html">Knot</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="knot.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="route-insert.html" aria-current="page">Route and Insert</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="route-insert.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="bottle-lift.html">Bottle Lift</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="bottle-lift.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
+      </ul>
+    </nav>
+
+    <main id="main">
+      <header class="standalone-project__header">
+        <h1>Rod Simulation and Cable Manipulation</h1>
+      </header>
+
+      <p class="media-page__intro">Research demonstrations from my ongoing simulation and robotics project at UCLA.</p>
+
+      <section class="page-section" id="route-insert" aria-labelledby="route-insert-title">
+        <p class="page-section__kicker">Sim</p>
+        <h2 class="page-section__title" id="route-insert-title">Route and Insert</h2>
+
+        <section class="page-subsection" id="scripted-expert" aria-labelledby="scripted-expert-title">
+          <h3 class="page-subsection__title" id="scripted-expert-title">Scripted Expert</h3>
+
+          <div class="page-prose" lang="zh-CN">
+            <p>脚本专家（抓取、换抓的规则和 Post Wrap 的专家相同）：R 抓起桌上网线的插头一端，带着线绕过第一根 50 mm 高的小柱子，在空中把插头交给 L；L 带线绕过第二根柱子，把 RJ45 插头插进离桌面 50 mm 的网口。线 S 形绕过两根柱子，第一根在线的右边，第二根在左边。随机场景里变的是柱子的位置（只取两只手都走得通的）、网口朝向（60° ± 20°）、线长（0.85–1.3 m，20% 为 1.8–2.2 m）、线径（4–7 mm）和刚度。</p>
+            <p><span class="page-prose__label">仿真</span>：离散弹性杆（DER），材料阻尼 Kelvin-Voigt（viscous_time 0.02 s，只作用于弯曲和扭转，线不会一直晃），牛顿迭代上限 40、容差 0.002：这条运行的 42170 个子步全部在上限内收敛（平均每步 7.5 次迭代）。<span class="page-prose__label">渲染</span>：3DGS 扫描场景，机械臂、柱子、网口、线和插头用扫描的环境光重新打光（带阴影和互反射），每像素 2×2 超采样。</p>
+          </div>
+
+          <div class="media-gallery">
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="绕线插入：标准场景">
+                  <source src="videos/route-insert.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>标准场景（俯视）：1.1 m × 6 mm 网线绕过两根柱子，R → L 交接，插头插入网口 13.8 mm</figcaption>
+            </figure>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="site.js"></script>
+</body>
+</html>

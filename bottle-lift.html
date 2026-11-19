@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bottle Lift · Rod Simulation and Cable Manipulation</title>
+  <meta name="description" content="Research demonstrations from an ongoing simulation and robotics project at UCLA.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="https://yukunethanzhou.github.io/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://yukunethanzhou.github.io/images/favicon-32x32.png">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="site-bar">
+    <button type="button" class="site-bar__menu" aria-controls="site-nav" aria-expanded="false" aria-label="Open sections">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <span class="site-bar__title">Bottle Lift</span>
+  </div>
+  <div class="site-scrim"></div>
+
+  <div class="standalone-project">
+    <nav class="site-nav" id="site-nav" aria-label="Sections">
+      <div class="site-nav__head">
+        <span class="site-nav__label">Sections</span>
+        <button type="button" class="site-nav__close" aria-label="Close sections">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="index.html">Home</a></li>
+        <li>
+          <a class="site-nav__link" href="gs-enhancement.html">Real2Sim</a>
+          <ul class="site-nav__sub">
+            <li><a class="site-nav__link site-nav__link--sub" href="gs-enhancement.html">GS Enhancement</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="perception.html">Perception</a></li>
+            <li><a class="site-nav__link site-nav__link--sub" href="parameter-identification.html">Parameter Identification</a></li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="simulator.html">Simulator</a></li>
+        <li>
+          <a class="site-nav__link is-active" href="sim.html">Sim</a>
+          <ul class="site-nav__sub">
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="post-wrap.html">Post Wrap</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="post-wrap.html#mpc">MPC</a></li>
+                <li>
+                  <a class="site-nav__link site-nav__link--deep" href="post-wrap.html#imitation-learning">Imitation Learning</a>
+                  <ul class="site-nav__sub site-nav__sub--deeper" lang="zh-CN">
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-scripted">脚本做法</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v0">V0</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v1">V1-纯感知版</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v2">V2-双臂相机</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v3">V3-pi0.5</a></li>
+                    <li><a class="site-nav__link site-nav__link--deeper" href="post-wrap.html#il-v4-dp">V4-DP</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="knot.html">Knot</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="knot.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="route-insert.html">Route and Insert</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="route-insert.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="site-nav__link site-nav__link--sub" href="bottle-lift.html" aria-current="page">Bottle Lift</a>
+              <ul class="site-nav__sub site-nav__sub--deep">
+                <li><a class="site-nav__link site-nav__link--deep" href="bottle-lift.html#scripted-expert">Scripted Expert</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a class="site-nav__link" href="sim2real.html">Sim2Real</a></li>
+      </ul>
+    </nav>
+
+    <main id="main">
+      <header class="standalone-project__header">
+        <h1>Rod Simulation and Cable Manipulation</h1>
+      </header>
+
+      <p class="media-page__intro">Research demonstrations from my ongoing simulation and robotics project at UCLA.</p>
+
+      <section class="page-section" id="bottle-lift" aria-labelledby="bottle-lift-title">
+        <p class="page-section__kicker">Sim</p>
+        <h2 class="page-section__title" id="bottle-lift-title">Bottle Lift</h2>
+
+        <section class="page-subsection" id="scripted-expert" aria-labelledby="scripted-expert-title">
+          <h3 class="page-subsection__title" id="scripted-expert-title">Scripted Expert</h3>
+
+          <div class="page-prose" lang="zh-CN">
+            <p>脚本专家：R 捏住塑料杆，L 把杆绕 R 的指尖弯成一个钩；L 从 R 手里接过杆身，把钩从瓶口插进 330 ml 的矮啤酒瓶，钩在瓶肩内侧撑住后把瓶子提起来。随机场景里变的是瓶子的位置、杆长（30 / 60 cm）和杆的材料（刚度、屈服弯矩）。</p>
+            <p><span class="page-prose__label">仿真</span>：离散弹性杆（DER，塑性），材料阻尼 Kelvin-Voigt（viscous_time 0.02 s，只作用于弯曲和扭转），牛顿迭代上限 40、容差 0.002：这条运行的 37790 个子步全部在上限内收敛（平均每步 4.1 次迭代）。<span class="page-prose__label">渲染</span>：3DGS 扫描场景，机械臂、杆和啤酒瓶用扫描的环境光重新打光（带阴影和互反射，瓶子按棕色玻璃的光泽），每像素 2×2 超采样。</p>
+          </div>
+
+          <div class="media-gallery">
+            <figure class="media-gallery__item">
+              <div class="media-gallery__media">
+                <video controls playsinline preload="metadata" aria-label="弯钩提瓶：标准场景">
+                  <source src="videos/bottle-lift.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>标准场景：30 cm × 4.8 mm 塑料杆弯成 136° 的钩，插进瓶口，瓶子提起 85 mm（倾斜 2°）</figcaption>
+            </figure>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="site.js"></script>
+</body>
+</html>
