@@ -1014,6 +1014,34 @@
                   </table>
                 </div>
               </details>
+              <details class="dp-run" id="dp-data-vis">
+                <summary><span class="dp-run__name">只用 RGB → 图像专家 vis、vis2 → 去掉静止帧</span><span class="dp-run__meta">11-19 – 11-20 · 数据生成 · 抓取都按图像来，不要 DAgger 数据</span><span class="dp-run__result">vis 1091 条；vis2 1118 条（专家 66%）</span></summary>
+                <div class="dp-run__note">
+                  <p>dp22 上真机后决定不用深度：真机腕部深度效果很一般，R 的腕部深度被策略读成“杆已经在手里”。之后的模型只用 4 个相机的 RGB 和机器人状态（dp23 起），也不再用 DAgger 数据。专家随之改成只靠图像抓：不再直接按仿真里杆的真实位置对准，而是先粗略瞄准，再按腕部相机里看到的杆对正。</p>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">改动</th><th scope="col">内容</th><th scope="col">为什么 / 效果</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>柱子底板贴胶带<br><span class="speed-use">11-19，dp23 起</span></td><td>柱子 80 × 80 × 3 mm 的底板用四条胶带盖住，只在柱脚周围留一小块；仿真里胶带取扫描垫子渲染出来的颜色（反照率 0.255 / 0.232 / 0.220，渲染出来约 (98, 90, 85)，和柱子旁边的垫子一样）；每条示范亮度 ±10%、留空的一圈多 0–4 mm、胶带超出 0–4 mm。clean 的 1069 条按这个重新渲染</td><td>实验室的柱子就是这样贴的，真机柱子相机里只看到柱脚一小块橙色。胶带和黑垫子几乎一样，所以不用纯黑（黑色 0.06 渲染成一块深色方块：扫描里的垫子比真的浅）</td></tr>
+                      <tr><td>图像专家 vis<br><span class="speed-use">11-19，dp24、dp25</span></td><td>桌面抓取先粗略瞄准（偏差 50% 在 0–15 mm、35% 在 15–35 mm、15% 在 35–60 mm，方向随机；够不到就换方向），再按腕部 RGB 对正（杆投影到 D405 画面里，用桌面平面代替深度，1.5 mm 噪声；3 cm/s；离杆 4 cm 内先停住，直到看准到 15 mm 以内）；从杆上方 8–12 cm 开始，下降放慢（5 cm 以内 1.5 cm/s，2 cm 以内 0.8 cm/s）。空中重抓 70% 加 6–40 mm 的偏差</td><td>示范里的每一次抓取都来自看得到的东西，策略才学得到“看着图像抓”。本地 12/12 次桌面抓取最后偏 0.5–1.9 mm，其中 5 次粗瞄偏了 46–57 mm 也对正了。6 张 RTX PRO 6000 跑 3.5 h：1091 条成功示范；专家成功率细杆 74%、中等 56%、粗杆 38%、长线 47%（细 &lt; 6 mm、中等 6–10 mm、粗 ≥ 10 mm、长 ≥ 0.8 m）</td></tr>
+                      <tr><td>图像专家 vis2<br><span class="speed-use">11-19，dp26–dp28</span></td><td>所有抓取（桌面和空中）都按图像来，定位杆时不用真值：桌面抓取的 TCP 固定在桌面正上方（不管杆多粗），去掉“离杆 4 cm 内先停住”；空中重抓粗瞄 0–40 mm，再按腕部图像对正，沿工具轴加 3 mm 噪声（腕部相机斜着装，深度方向在 320×180 的画面里只有约 3 px/cm）；空中抓取不再加关节偏差。其余不变</td><td>dp24 的失败里 L 水平方向已经离杆 1–3 mm，却在杆上方 4–15 mm 悬停几十秒不合爪：问题在高度和合爪，不在粗定位。6 张卡 3.5 h：1118 条；专家细杆 74%、中等 63%、粗杆 42%、长线 53%（总体 66%，vis 64%）；桌面抓取 2885/2885；空中每次重抓成功细 / 中 / 粗 / 长 83 / 77 / 63 / 68%</td></tr>
+                      <tr><td>去掉静止帧<br><span class="speed-use">11-20，dp27–dp29</span></td><td>一步只有在某只手移动 ≥ 1.5 mm、转 ≥ 1.5°，或夹爪读数 / 指令变化 ≥ 1 mm 之后才保留（时间戳不变，辅助标签一起过滤）：vis2 留下 77.5%（80.6 万帧 → 62.5 万帧），clean 留下 80.8%</td><td>策略只看 2 帧，不知道自己已经等了多久，就学着一直等：L 桌面合爪前几乎不动的帧，vis / vis2 中位 8 帧（慢速下降 0.8 mm/帧 + 停顿），clean 只有 3 帧——dp24–dp26 在杆上方悬停不合，dp23 合得很积极。dp27 “L 一直没抓住” 9 → 5</td></tr>
+                      <tr><td>颜色<br><span class="speed-use">11-20</span></td><td>核对 dp20 起所有数据渲染和评测：都用实验室配色（白、绿、红、蓝，没有黑）；改成默认</td><td>一直用的就是不含黑色的那组颜色，之前的数字不受影响</td></tr>
+                      <tr><td>评测：细杆合到底<br><span class="speed-use">11-20，dp27 的评测起</span></td><td>手指合到最小（CAD 指尖读数 0 时还有 4 mm 间隙）时杆的中心在两指之间、沿工具轴也够得着 → 算抓住</td><td>原来比 4.5 mm 细又正好居中的杆，指尖碰不到就判成合空：细杆的桌面合爪有 15–30% 这样被判掉，而专家的抓取能抓住，真机的杆也都比 4 mm 粗。按日志估计上限，30 个验证场景（10 万步）dp23 16 → 19、dp24 13 → 14、dp25 12 → 15、dp26 13 → 15；modes 场景 23 → 29、25 → 28、22 → 27、23 → 25（没有重跑）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p class="page-prose__label">没改的</p>
+                  <ul>
+                    <li>软杆（EI &lt; 5e-3）仍有 19% 要重抓，其中 70% 是绕的时候手落后于路径：不是杆拉的、也不是速度上限，而是 J5 到了 ±70° 的 90% 以上，柱子另一侧手腕弯不过去，TCP 够不到。可以整圈先按运动学规划、给 J5 留余量，或换工具的横滚、绕线高度、起始角度。</li>
+                    <li>粗杆每次成功平均 3.2 次绕线 + 2.4 次空中重抓（细杆 2.1 + 0.5），每次重抓成功 61%（细杆 87%）；没抓住时杆在 TCP 外约 6 mm、横向约 11 mm（指尖压在杆上）。可以把 free_past_turn 从 0.03 提到 0.06，让硬杆少重抓。</li>
+                  </ul>
+                </div>
+              </details>
             </div>
 
             <h5>Train</h5>
@@ -1407,6 +1435,108 @@
               </details>
 
               <details class="dp-run">
+                <summary><span class="dp-run__name">dp22 · 杆的关键点</span><span class="dp-run__meta">11-17 · 从头 10 万步 · clean + 288 段纠正 · 加上感知到的杆</span><span class="dp-run__result">37/50（dp21 38/50）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>像感知模块那样把杆的位置直接给策略：顶部相机每 0.6–1.4 s 一张快照（晚 0.2–0.5 s，带“多久以前”），抬起来的点用 D415 深度（射线方向 5–10 mm 噪声、30% 缺失），被挡住的点留在最后看到的位置；腕部每步给最近的点和方向。训练时按这个误差模型随机抽，MLP 编成每步 64 维接到条件里。数据 = clean + dp21 的 288 段纠正，从头 10 万步（dp20 的验证 8 万步后就平了）</td></tr>
+                      <tr><th scope="row">结果</th><td>12 个验证场景 1–7 万步 1, 4, 4, 8, 9, 10, 9；30 个场景 8 / 9 / 10 万步 19, 21, 19（dp20 同步数 17, 16, 16，旧掉杆判定，约少 4 个）。modes 场景 37/50：细杆 26/31、长线 7/11、粗杆 4/8；合爪 75% 在杆上（dp21 67%、dp20 55%）</td></tr>
+                      <tr><th scope="row">问题</th><td>同步数下和 dp20 差不多。把关键点关掉：30 个场景 0/30（双手都抓住 26 次，但到柱子要 66 s，几乎不绕）——搬运和绕线全靠它，抓取靠图像加重试还能抓住。6 个“两手都松开”的失败里 4 个是长线：R 抓在杆中间，杆在指尖慢慢滑出。真机上 R 的腕部深度被读成“杆已在手里”，R 合着爪往前走 → 之后不再用深度</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp23 · 只用 RGB</span><span class="dp-run__meta">11-19 · 从头 10 万步 · clean 贴胶带版 1069 条 · 不用深度</span><span class="dp-run__result">23/50</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>保留原来的纯 RGB 结构：去掉腕部深度、点云和杆的关键点，只有 4 个相机的 RGB + 机器人状态（训练时的辅助头保留）；数据只用 clean（<a href="#dp-data-vis">柱子贴胶带</a>重新渲染，1069 条），不要 DAgger，从头 10 万步（1e-4）。原来的 dp23（深度 + 关键点、只用 clean）训到 8.8 万步时停掉，换成这个</td></tr>
+                      <tr><th scope="row">结果</th><td>12 个场景 0, 2, 3, 5, 5, 6, 9；30 个场景 13, 13, 16。modes 场景 23/50：双手都抓住 37、细杆 11/31、长线 7/11、粗杆 5/8；超时 22 个</td></tr>
+                      <tr><th scope="row">问题</th><td>比有深度的模型（dp22 37、dp21 38、dp20 31）少在细杆上（顶部画面里只有 2–3 px）和又慢又反复的抓取（22 个超时）。两次评测里没双手抓住的 20 个回合：手水平方向已经对准（0–2 mm），第一次合空 10 次是“太高”（杆在 TCP 外 4–22 mm，TCP 离桌面 9–20 mm，抓住时 2–6 mm），7 次是细杆居中却判成合空（评测规则，见<a href="#dp-data-vis">数据生成</a>）；合空之后不会补救，到处乱走，杆被拖走最多 1.4 m</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp24 · 图像专家的数据</span><span class="dp-run__meta">11-19 · 从头 10 万步 · vis 1091 条 · 只用 RGB</span><span class="dp-run__result">25/50</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>数据换成<a href="#dp-data-vis">图像专家 vis</a> 的 1091 条（贴胶带），不和 clean 混，不要 DAgger；其余同 dp23</td></tr>
+                      <tr><th scope="row">结果</th><td>12 个场景 0, 0, 1, 1, 6, 3, 8；30 个场景 15, 13, 13。modes 场景 25/50：细杆 15/31、长线 8/11、粗杆 2/8；超时 17 个。前 3 万步双手都抓住 3 / 5 / 9 次（dp23 6 / 6 / 6），抓取学得快，绕线还没学会</td></tr>
+                      <tr><th scope="row">问题</th><td>25 个失败里 12 个是绕线中 L 的空中重抓（5 根粗杆全在这里），8 个是 L 一直没抓住（都是细杆）——但多数时候 L 水平离杆只有 1–3 mm，在杆上方 4–15 mm 悬停几十秒；R 松开再抓，把杆拖走 14–40 cm。真正粗定位错的只有约 2 个，顶部相机的分辨率不是主要问题 → vis2</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp25 · 状态加噪和丢弃</span><span class="dp-run__meta">11-19 · 从头 10 万步 · dp24 的数据 · 训练时扰动机器人状态</span><span class="dp-run__result">22/50（dp24 25/50）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>担心 DP 只看机器人状态、不看图像：训练时给关节、TCP 位置和姿态加噪声（0.02 rad、0.01 m、0.02，每个样本一个偏移，两帧相同），并以 0.3 的概率把它们换成 batch 平均；夹爪宽度和杆的参数不动，动作目标仍按干净的状态算。其余同 dp24</td></tr>
+                      <tr><th scope="row">结果</th><td>12 个场景 0, 0, 3, 1, 1, 3, 4；30 个场景 11, 12, 12。modes 场景 22/50：细杆 12/31、长线 5/11、粗杆 5/8；超时 21 个</td></tr>
+                      <tr><th scope="row">问题</th><td>没有帮助。另做了图像冻结的对照（每个相机一直发回合的第一帧，状态照常）：dp23–dp26 在 30 个场景上全是 0/30，没有一次抓住；R 离杆最近处中位 54–138 mm（正常 1 mm），手走了 7–8 m（正常 1.3 m）——接近和抓杆确实靠图像</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp26 · vis2 数据</span><span class="dp-run__meta">11-20 · 从头 10 万步 · vis2 1118 条 · 同 dp25 的状态扰动</span><span class="dp-run__result">23/50</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>数据换成 <a href="#dp-data-vis">vis2</a>（所有抓取都按图像），保留 dp25 的状态扰动，和 dp25 只差数据。一台 pod 的后处理出错，前 2 万步只用了 945 条；补齐 1118 条后从 2 万步接着训（动作的归一化范围沿用）</td></tr>
+                      <tr><th scope="row">结果</th><td>12 个场景 1, 0, 4, 4, 3, 5, 4；30 个场景 10, 10, 13。modes 场景 23/50：细杆 16/31（RGB 模型里最好）、长线 6/11、粗杆 1/8；超时 19 个。R 的桌面合爪 64 次，中位偏 3.9 mm、17% 超过 10 mm（dp24 151 次、9.4 mm、50%；dp25 233 次、38 mm、73%）：图像专家把 R 的桌面抓取修好了</td></tr>
+                      <tr><th scope="row">问题</th><td>L 的空中重抓仍是瓶颈：155 次合爪，75% 离杆超过 10 mm，中位 24 mm；27 个失败里 15 个是“L 松开后重抓”，9 个是 L 一直没抓住。L 已经停在最低点（TCP 离桌面 2.2 mm、杆离 TCP 1–2 mm，辅助头的估计也对），每段动作的夹爪指令却一直是全开，30 s 后又往上飘：示范里合爪前有一段几乎不动的帧，只看 2 帧的策略不知道自己已经等了多久，就一直等 → <a href="#dp-data-vis">去掉静止帧</a></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp27 · 去掉静止帧</span><span class="dp-run__meta">11-20 · 从头 10 万步 · vis2 去掉静止帧（77.5%）· 同 dp26 的状态扰动</span><span class="dp-run__result">26/50（RGB 里最好）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>vis2 里几乎不动的步去掉（<a href="#dp-data-vis">数据生成</a>），时间戳照旧，训练时不检查时间间隔；其余同 dp26</td></tr>
+                      <tr><th scope="row">结果</th><td>12 个场景 0, 2, 1, 5, 3, 7, 9；30 个场景 11, 12, 17（RGB 模型里最好）。modes 场景 26/50：双手都抓住 42、细杆 13/31、长线 9/11、粗杆 4/8；超时 18 个。比 dp26：L 一直没抓住 9 → 5，绕到 0.5–0.95 圈卡住 7 → 3，L 在低处张着不合 96 → 55 s，悬停 1286 → 804 s</td></tr>
+                      <tr><th scope="row">问题</th><td>不再等了，但合得更盲：L 空中合爪 289 次，81% 离杆超过 10 mm，中位 41 mm（dp26 155 次、24 mm）；R 的桌面合爪中位偏 175 mm（dp26 3.9 mm），R 一直没抓住 1 → 3。评测已用新的细杆判定，和之前的数字差几个（见<a href="#dp-data-vis">数据生成</a>）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp28 · 去掉状态扰动</span><span class="dp-run__meta">11-20 · 从头 10 万步 · dp27 的数据 · 不加噪声和丢弃</span><span class="dp-run__result">训练中（4 万步）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>dp27 的数据（vis2 去掉静止帧），去掉全部状态噪声和丢弃（dp25 已经说明它们没用）；杆参数输入的噪声照旧，和 dp23 同一套训练设置</td></tr>
+                      <tr><th scope="row">进度</th><td>11-20 18:35 UTC 开始，20:30 到 4 万步（0.17 s/步，约 23:20 UTC 训完）。12 个场景：2 万步 3/12（dp27 2/12、dp26 0/12），1 万、3 万步在跑；验证改用 RTX 5090 和 A40（RTX PRO 6000 太贵）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dp29 · clean 去掉静止帧</span><span class="dp-run__meta">11-20 · 从头 10 万步 · clean 贴胶带版去掉静止帧（80.8%）· 不加状态扰动</span><span class="dp-run__result">训练中（2.4 万步）</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">修改</th><td>dp23 的数据（clean 贴胶带版 1069 条）同样去掉静止帧，不加状态扰动：和 dp28 只差专家（clean 按真值对准，vis2 按图像）</td></tr>
+                      <tr><th scope="row">进度</th><td>11-20 19:15 UTC 开始，20:30 到 2.4 万步（0.19 s/步，约 11-21 00:30 UTC 训完）；1 万、2 万步的验证在 3 台 A40 上跑</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="dp-run">
                 <summary><span class="dp-run__name">训练提速</span><span class="dp-run__meta">11-09 · 数据加载 + 计算 + 续训 · 训练结果不变</span><span class="dp-run__result">0.42 → 0.14 s/步</span></summary>
                 <div class="page-prose__table">
                   <table>
@@ -1428,68 +1558,28 @@
             </div>
 
             <h5>Eval</h5>
-            <p class="page-prose__label">结果对比（50 个场景，同一组种子，配对比较）</p>
+            <p class="page-prose__label" id="dp-val">验证：每 1 万步一次（1–7 万步 12 个场景，8–10 万步 30 个场景，种子 6000000 起）</p>
             <div class="page-prose__table">
               <table>
                 <thead>
-                  <tr><th scope="col">训练</th><th scope="col">成功</th><th scope="col">双手抓住</th><th scope="col">到柱子</th><th scope="col">最多绕 ≥0.5 圈</th><th scope="col">桌面抓取</th><th scope="col">R 空中重抓</th><th scope="col">L 空中重抓</th></tr>
+                  <tr><th scope="col">训练</th><th scope="col">1 万</th><th scope="col">2 万</th><th scope="col">3 万</th><th scope="col">4 万</th><th scope="col">5 万</th><th scope="col">6 万</th><th scope="col">7 万</th><th scope="col">8 万</th><th scope="col">9 万</th><th scope="col">10 万</th><th scope="col">图像冻结</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>dp7ft 16 万步</td><td>18</td><td>42</td><td>47</td><td>35</td><td>88 / 93%</td><td>80 / 80%</td><td>22 / 34%</td></tr>
-                  <tr><td>dp8 22 万步</td><td>22</td><td>44</td><td>47</td><td>37</td><td>88 / 92%</td><td>88 / 90%</td><td>40 / 51%</td></tr>
-                  <tr><td>dp9 10 万步（相对观测、不平移）</td><td>7</td><td>36</td><td>44</td><td>18</td><td>78 / 87%</td><td>67 / 78%</td><td>33 / 56%</td></tr>
-                  <tr><td>dp8ft 30 万步（dp8 + 8 万）</td><td>23</td><td>46</td><td>48</td><td>41</td><td>96 / 97%</td><td>89 / 94%</td><td>28 / 47%</td></tr>
-                  <tr><td>dp10 30 万步（dp8 + 8 万，逐步归一化）</td><td>25</td><td>46</td><td>48</td><td>40</td><td>94 / 97%</td><td>84 / 84%</td><td>34 / 66%</td></tr>
-                  <tr><td>dp9ft2 22 万步（dp9 续训，相对观测）</td><td>22</td><td>45</td><td>47</td><td>33</td><td>90 / 92%</td><td>78 / 91%</td><td>35 / 52%</td></tr>
-                  <tr><td>dp10，新合手判定（深 30 mm）*</td><td>23</td><td>43</td><td>47</td><td>36</td><td>91 / 93%</td><td>87 / 93%</td><td>53 / 73%</td></tr>
-                  <tr><td>dp10，新判定 + 空中多张开 10 mm（只在评测时）*</td><td>2</td><td>45</td><td>49</td><td>2</td><td>94 / 95%</td><td>19 / 25%</td><td>0 / 20%</td></tr>
-                  <tr><td>dp11 34 万步（+ 腕部深度）*</td><td>26</td><td>47</td><td>47</td><td>35</td><td>97 / 97%</td><td>85 / 90%</td><td>46 / 63%</td></tr>
-                  <tr><td>dp12 38 万步（+ 颜色随机）**</td><td>33</td><td>48</td><td>49</td><td>43</td><td>96 / 97%</td><td>94 / 94%</td><td>64 / 81%</td></tr>
-                  <tr><td>dp13 42 万步（+ 点云、相机抖动、图像增强）**</td><td>34</td><td>44</td><td>49</td><td>41</td><td>94 / 97%</td><td>88 / 88%</td><td>75 / 85%</td></tr>
-                  <tr><td>dp14 46 万步（dp13 + DAgger 第一轮）**</td><td>28</td><td>46</td><td>48</td><td>39</td><td>91 / 98%</td><td>89 / 90%</td><td>60 / 80%</td></tr>
-                  <tr><td>dp15 46 万步（dp13 + DAgger 第二轮）**</td><td>27</td><td>47</td><td>50</td><td>43</td><td>93 / 97%</td><td>96 / 100%</td><td>69 / 88%</td></tr>
+                  <tr><td>dp22（深度 + 杆的关键点）</td><td>1</td><td>4</td><td>4</td><td>8</td><td>9</td><td>10</td><td>9</td><td>19</td><td>21</td><td>19</td><td>—</td></tr>
+                  <tr><td>dp23（RGB，clean）</td><td>0</td><td>2</td><td>3</td><td>5</td><td>5</td><td>6</td><td>9</td><td>13</td><td>13</td><td>16</td><td>0</td></tr>
+                  <tr><td>dp24（RGB，vis）</td><td>0</td><td>0</td><td>1</td><td>1</td><td>6</td><td>3</td><td>8</td><td>15</td><td>13</td><td>13</td><td>0</td></tr>
+                  <tr><td>dp25（vis + 状态扰动）</td><td>0</td><td>0</td><td>3</td><td>1</td><td>1</td><td>3</td><td>4</td><td>11</td><td>12</td><td>12</td><td>0</td></tr>
+                  <tr><td>dp26（vis2 + 状态扰动）</td><td>1</td><td>0</td><td>4</td><td>4</td><td>3</td><td>5</td><td>4</td><td>10</td><td>10</td><td>13</td><td>0</td></tr>
+                  <tr><td>dp27（vis2 去掉静止帧 + 状态扰动）†</td><td>0</td><td>2</td><td>1</td><td>5</td><td>3</td><td>7</td><td>9</td><td>11</td><td>12</td><td>17</td><td>—</td></tr>
+                  <tr><td>dp28（vis2 去掉静止帧）†</td><td>…</td><td>3</td><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td>dp29（clean 去掉静止帧）†</td><td>…</td><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                 </tbody>
               </table>
             </div>
             <div class="dp-run__note">
-              <p>种子 800000–800049，各模型同一组，设置相同（大 kernel + banded 分 4 段、批处理策略服务、每次执行 4 步）。按种子配对比较成功（McNemar 精确检验）：dp8 对 dp7ft p = 0.56，dp8ft 对 dp8 p = 1.0，dp10 对 dp8ft p = 0.82，dp9 对 dp8 p = 0.001，dp9ft2 对 dp8 p = 1.0；新判定下 dp11 对 dp10 p = 0.66，dp12 对 dp11 p = 0.23，dp13 对 dp12 p = 1.0，dp14 对 dp13 p = 0.24，dp15 对 dp13 p = 0.23。抓取按每次重抓统计（第一次合手就抓住 / 最终抓住），不按每次合手：个别回合会连续合手二十几次，把比例拉偏。</p>
-              <p>* 合手判定放宽：CAD 指尖的夹持面从指尖往里约 78 mm 都是平行的平面，杆在两指之间、比 TCP 深 5–15 mm 也能夹住，原来的判定只认 TCP 前后 5 mm（dp10 的 41 次 L 空中合空里有 14 次是这种）→ 深的一侧放宽到 30 mm（指尖一侧仍是 5 mm），之后的评测都用新判定。只在评测时让空中重抓多张开 10 mm，成功掉到 2/50：R 的锚点重抓第一次合手的成功率 87% → 19%，合手时离杆约 67 mm——腕部相机里手指张得更开，策略把它当成了另一个阶段（dp1、dp2 强制张开桌面抓取时也是这样），所以张开宽度只能连训练数据一起改。** 再加：评测场景按种子随机杆和柱子的颜色，仿真把腕部深度发给策略（dp11 只发深度，杆仍是蓝色）。</p>
-              <p>16 个场景分不出模型：dp7ft 和 dp8 在 16 个场景是 7 对 4，在 50 个场景是 18 对 22；50 个场景里有 26 个是一个模型成功、另一个失败，单个场景成不成很大程度上看运气。下面那张 16 场景的表只作早期记录。</p>
+              <p>格子里是成功数：1–7 万步 / 12，8–10 万步 / 30。每个回合最多 180 s，场景按 modes 数据的分布抽，实验室配色，新掉杆判定，各模型同一组种子；dp23 起柱子贴胶带、不发深度。12 个场景波动很大（dp24 5 万步 6、6 万步 3），只看趋势；同一组 30 个场景上 dp20（旧掉杆判定）8 / 9 / 10 万步 17、16、16。图像冻结：10 万步、30 个场景，每个相机一直发回合的第一帧（状态照常），全部 0/30，一次也没抓住——策略确实靠图像接近和抓杆；dp22 把杆的关键点关掉也是 0/30。† 用新的细杆判定（见<a href="#dp-data-vis">数据生成</a>），按日志估计 dp23–dp26 换成新判定 10 万步最多 19、14、15、15。… = 正在跑，空着 = 还没训到（11-20 20:30 UTC）。</p>
             </div>
-            <p class="page-prose__label">按杆的颜色（随机颜色的评测；50 个场景里黑 23、绿 11、红 8、白 8）</p>
-            <div class="page-prose__table">
-              <table>
-                <thead>
-                  <tr><th scope="col">训练</th><th scope="col">黑杆</th><th scope="col">绿杆</th><th scope="col">红杆</th><th scope="col">白杆</th><th scope="col">不算黑杆</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>dp12（+ 颜色随机）</td><td>14/23</td><td>6/11</td><td>7/8</td><td>6/8</td><td>19/27 = 70%</td></tr>
-                  <tr><td>dp13（+ 点云、相机抖动、图像增强）</td><td>13/23</td><td>7/11</td><td>7/8</td><td>7/8</td><td>21/27 = 78%</td></tr>
-                  <tr><td>dp14（dp13 + DAgger 第一轮）</td><td>8/23</td><td>9/11</td><td>5/8</td><td>6/8</td><td>20/27 = 74%</td></tr>
-                  <tr><td>dp15（dp13 + DAgger 第二轮）</td><td>10/23</td><td>8/11</td><td>5/8</td><td>4/8</td><td>17/27 = 63%</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="dp-run__note">
-              <p>训练数据和评测场景里黑杆都占 55%（按当时“实际以黑色为主”设的），而黑杆最难（对比度低）：dp12、dp13 在黑杆上只有 61%、57%。实际不用黑杆，所以更该看不算黑杆的成功率：dp13 78%。dp14 比 dp13 少的 6 个成功里有 5 个在黑杆上，不算黑杆时两者差不多（20 对 21 / 27）。</p>
-            </div>
-            <p class="page-prose__label">cable 场景（新任务：办公室的杆和线，握着成一圈算成功；50 个场景，种子 3000000 起）</p>
-            <div class="page-prose__table">
-              <table>
-                <thead>
-                  <tr><th scope="col">训练</th><th scope="col">成功</th><th scope="col">双手抓住</th><th scope="col">到柱子</th><th scope="col">最多绕 ≥0.5 圈</th><th scope="col">黑杆</th><th scope="col">绿杆</th><th scope="col">红杆</th><th scope="col">白杆</th><th scope="col">不算黑杆</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>dp13（没见过这些场景）</td><td>17</td><td>27</td><td>40</td><td>22</td><td>4/21</td><td>4/10</td><td>5/10</td><td>4/9</td><td>13/29</td></tr>
-                  <tr><td>dp16 4 万步</td><td>24</td><td>37</td><td>44</td><td>29</td><td>7/21</td><td>3/10</td><td>9/10</td><td>5/9</td><td>17/29</td></tr>
-                  <tr><td>dp16 8 万步</td><td>24</td><td>38</td><td>44</td><td>28</td><td>8/21</td><td>6/10</td><td>6/10</td><td>4/9</td><td>16/29</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="dp-run__note">
-              <p>场景按第一批数据的分布抽（0.4–2.2 m、4–16 mm，摆放围绕原位置），评测时杆和柱子按种子随机颜色（办公室配色，黑杆占约 42%），每个回合最多 180 s（成功的回合中位 61 s，65 个成功里有 4 个超过 150 s），和上面 dlo 场景的数字不能直接比。专家在这类场景上约 58%。dp16 换成实验室配色（白、绿、红、蓝）评测是 23/50（办公室配色 24/50），黑杆的差距不是颜色造成的。之后的模型改在下面的 modes 场景上评测。</p>
-            </div>
-            <p class="page-prose__label">modes 场景（只用新专家的数据之后；50 个场景，种子 3100000 起，实验室配色）</p>
+            <p class="page-prose__label" id="dp-test">测试：modes 场景（dp17 起；50 个场景，种子 3100000 起，实验室配色）</p>
             <div class="page-prose__table">
               <table>
                 <thead>
@@ -1503,31 +1593,108 @@
                   <tr><td>dp20 15 万步（clean，从头）*</td><td>31</td><td>44</td><td>35</td><td>20</td><td>10</td><td>1</td></tr>
                   <tr><td>dp20 20 万步 *（360 s）</td><td>31</td><td>40</td><td>32</td><td>19</td><td>6</td><td>6</td></tr>
                   <tr><td>dp21 30 万步（dp20 + 10 万，clean DAgger）*（360 s）</td><td>38</td><td>46</td><td>40</td><td>22</td><td>10</td><td>6</td></tr>
+                  <tr><td>dp22 10 万步（clean + DAgger，从头，+ 杆的关键点）*（360 s）</td><td>37</td><td>49</td><td>38</td><td>26</td><td>7</td><td>4</td></tr>
+                  <tr><td>dp23 10 万步（clean，只用 RGB）*（360 s）</td><td>23</td><td>37</td><td>24</td><td>11</td><td>7</td><td>5</td></tr>
+                  <tr><td>dp24 10 万步（vis，只用 RGB）*（360 s）</td><td>25</td><td>39</td><td>27</td><td>15</td><td>8</td><td>2</td></tr>
+                  <tr><td>dp25 10 万步（vis + 状态扰动）*（360 s）</td><td>22</td><td>40</td><td>23</td><td>12</td><td>5</td><td>5</td></tr>
+                  <tr><td>dp26 10 万步（vis2 + 状态扰动）*（360 s）</td><td>23</td><td>38</td><td>24</td><td>16</td><td>6</td><td>1</td></tr>
+                  <tr><td>dp27 10 万步（vis2 去掉静止帧 + 状态扰动）*†（360 s）</td><td>26</td><td>42</td><td>26</td><td>13</td><td>9</td><td>4</td></tr>
                 </tbody>
               </table>
             </div>
             <div class="dp-run__note">
               <p>每个回合最多 180 s（标了 360 s 的除外），场景按 modes 数据的分布抽。* 用新的掉杆判定（夹住的那段杆整个离开指垫才算掉，见 <a href="#dp-data-modes">数据生成</a>），和上面几行不完全可比。难场景（长线 32%、粗杆 29%，种子 3200000 起）：dp18 13/50，dp19 27/50。同一模型两个检查点之间常有一半场景结果相反（dp20 15 万和 20 万步 24/50），相差几个成功说明不了什么。</p>
+              <p>dp23 起只用 RGB（不发深度、点云和杆的关键点），评测里的柱子也贴胶带；这些模型的失败大多是超时（dp23–dp27 17–22 个，dp22 7 个）。† 用新的细杆判定（合到底、杆在两指之间算抓住，见<a href="#dp-data-vis">数据生成</a>）；按日志估计，dp23–dp26 换成新判定最多 29、28、27、25。</p>
             </div>
-            <p class="page-prose__label">结果对比（16 个场景，早期）</p>
-            <div class="page-prose__table">
-              <table>
-                <thead>
-                  <tr><th scope="col">训练</th><th scope="col">成功</th><th scope="col">R 抓住</th><th scope="col">L 抓住</th><th scope="col">双手抓住</th><th scope="col">抬起</th><th scope="col">到柱子</th><th scope="col">最多绕 ≥0.5 圈</th><th scope="col">空中抓取</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>dp2 4 万步（修正后）</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>—</td><td>0</td><td>—</td></tr>
-                  <tr><td>dp4 8 万步（旧结束规则）</td><td>1</td><td>14</td><td>13</td><td>13</td><td>11</td><td>14</td><td>2</td><td>3/17</td></tr>
-                  <tr><td>dp5 8 万步</td><td>2</td><td>13</td><td>13</td><td>10</td><td>7</td><td>14</td><td>4</td><td>—</td></tr>
-                  <tr><td>dp5 12 万步</td><td>2</td><td>15</td><td>15</td><td>14</td><td>11</td><td>14</td><td>7</td><td>6/30</td></tr>
-                  <tr><td>dp5ft 16 万步（12 万 + 4 万）</td><td>2</td><td>16</td><td>14</td><td>14</td><td>11</td><td>15</td><td>8</td><td>4/27</td></tr>
-                  <tr><td>dp7 10 万步（banded，执行 4 步）</td><td>4</td><td>12</td><td>12</td><td>10</td><td>10</td><td>13</td><td>9</td><td>12/32</td></tr>
-                  <tr><td>dp7ft 16 万步（10 万 + 6 万）</td><td>7</td><td>15</td><td>16</td><td>15</td><td>15</td><td>16</td><td>15</td><td>27/53</td></tr>
-                  <tr><td>dp8 22 万步（dp7ft + 6 万，杆位置辅助）</td><td>4</td><td>14</td><td>15</td><td>14</td><td>14</td><td>14</td><td>11</td><td>18/38</td></tr>
-                </tbody>
-              </table>
-            </div>
+            <p class="page-prose__label">更早的评测</p>
             <div class="dp-runs">
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dlo 场景 · 50 个</span><span class="dp-run__meta">11-10 – 11-12 · dp7ft – dp15 · 种子 800000 起，配对比较</span><span class="dp-run__result">dp13 34/50</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">训练</th><th scope="col">成功</th><th scope="col">双手抓住</th><th scope="col">到柱子</th><th scope="col">最多绕 ≥0.5 圈</th><th scope="col">桌面抓取</th><th scope="col">R 空中重抓</th><th scope="col">L 空中重抓</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>dp7ft 16 万步</td><td>18</td><td>42</td><td>47</td><td>35</td><td>88 / 93%</td><td>80 / 80%</td><td>22 / 34%</td></tr>
+                      <tr><td>dp8 22 万步</td><td>22</td><td>44</td><td>47</td><td>37</td><td>88 / 92%</td><td>88 / 90%</td><td>40 / 51%</td></tr>
+                      <tr><td>dp9 10 万步（相对观测、不平移）</td><td>7</td><td>36</td><td>44</td><td>18</td><td>78 / 87%</td><td>67 / 78%</td><td>33 / 56%</td></tr>
+                      <tr><td>dp8ft 30 万步（dp8 + 8 万）</td><td>23</td><td>46</td><td>48</td><td>41</td><td>96 / 97%</td><td>89 / 94%</td><td>28 / 47%</td></tr>
+                      <tr><td>dp10 30 万步（dp8 + 8 万，逐步归一化）</td><td>25</td><td>46</td><td>48</td><td>40</td><td>94 / 97%</td><td>84 / 84%</td><td>34 / 66%</td></tr>
+                      <tr><td>dp9ft2 22 万步（dp9 续训，相对观测）</td><td>22</td><td>45</td><td>47</td><td>33</td><td>90 / 92%</td><td>78 / 91%</td><td>35 / 52%</td></tr>
+                      <tr><td>dp10，新合手判定（深 30 mm）*</td><td>23</td><td>43</td><td>47</td><td>36</td><td>91 / 93%</td><td>87 / 93%</td><td>53 / 73%</td></tr>
+                      <tr><td>dp10，新判定 + 空中多张开 10 mm（只在评测时）*</td><td>2</td><td>45</td><td>49</td><td>2</td><td>94 / 95%</td><td>19 / 25%</td><td>0 / 20%</td></tr>
+                      <tr><td>dp11 34 万步（+ 腕部深度）*</td><td>26</td><td>47</td><td>47</td><td>35</td><td>97 / 97%</td><td>85 / 90%</td><td>46 / 63%</td></tr>
+                      <tr><td>dp12 38 万步（+ 颜色随机）**</td><td>33</td><td>48</td><td>49</td><td>43</td><td>96 / 97%</td><td>94 / 94%</td><td>64 / 81%</td></tr>
+                      <tr><td>dp13 42 万步（+ 点云、相机抖动、图像增强）**</td><td>34</td><td>44</td><td>49</td><td>41</td><td>94 / 97%</td><td>88 / 88%</td><td>75 / 85%</td></tr>
+                      <tr><td>dp14 46 万步（dp13 + DAgger 第一轮）**</td><td>28</td><td>46</td><td>48</td><td>39</td><td>91 / 98%</td><td>89 / 90%</td><td>60 / 80%</td></tr>
+                      <tr><td>dp15 46 万步（dp13 + DAgger 第二轮）**</td><td>27</td><td>47</td><td>50</td><td>43</td><td>93 / 97%</td><td>96 / 100%</td><td>69 / 88%</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p>种子 800000–800049，各模型同一组，设置相同（大 kernel + banded 分 4 段、批处理策略服务、每次执行 4 步）。按种子配对比较成功（McNemar 精确检验）：dp8 对 dp7ft p = 0.56，dp8ft 对 dp8 p = 1.0，dp10 对 dp8ft p = 0.82，dp9 对 dp8 p = 0.001，dp9ft2 对 dp8 p = 1.0；新判定下 dp11 对 dp10 p = 0.66，dp12 对 dp11 p = 0.23，dp13 对 dp12 p = 1.0，dp14 对 dp13 p = 0.24，dp15 对 dp13 p = 0.23。抓取按每次重抓统计（第一次合手就抓住 / 最终抓住），不按每次合手：个别回合会连续合手二十几次，把比例拉偏。</p>
+                  <p>* 合手判定放宽：CAD 指尖的夹持面从指尖往里约 78 mm 都是平行的平面，杆在两指之间、比 TCP 深 5–15 mm 也能夹住，原来的判定只认 TCP 前后 5 mm（dp10 的 41 次 L 空中合空里有 14 次是这种）→ 深的一侧放宽到 30 mm（指尖一侧仍是 5 mm），之后的评测都用新判定。只在评测时让空中重抓多张开 10 mm，成功掉到 2/50：R 的锚点重抓第一次合手的成功率 87% → 19%，合手时离杆约 67 mm——腕部相机里手指张得更开，策略把它当成了另一个阶段（dp1、dp2 强制张开桌面抓取时也是这样），所以张开宽度只能连训练数据一起改。** 再加：评测场景按种子随机杆和柱子的颜色，仿真把腕部深度发给策略（dp11 只发深度，杆仍是蓝色）。</p>
+                  <p>16 个场景分不出模型：dp7ft 和 dp8 在 16 个场景是 7 对 4，在 50 个场景是 18 对 22；50 个场景里有 26 个是一个模型成功、另一个失败，单个场景成不成很大程度上看运气。16 个场景的那张表只作早期记录。</p>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">按杆的颜色</span><span class="dp-run__meta">11-12 · dp12 – dp15 · 随机颜色的 dlo 评测（黑 23、绿 11、红 8、白 8）</span><span class="dp-run__result">不算黑杆 dp13 21/27</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">训练</th><th scope="col">黑杆</th><th scope="col">绿杆</th><th scope="col">红杆</th><th scope="col">白杆</th><th scope="col">不算黑杆</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>dp12（+ 颜色随机）</td><td>14/23</td><td>6/11</td><td>7/8</td><td>6/8</td><td>19/27 = 70%</td></tr>
+                      <tr><td>dp13（+ 点云、相机抖动、图像增强）</td><td>13/23</td><td>7/11</td><td>7/8</td><td>7/8</td><td>21/27 = 78%</td></tr>
+                      <tr><td>dp14（dp13 + DAgger 第一轮）</td><td>8/23</td><td>9/11</td><td>5/8</td><td>6/8</td><td>20/27 = 74%</td></tr>
+                      <tr><td>dp15（dp13 + DAgger 第二轮）</td><td>10/23</td><td>8/11</td><td>5/8</td><td>4/8</td><td>17/27 = 63%</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p>训练数据和评测场景里黑杆都占 55%（按当时“实际以黑色为主”设的），而黑杆最难（对比度低）：dp12、dp13 在黑杆上只有 61%、57%。实际不用黑杆，所以更该看不算黑杆的成功率：dp13 78%。dp14 比 dp13 少的 6 个成功里有 5 个在黑杆上，不算黑杆时两者差不多（20 对 21 / 27）。</p>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">cable 场景 · 50 个</span><span class="dp-run__meta">11-13 · dp13、dp16 · 办公室的杆和线，种子 3000000 起</span><span class="dp-run__result">dp16 24/50</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">训练</th><th scope="col">成功</th><th scope="col">双手抓住</th><th scope="col">到柱子</th><th scope="col">最多绕 ≥0.5 圈</th><th scope="col">黑杆</th><th scope="col">绿杆</th><th scope="col">红杆</th><th scope="col">白杆</th><th scope="col">不算黑杆</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>dp13（没见过这些场景）</td><td>17</td><td>27</td><td>40</td><td>22</td><td>4/21</td><td>4/10</td><td>5/10</td><td>4/9</td><td>13/29</td></tr>
+                      <tr><td>dp16 4 万步</td><td>24</td><td>37</td><td>44</td><td>29</td><td>7/21</td><td>3/10</td><td>9/10</td><td>5/9</td><td>17/29</td></tr>
+                      <tr><td>dp16 8 万步</td><td>24</td><td>38</td><td>44</td><td>28</td><td>8/21</td><td>6/10</td><td>6/10</td><td>4/9</td><td>16/29</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p>场景按第一批数据的分布抽（0.4–2.2 m、4–16 mm，摆放围绕原位置），评测时杆和柱子按种子随机颜色（办公室配色，黑杆占约 42%），每个回合最多 180 s（成功的回合中位 61 s，65 个成功里有 4 个超过 150 s），和上面 dlo 场景的数字不能直接比。专家在这类场景上约 58%。dp16 换成实验室配色（白、绿、红、蓝）评测是 23/50（办公室配色 24/50），黑杆的差距不是颜色造成的。之后的模型改在 modes 场景上评测（见上）。</p>
+                </div>
+              </details>
+              <details class="dp-run">
+                <summary><span class="dp-run__name">dlo 场景 · 16 个（早期）</span><span class="dp-run__meta">11-07 – 11-11 · dp2 – dp8</span><span class="dp-run__result">dp7ft 7/16</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">训练</th><th scope="col">成功</th><th scope="col">R 抓住</th><th scope="col">L 抓住</th><th scope="col">双手抓住</th><th scope="col">抬起</th><th scope="col">到柱子</th><th scope="col">最多绕 ≥0.5 圈</th><th scope="col">空中抓取</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>dp2 4 万步（修正后）</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>—</td><td>0</td><td>—</td></tr>
+                      <tr><td>dp4 8 万步（旧结束规则）</td><td>1</td><td>14</td><td>13</td><td>13</td><td>11</td><td>14</td><td>2</td><td>3/17</td></tr>
+                      <tr><td>dp5 8 万步</td><td>2</td><td>13</td><td>13</td><td>10</td><td>7</td><td>14</td><td>4</td><td>—</td></tr>
+                      <tr><td>dp5 12 万步</td><td>2</td><td>15</td><td>15</td><td>14</td><td>11</td><td>14</td><td>7</td><td>6/30</td></tr>
+                      <tr><td>dp5ft 16 万步（12 万 + 4 万）</td><td>2</td><td>16</td><td>14</td><td>14</td><td>11</td><td>15</td><td>8</td><td>4/27</td></tr>
+                      <tr><td>dp7 10 万步（banded，执行 4 步）</td><td>4</td><td>12</td><td>12</td><td>10</td><td>10</td><td>13</td><td>9</td><td>12/32</td></tr>
+                      <tr><td>dp7ft 16 万步（10 万 + 6 万）</td><td>7</td><td>15</td><td>16</td><td>15</td><td>15</td><td>16</td><td>15</td><td>27/53</td></tr>
+                      <tr><td>dp8 22 万步（dp7ft + 6 万，杆位置辅助）</td><td>4</td><td>14</td><td>15</td><td>14</td><td>14</td><td>14</td><td>11</td><td>18/38</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
               <details class="dp-run">
                 <summary><span class="dp-run__name">Eval 提速</span><span class="dp-run__meta">11-10 – 11-11 · 评测 · 物理与训练数据一致</span><span class="dp-run__result">每帧 −25%，单进程再 −32%，每回合 3.7 → 1.4 min</span></summary>
                 <div class="dp-run__note">
