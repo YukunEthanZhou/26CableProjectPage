@@ -1561,6 +1561,7 @@
 
             <h5 id="dp-real">真机</h5>
             <p>11-13（UTC 00:13–03:31）dp13 在两台真 PiPER 上跑了 15 次，都停在第一步：R 从桌上抓杆。R 抓住 1 次，另有 2 次可能抓住（待确认）；L 一次也没有抓到杆。</p>
+            <p>11-20（UTC 19:39–20:23）两个只用 RGB 的策略 dp26 和 dp23 又跑了 12 次，还是只到 R 从桌上抓杆：dp23 能把 R 带到杆上方，但不会合爪；dp26 定位容易错，而且很容易在空中就早早合爪。下降过程中 R 的腕部画面在离桌约 12 mm 以下几乎看不出高度的区别。</p>
             <div class="dp-runs">
               <details class="dp-run">
                 <summary><span class="dp-run__name">dp13 · 第一次上真机</span><span class="dp-run__meta">11-13 · 15 次运行 · 只到 R 的桌面抓取</span><span class="dp-run__result">R 抓住 1/15（另 2 次待确认），L 0</span></summary>
@@ -1672,6 +1673,86 @@
                     <li>标定两个 D405 的真实安装位置，用它重新渲染已有数据的腕部画面再微调；或者在 dp_run 里先把真实腕部图像按拟合的角度转回仿真的视角（角度能补准，约 1 cm 的位置差因为视差补不了）。</li>
                     <li>L 的腕部相机还没检查。</li>
                   </ul>
+                </div>
+              </details>
+              <details class="dp-run" id="dp-real-rgb">
+                <summary><span class="dp-run__name">dp26 / dp23 · 纯 RGB 上真机</span><span class="dp-run__meta">11-20 · 12 次运行 · 只到 R 的桌面抓取</span><span class="dp-run__result">dp23 定位对、不会合爪；dp26 定位易错、早合</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <tbody>
+                      <tr><th scope="row">策略</th><td>都只用 RGB（顶部、柱子、两个腕部相机）+ 机器人状态，没有深度、点云和杆的感知输入，10 万步。<strong>dp26</strong>：按图像抓取的专家数据 vis2（1118 条），训练时给机器人状态加噪声、随机丢掉（逼它看图）；仿真 30 个场景成功 13 个，50 个场景 23 个。<strong>dp23</strong>：clean 专家的数据（1069 条，柱子底板贴胶带的渲染）；仿真 30 个场景 16 个，50 个场景 23 个</td></tr>
+                      <tr><th scope="row">策略服务</th><td>一个 Runpod pod（RTX PRO 4500 Blackwell）上同时跑两个 train.dp.serve：dp26 在 8300 端口，dp23 在 8302 端口，机器人换代理地址就换策略。从笔记本测往返约 1 s；真机上查询间隔中位数 dp26 2.4 s，dp23 1.8 s</td></tr>
+                      <tr><th scope="row">机器人端</th><td>real/dp_run.py 不用改：服务器告诉它这两个策略不要深度、不要杆的感知，就不开 D405 的深度，也不跑杆的检测</td></tr>
+                      <tr><th scope="row">杆</th><td>细的绿色直杆（dp26 的 5 次、dp23 的 1 次），长的粗绿线、摆成 S 形（dp23 的 5 次、dp26 的 1 次）；柱子是橙色的，底板贴了黑胶带</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">时间（UTC）· 杆</th><th scope="col">策略</th><th scope="col">查询</th><th scope="col">R 做了什么</th><th scope="col">结果</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>19:39<br>细直杆</td><td>dp26</td><td>9</td><td>一直没张开（读数 0–10 mm，最后才到 29 mm），停在离桌 81–108 mm，手转向了桌外（腕部画面里是地板）</td><td>没下降 · 定位错</td></tr>
+                      <tr><td>19:53<br>细直杆</td><td>dp26</td><td>10</td><td>张到 25–27 mm，q3 在离桌 77 mm 合上，之后合着下到 50 mm；杆在腕部画面上方，离手很远</td><td>空中早合 · 定位错</td></tr>
+                      <tr><td>19:54<br>细直杆</td><td>dp26</td><td>10</td><td>张到 25–28 mm，q4 在离桌 119 mm 合上；杆从指尖旁斜着过去</td><td>空中早合</td></tr>
+                      <tr><td>19:55<br>细直杆</td><td>dp26</td><td>7</td><td>张到 25 mm，q3 在离桌 115 mm 合上</td><td>空中早合</td></tr>
+                      <tr><td>19:55<br>细直杆</td><td>dp26</td><td>7</td><td>张到 69 mm，q3–q4 下到离桌 7–9 mm，但在杆头外（腕部画面里杆头在右上角）；没合，q6 开始抬起</td><td>定位错（杆头外）</td></tr>
+                      <tr><td>20:00<br>粗线</td><td>dp26</td><td>6</td><td>最多张到 17 mm，抬到离桌 136–139 mm，腕部画面里是房间</td><td>没下降 · 定位错</td></tr>
+                      <tr><td>19:56<br>细直杆</td><td>dp23</td><td>25</td><td>张到 70 mm，q8 下到离桌 2–5 mm，杆在两指之间（斜压在右指尖上）；张着停了约 40 s，没合</td><td>定位对 · 不合爪</td></tr>
+                      <tr><td>19:59<br>粗线</td><td>dp23</td><td>7</td><td>只张到 25 mm，q4 在离桌 66 mm 开始合，q6 在 34 mm 合拢（读数 0）；线在两指之间</td><td>定位对 · 空中合（空）</td></tr>
+                      <tr><td>19:59<br>粗线</td><td>dp23</td><td>8</td><td>q1 张到 69 mm，q2 在离桌 123 mm 就收到 27 mm，q5 在 61 mm 合到 15 mm；线在两指之间</td><td>定位对 · 空中合（空）</td></tr>
+                      <tr><td>20:01<br>粗线</td><td>dp23</td><td>19</td><td>张到 70 mm，q12 下到离桌 2–3 mm，线在两指之间；张着停了约 18 s，没合</td><td>定位对 · 不合爪</td></tr>
+                      <tr><td>20:22<br>粗线</td><td>dp23</td><td>8</td><td>张到 68 mm 后又收到 22–34 mm，q5 在离桌 40 mm 合上，q7 在 25 mm 合拢（读数 0）；线在两指之间</td><td>定位对 · 空中合（空）</td></tr>
+                      <tr><td>20:23<br>粗线</td><td>dp23</td><td>27</td><td>张到 70 mm，q11 下到离桌 4 mm，线在两指之间；在 4–10 mm 张着停了约 25 s，之后往旁边滑开，没合</td><td>定位对 · 不合爪</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <p>离桌高度是 R 的 TCP（按 FK）到桌面的距离，张开量是夹爪读数；“合上”= 张开后读数又回到 15 mm 以下（起始姿态的读数约 11 mm）。数据取自服务器存下的每次查询；19:39 那次之前还有 1 次只有 1 个查询，没算在内。</p>
+                  <ul>
+                    <li><strong>dp23：定位对，但不会合爪。</strong>6 次都把 R 带到了杆上方，腕部画面里杆或线都在两指之间。降到底的 3 次在离桌 2–4 mm（仿真专家数据里 R 合爪的 TCP 高度约 3.8 mm，高度是对的）张着 70 mm 停了 18–40 s，一直没合；另外 3 次没张满就往回收，在离桌 25–66 mm 的空中合拢，合空。</li>
+                    <li><strong>dp26：定位容易错，而且早合。</strong>6 次里只有 1 次降到桌面，还在杆头外；3 次只张到 25–28 mm，就在离桌 77–119 mm 的空中合上；2 次手根本没朝向桌面（腕部画面里是地板或房间）。</li>
+                    <li>不是严格对照：dp26 大多用细直杆，dp23 大多用摆成 S 形的粗线。</li>
+                    <li>仿真里 dp24–dp26 也有“到了底部张着不合”的失败（L 的桌面抓取），dp23 在仿真里反而合得积极但常合偏。一个可能的原因：策略只看 2 帧历史，不知道自己在底部已经等了多久；而且降到 12 mm 以下，腕部画面几乎不再变化（见下一条）。</li>
+                  </ul>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/1120_r_moments.webp" width="1294" height="1254" loading="lazy" decoding="async" alt="12 次运行里 R 合爪或最低那一刻的顶部画面和 R 腕部画面：左列 dp26，多数手离杆很远或在空中合上；右列 dp23，杆或线都在两指之间">
+                    <figcaption>每次运行里 R 合爪（closing）或最低（lowest）那一刻：左边是顶部相机，右边是 R 腕部相机，都是发给策略的画面。左列 dp26，右列 dp23；标题里是时间、查询号、离桌高度和张开量。</figcaption>
+                  </figure>
+                </div>
+              </details>
+              <details class="dp-run" id="dp-real-height">
+                <summary><span class="dp-run__name">R 腕部相机 · 下降中的不同高度</span><span class="dp-run__meta">11-20 · dp23 降到底的 3 次 · 策略看到的 320×180</span><span class="dp-run__result">12 mm 以下几乎看不出区别</span></summary>
+                <div class="page-prose__table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">R 离桌高度</th><th scope="col">杆在画面里的宽度</th><th scope="col">和最低那帧的平均像素差（0–255）</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>40–60 mm</td><td>6–7 px</td><td>13–37</td></tr>
+                      <tr><td>21–30 mm</td><td>7–8 px</td><td>11–26</td></tr>
+                      <tr><td>12–13 mm</td><td>9 px</td><td>10–15</td></tr>
+                      <tr><td>3–6 mm</td><td>9–10 px</td><td>0–11</td></tr>
+                      <tr><td>同样停在 2–3 mm、相隔一两秒的两帧</td><td>—</td><td>5–12</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="dp-run__note dp-run__note--end">
+                  <ul>
+                    <li>60 → 12 mm 看得出来：杆从 6–7 px 变粗到 9 px；两指尖之间夹爪的影子从淡变得又黑又清晰；桌面的纹理变大。</li>
+                    <li>12 mm 以下看不出来：杆宽停在 9–10 px；12 mm 那帧和最低那帧的差（10–15）和同一高度相隔一两秒的两帧之差（5–12）差不多，跟噪声一样大。只靠这张图分不清是在 12 mm 还是 3 mm，最后这 1 cm 只能靠状态里的 TCP 高度。</li>
+                    <li>刚开始下降时有的帧整体偏青（如 20:23 的 q3，离桌 125 mm），像是 D405 的自动白平衡还没稳定，这是训练数据里没有的颜色。</li>
+                    <li>20:23 那次最后几帧（q19 以后）和底部的差变大，是手在悬停中往旁边滑开了（画面里出现桌边和一卷胶带），不是相机颜色在变。</li>
+                  </ul>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/1120_r_by_height.webp" width="1950" height="624" loading="lazy" decoding="async" alt="dp23 降到底的 3 次运行里，R 腕部相机在离桌约 60、40、25、12、5、3 mm 时的画面：12 mm 以下几乎一样">
+                    <figcaption>dp23 降到底的 3 次（每行一次），R 腕部相机在相近高度的画面，标题里是离桌高度和张开量。</figcaption>
+                  </figure>
+                  <figure class="page-prose__figure page-prose__figure--wide">
+                    <img src="images/post-wrap/real/1120_202332_descent.webp" width="1950" height="414" loading="lazy" decoding="async" alt="20:23 那次 R 从离桌 125 mm 下到 4 mm 再张着悬停的腕部画面序列">
+                    <figcaption>20:23（dp23）的整个下降：q3 离桌 125 mm（偏青）→ q11 4 mm，之后张着停在 4–10 mm，最后往旁边滑开。</figcaption>
+                  </figure>
                 </div>
               </details>
             </div>
