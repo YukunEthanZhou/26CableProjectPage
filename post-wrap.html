@@ -165,6 +165,22 @@
       font-weight: 700;
     }
 
+    /* a training run's time and GPU, right after its title */
+    .dp-run__train {
+      padding: 0 0.45rem;
+      color: var(--text-light);
+      font-size: 0.75rem;
+      white-space: nowrap;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .page-prose .dp-train-legend {
+      margin: 0 0 0.4rem;
+      color: var(--text-light);
+      font-size: 0.8rem;
+    }
+
     .dp-run__meta {
       color: var(--text-light);
       font-size: 0.85rem;
@@ -1045,9 +1061,10 @@
             </div>
 
             <h5>Train</h5>
+            <p class="dp-train-legend">标题后面：训练用时（从第一步到最后一步，不含数据准备和评测）· 显卡（都是单卡）。</p>
             <div class="dp-runs">
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp1</span><span class="dp-run__meta">11-07 · 数据 v3 · 1 帧观测 · 4 万步</span><span class="dp-run__result">0/32 抓住</span></summary>
+                <summary><span class="dp-run__name">dp1</span><span class="dp-run__train">2 h 43 min · RTX PRO 6000</span><span class="dp-run__meta">11-07 · 数据 v3 · 1 帧观测 · 4 万步</span><span class="dp-run__result">0/32 抓住</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1067,7 +1084,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp2</span><span class="dp-run__meta">11-07 · 同 dp1 · 2 帧观测 · 4 万步</span><span class="dp-run__result">R 1、L 1 / 16</span></summary>
+                <summary><span class="dp-run__name">dp2</span><span class="dp-run__train">5 h 15 min · RTX PRO 6000</span><span class="dp-run__meta">11-07 · 同 dp1 · 2 帧观测 · 4 万步</span><span class="dp-run__result">R 1、L 1 / 16</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1086,7 +1103,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp4 · 第一轮</span><span class="dp-run__meta">11-08 · 数据 v4 · 8 万步</span><span class="dp-run__result">双手 13/16，成功 1/16</span></summary>
+                <summary><span class="dp-run__name">dp4 · 第一轮</span><span class="dp-run__train">6 h 04 min · RTX PRO 6000</span><span class="dp-run__meta">11-08 · 数据 v4 · 8 万步</span><span class="dp-run__result">双手 13/16，成功 1/16</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1107,7 +1124,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp5 · 第二轮</span><span class="dp-run__meta">11-09 · 数据 v5 · 12 万步</span><span class="dp-run__result">双手 14/16，成功 2/16</span></summary>
+                <summary><span class="dp-run__name">dp5 · 第二轮</span><span class="dp-run__train">8 h 37 min · RTX PRO 6000</span><span class="dp-run__meta">11-09 · 数据 v5 · 12 万步</span><span class="dp-run__result">双手 14/16，成功 2/16</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1128,7 +1145,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp5ft · 继续训练</span><span class="dp-run__meta">11-09 · dp5 + 4 万步</span><span class="dp-run__result">双手 14/16，成功 2/16</span></summary>
+                <summary><span class="dp-run__name">dp5ft · 继续训练</span><span class="dp-run__train">3 h 20 min · RTX PRO 6000</span><span class="dp-run__meta">11-09 · dp5 + 4 万步</span><span class="dp-run__result">双手 14/16，成功 2/16</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1145,7 +1162,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp7 · 相对位姿</span><span class="dp-run__meta">11-10 · 数据 v7 · 10 万步</span><span class="dp-run__result">双手 10/16，成功 4/16</span></summary>
+                <summary><span class="dp-run__name">dp7 · 相对位姿</span><span class="dp-run__train">3 h 08 min · B200</span><span class="dp-run__meta">11-10 · 数据 v7 · 10 万步</span><span class="dp-run__result">双手 10/16，成功 4/16</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1166,7 +1183,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp7ft · 继续训练</span><span class="dp-run__meta">11-10 · dp7 + 6 万步</span><span class="dp-run__result">成功 18/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp7ft · 继续训练</span><span class="dp-run__train">2 h 03 min · H200</span><span class="dp-run__meta">11-10 · dp7 + 6 万步</span><span class="dp-run__result">成功 18/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1183,7 +1200,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp8 · 杆位置辅助</span><span class="dp-run__meta">11-11 · dp7ft + 6 万步 · 腕部相机辅助任务</span><span class="dp-run__result">成功 22/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp8 · 杆位置辅助</span><span class="dp-run__train">2 h 14 min · H100</span><span class="dp-run__meta">11-11 · dp7ft + 6 万步 · 腕部相机辅助任务</span><span class="dp-run__result">成功 22/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1200,7 +1217,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp9 · 相对观测</span><span class="dp-run__meta">11-11 · 从头 10 万步 · UMI 观测、不做随机平移</span><span class="dp-run__result">成功 7/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp9 · 相对观测</span><span class="dp-run__train">4 h 43 min · H100</span><span class="dp-run__meta">11-11 · 从头 10 万步 · UMI 观测、不做随机平移</span><span class="dp-run__result">成功 7/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1217,7 +1234,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp8ft · 继续训练（对照）</span><span class="dp-run__meta">11-11 · dp8 + 8 万步</span><span class="dp-run__result">成功 23/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp8ft · 继续训练（对照）</span><span class="dp-run__train">2 h 59 min · H100</span><span class="dp-run__meta">11-11 · dp8 + 8 万步</span><span class="dp-run__result">成功 23/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1234,7 +1251,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp10 · 逐步归一化</span><span class="dp-run__meta">11-11 · dp8 + 8 万步 · 动作按每一步归一化</span><span class="dp-run__result">成功 25/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp10 · 逐步归一化</span><span class="dp-run__train">2 h 51 min · H100</span><span class="dp-run__meta">11-11 · dp8 + 8 万步 · 动作按每一步归一化</span><span class="dp-run__result">成功 25/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1251,7 +1268,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp9ft2 · 续训到 22 万步</span><span class="dp-run__meta">11-11 · dp9 + 6 万 + 6 万步 · 相对观测</span><span class="dp-run__result">成功 22/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp9ft2 · 续训到 22 万步</span><span class="dp-run__train">5 h 24 min · H100</span><span class="dp-run__meta">11-11 · dp9 + 6 万 + 6 万步 · 相对观测</span><span class="dp-run__result">成功 22/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1268,7 +1285,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp11 · 腕部深度</span><span class="dp-run__meta">11-11 · dp10 + 4 万步 · 腕部深度图</span><span class="dp-run__result">成功 26/50（50 场景）</span></summary>
+                <summary><span class="dp-run__name">dp11 · 腕部深度</span><span class="dp-run__train">1 h 21 min · H200</span><span class="dp-run__meta">11-11 · dp10 + 4 万步 · 腕部深度图</span><span class="dp-run__result">成功 26/50（50 场景）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1285,7 +1302,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp12 · 颜色随机</span><span class="dp-run__meta">11-12 · dp11 + 4 万步 · 杆和柱子的颜色随机</span><span class="dp-run__result">成功 33/50，不算黑杆 19/27</span></summary>
+                <summary><span class="dp-run__name">dp12 · 颜色随机</span><span class="dp-run__train">1 h 21 min · H200</span><span class="dp-run__meta">11-12 · dp11 + 4 万步 · 杆和柱子的颜色随机</span><span class="dp-run__result">成功 33/50，不算黑杆 19/27</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1302,7 +1319,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp13 · 点云 + 细微随机</span><span class="dp-run__meta">11-12 · dp12 + 4 万步 · 腕部点云、相机抖动、图像增强</span><span class="dp-run__result">成功 34/50，不算黑杆 21/27（目前最好）</span></summary>
+                <summary><span class="dp-run__name">dp13 · 点云 + 细微随机</span><span class="dp-run__train">1 h 34 min · H200</span><span class="dp-run__meta">11-12 · dp12 + 4 万步 · 腕部点云、相机抖动、图像增强</span><span class="dp-run__result">成功 34/50，不算黑杆 21/27（目前最好）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1319,7 +1336,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp14 · DAgger 第一轮</span><span class="dp-run__meta">11-12 · dp13 + 4 万步 · 专家接管的纠错数据</span><span class="dp-run__result">成功 28/50，不算黑杆 20/27</span></summary>
+                <summary><span class="dp-run__name">dp14 · DAgger 第一轮</span><span class="dp-run__train">1 h 36 min · H200</span><span class="dp-run__meta">11-12 · dp13 + 4 万步 · 专家接管的纠错数据</span><span class="dp-run__result">成功 28/50，不算黑杆 20/27</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1336,7 +1353,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp15 · DAgger 第二轮</span><span class="dp-run__meta">11-12 · dp13 + 4 万步 · 专家只做下一步</span><span class="dp-run__result">成功 27/50，不算黑杆 17/27</span></summary>
+                <summary><span class="dp-run__name">dp15 · DAgger 第二轮</span><span class="dp-run__train">1 h 34 min · H200</span><span class="dp-run__meta">11-12 · dp13 + 4 万步 · 专家只做下一步</span><span class="dp-run__result">成功 27/50，不算黑杆 17/27</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1353,7 +1370,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp16 · 办公室的杆和线</span><span class="dp-run__meta">11-13 · dp13 + 8 万步 · dp13 的数据 + 第一批新数据</span><span class="dp-run__result">cable 场景 24/50（dp13 17/50）</span></summary>
+                <summary><span class="dp-run__name">dp16 · 办公室的杆和线</span><span class="dp-run__train">4 h 32 min · RTX PRO 6000</span><span class="dp-run__meta">11-13 · dp13 + 8 万步 · dp13 的数据 + 第一批新数据</span><span class="dp-run__result">cable 场景 24/50（dp13 17/50）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1370,7 +1387,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp17 · 只用 modes 数据</span><span class="dp-run__meta">11-14 · 从头 20 万步 · modes 1076 条</span><span class="dp-run__result">modes 场景 15/50</span></summary>
+                <summary><span class="dp-run__name">dp17 · 只用 modes 数据</span><span class="dp-run__train">11 h 43 min · RTX PRO 6000</span><span class="dp-run__meta">11-14 · 从头 20 万步 · modes 1076 条</span><span class="dp-run__result">modes 场景 15/50</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1383,7 +1400,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp18 · DAgger</span><span class="dp-run__meta">11-15 · dp17 + 10 万步 · modes + 360 段纠正</span><span class="dp-run__result">22/50（对照 dp17c 13/50）</span></summary>
+                <summary><span class="dp-run__name">dp18 · DAgger</span><span class="dp-run__train">5 h 44 min · RTX PRO 6000</span><span class="dp-run__meta">11-15 · dp17 + 10 万步 · modes + 360 段纠正</span><span class="dp-run__result">22/50（对照 dp17c 13/50）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1396,7 +1413,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp19 · DAgger 第二轮</span><span class="dp-run__meta">11-16 · dp18 + 10 万步 · 在难场景上纠正</span><span class="dp-run__result">25/50；难场景 27/50（dp18 13/50）</span></summary>
+                <summary><span class="dp-run__name">dp19 · DAgger 第二轮</span><span class="dp-run__train">5 h 35 min · RTX PRO 6000</span><span class="dp-run__meta">11-16 · dp18 + 10 万步 · 在难场景上纠正</span><span class="dp-run__result">25/50；难场景 27/50（dp18 13/50）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1409,7 +1426,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp20 · clean 专家</span><span class="dp-run__meta">11-16 · 从头 20 万步 · clean 1069 条</span><span class="dp-run__result">31/50（新掉杆判定）</span></summary>
+                <summary><span class="dp-run__name">dp20 · clean 专家</span><span class="dp-run__train">11 h 19 min · RTX PRO 6000</span><span class="dp-run__meta">11-16 · 从头 20 万步 · clean 1069 条</span><span class="dp-run__result">31/50（新掉杆判定）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1422,7 +1439,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp21 · clean 专家的 DAgger</span><span class="dp-run__meta">11-17 · dp20 + 10 万步 · clean + 288 段纠正</span><span class="dp-run__result">38/50（dp20 31/50）</span></summary>
+                <summary><span class="dp-run__name">dp21 · clean 专家的 DAgger</span><span class="dp-run__train">5 h 26 min · RTX PRO 6000</span><span class="dp-run__meta">11-17 · dp20 + 10 万步 · clean + 288 段纠正</span><span class="dp-run__result">38/50（dp20 31/50）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1435,7 +1452,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp22 · 杆的关键点</span><span class="dp-run__meta">11-17 · 从头 10 万步 · clean + 288 段纠正 · 加上感知到的杆</span><span class="dp-run__result">37/50（dp21 38/50）</span></summary>
+                <summary><span class="dp-run__name">dp22 · 杆的关键点</span><span class="dp-run__train">5 h 30 min · RTX PRO 6000</span><span class="dp-run__meta">11-17 · 从头 10 万步 · clean + 288 段纠正 · 加上感知到的杆</span><span class="dp-run__result">37/50（dp21 38/50）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1448,7 +1465,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp23 · 只用 RGB</span><span class="dp-run__meta">11-19 · 从头 10 万步 · clean 贴胶带版 1069 条 · 不用深度</span><span class="dp-run__result">23/50</span></summary>
+                <summary><span class="dp-run__name">dp23 · 只用 RGB</span><span class="dp-run__train">5 h 21 min · RTX PRO 6000</span><span class="dp-run__meta">11-19 · 从头 10 万步 · clean 贴胶带版 1069 条 · 不用深度</span><span class="dp-run__result">23/50</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1461,7 +1478,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp24 · 图像专家的数据</span><span class="dp-run__meta">11-19 · 从头 10 万步 · vis 1091 条 · 只用 RGB</span><span class="dp-run__result">25/50</span></summary>
+                <summary><span class="dp-run__name">dp24 · 图像专家的数据</span><span class="dp-run__train">5 h 37 min · RTX PRO 6000</span><span class="dp-run__meta">11-19 · 从头 10 万步 · vis 1091 条 · 只用 RGB</span><span class="dp-run__result">25/50</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1474,7 +1491,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp25 · 状态加噪和丢弃</span><span class="dp-run__meta">11-19 · 从头 10 万步 · dp24 的数据 · 训练时扰动机器人状态</span><span class="dp-run__result">22/50（dp24 25/50）</span></summary>
+                <summary><span class="dp-run__name">dp25 · 状态加噪和丢弃</span><span class="dp-run__train">5 h 26 min · RTX PRO 6000</span><span class="dp-run__meta">11-19 · 从头 10 万步 · dp24 的数据 · 训练时扰动机器人状态</span><span class="dp-run__result">22/50（dp24 25/50）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1487,7 +1504,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp26 · vis2 数据</span><span class="dp-run__meta">11-20 · 从头 10 万步 · vis2 1118 条 · 同 dp25 的状态扰动</span><span class="dp-run__result">23/50</span></summary>
+                <summary><span class="dp-run__name">dp26 · vis2 数据</span><span class="dp-run__train">5 h 37 min · RTX PRO 6000</span><span class="dp-run__meta">11-20 · 从头 10 万步 · vis2 1118 条 · 同 dp25 的状态扰动</span><span class="dp-run__result">23/50</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1500,7 +1517,7 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp27 · 去掉静止帧</span><span class="dp-run__meta">11-20 · 从头 10 万步 · vis2 去掉静止帧（77.5%）· 同 dp26 的状态扰动</span><span class="dp-run__result">26/50（RGB 里最好）</span></summary>
+                <summary><span class="dp-run__name">dp27 · 去掉静止帧</span><span class="dp-run__train">4 h 49 min · RTX PRO 6000</span><span class="dp-run__meta">11-20 · 从头 10 万步 · vis2 去掉静止帧（77.5%）· 同 dp26 的状态扰动</span><span class="dp-run__result">26/50（RGB 里最好）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
@@ -1513,24 +1530,24 @@
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp28 · 去掉状态扰动</span><span class="dp-run__meta">11-20 · 从头 10 万步 · dp27 的数据 · 不加噪声和丢弃</span><span class="dp-run__result">训练中（4 万步）</span></summary>
+                <summary><span class="dp-run__name">dp28 · 去掉状态扰动</span><span class="dp-run__train">已训 2 h 20 min · RTX PRO 6000</span><span class="dp-run__meta">11-20 · 从头 10 万步 · dp27 的数据 · 不加噪声和丢弃</span><span class="dp-run__result">训练中（4.8 万步）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
                       <tr><th scope="row">修改</th><td>dp27 的数据（vis2 去掉静止帧），去掉全部状态噪声和丢弃（dp25 已经说明它们没用）；杆参数输入的噪声照旧，和 dp23 同一套训练设置</td></tr>
-                      <tr><th scope="row">进度</th><td>11-20 18:35 UTC 开始，20:30 到 4 万步（0.17 s/步，约 23:20 UTC 训完）。12 个场景：2 万步 3/12（dp27 2/12、dp26 0/12），1 万、3 万步在跑；验证改用 RTX 5090 和 A40（RTX PRO 6000 太贵）</td></tr>
+                      <tr><th scope="row">进度</th><td>11-20 18:37 UTC 开始，20:57 到 4.8 万步（0.17 s/步，约 23:25 UTC 训完）。12 个场景：1 万步 0/12、2 万步 3/12（dp27 0/12、2/12；dp26 1/12、0/12），3 万、4 万步在跑；验证改用 RTX 5090 和 A40（RTX PRO 6000 太贵）</td></tr>
                     </tbody>
                   </table>
                 </div>
               </details>
 
               <details class="dp-run">
-                <summary><span class="dp-run__name">dp29 · clean 去掉静止帧</span><span class="dp-run__meta">11-20 · 从头 10 万步 · clean 贴胶带版去掉静止帧（80.8%）· 不加状态扰动</span><span class="dp-run__result">训练中（2.4 万步）</span></summary>
+                <summary><span class="dp-run__name">dp29 · clean 去掉静止帧</span><span class="dp-run__train">已训 1 h 40 min · RTX PRO 6000</span><span class="dp-run__meta">11-20 · 从头 10 万步 · clean 贴胶带版去掉静止帧（80.8%）· 不加状态扰动</span><span class="dp-run__result">训练中（3.2 万步）</span></summary>
                 <div class="page-prose__table">
                   <table>
                     <tbody>
                       <tr><th scope="row">修改</th><td>dp23 的数据（clean 贴胶带版 1069 条）同样去掉静止帧，不加状态扰动：和 dp28 只差专家（clean 按真值对准，vis2 按图像）</td></tr>
-                      <tr><th scope="row">进度</th><td>11-20 19:15 UTC 开始，20:30 到 2.4 万步（0.19 s/步，约 11-21 00:30 UTC 训完）；1 万、2 万步的验证在 3 台 A40 上跑</td></tr>
+                      <tr><th scope="row">进度</th><td>11-20 19:17 UTC 开始，20:57 到 3.2 万步（0.19 s/步，约 11-21 00:35 UTC 训完）；1–3 万步的验证在 3 台 A40 上跑</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -1571,13 +1588,13 @@
                   <tr><td>dp25（vis + 状态扰动）</td><td>0</td><td>0</td><td>3</td><td>1</td><td>1</td><td>3</td><td>4</td><td>11</td><td>12</td><td>12</td><td>0</td></tr>
                   <tr><td>dp26（vis2 + 状态扰动）</td><td>1</td><td>0</td><td>4</td><td>4</td><td>3</td><td>5</td><td>4</td><td>10</td><td>10</td><td>13</td><td>0</td></tr>
                   <tr><td>dp27（vis2 去掉静止帧 + 状态扰动）†</td><td>0</td><td>2</td><td>1</td><td>5</td><td>3</td><td>7</td><td>9</td><td>11</td><td>12</td><td>17</td><td>—</td></tr>
-                  <tr><td>dp28（vis2 去掉静止帧）†</td><td>…</td><td>3</td><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                  <tr><td>dp29（clean 去掉静止帧）†</td><td>…</td><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td>dp28（vis2 去掉静止帧）†</td><td>0</td><td>3</td><td>…</td><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td>dp29（clean 去掉静止帧）†</td><td>…</td><td>…</td><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                 </tbody>
               </table>
             </div>
             <div class="dp-run__note">
-              <p>格子里是成功数：1–7 万步 / 12，8–10 万步 / 30。每个回合最多 180 s，场景按 modes 数据的分布抽，实验室配色，新掉杆判定，各模型同一组种子；dp23 起柱子贴胶带、不发深度。12 个场景波动很大（dp24 5 万步 6、6 万步 3），只看趋势；同一组 30 个场景上 dp20（旧掉杆判定）8 / 9 / 10 万步 17、16、16。图像冻结：10 万步、30 个场景，每个相机一直发回合的第一帧（状态照常），全部 0/30，一次也没抓住——策略确实靠图像接近和抓杆；dp22 把杆的关键点关掉也是 0/30。† 用新的细杆判定（见<a href="#dp-data-vis">数据生成</a>），按日志估计 dp23–dp26 换成新判定 10 万步最多 19、14、15、15。… = 正在跑，空着 = 还没训到（11-20 20:30 UTC）。</p>
+              <p>格子里是成功数：1–7 万步 / 12，8–10 万步 / 30。每个回合最多 180 s，场景按 modes 数据的分布抽，实验室配色，新掉杆判定，各模型同一组种子；dp23 起柱子贴胶带、不发深度。12 个场景波动很大（dp24 5 万步 6、6 万步 3），只看趋势；同一组 30 个场景上 dp20（旧掉杆判定）8 / 9 / 10 万步 17、16、16。图像冻结：10 万步、30 个场景，每个相机一直发回合的第一帧（状态照常），全部 0/30，一次也没抓住——策略确实靠图像接近和抓杆；dp22 把杆的关键点关掉也是 0/30。† 用新的细杆判定（见<a href="#dp-data-vis">数据生成</a>），按日志估计 dp23–dp26 换成新判定 10 万步最多 19、14、15、15。… = 正在跑，空着 = 还没训到（11-20 20:57 UTC）。</p>
             </div>
             <p class="page-prose__label" id="dp-test">测试：modes 场景（dp17 起；50 个场景，种子 3100000 起，实验室配色）</p>
             <div class="page-prose__table">
